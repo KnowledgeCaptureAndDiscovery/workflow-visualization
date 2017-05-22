@@ -48,6 +48,9 @@ Bivariate.stackedhistogram = (function($) {
 				gridLineWidth: 1
 			},
 			xAxis: {
+				title: {
+					text: names[0]
+				},
 				min: 0,
 				gridLineWidth: 1,
 				tickmarkPlacement: 'on',
