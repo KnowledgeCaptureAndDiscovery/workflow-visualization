@@ -16,8 +16,6 @@ Univariate.columnchart = (function($) {
 			return data.filter(function(val) { return val == item; }).length
 		});
 
-		console.log(graphData, classes);
-
 		var graph = new Highcharts.Chart({
 			chart: {
 				renderTo: $graph.get(0),

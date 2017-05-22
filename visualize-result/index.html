@@ -330,6 +330,12 @@
 <!-- Semantic UI JS -->
 <script type="text/javascript" src="../assets/js/semantic.min.js"></script>
 
+<!-- Div Resize Event JS -->
+<script type="text/javascript" src="../assets/js/resize.min.js"></script>
+
+<!-- Masonry JS -->
+<script type="text/javascript" src="../assets/js/masonry.min.js"></script>
+
 <!-- Range Slider Plugin -->
 <script type="text/javascript" src="../assets/js/range.min.js"></script>
 
@@ -380,6 +386,16 @@
 		/* Hide All Graphs */
 		$(".graph-content > .column").addClass("hidden");
 
+		/* Initialize Masonry */
+		$(".masonry.grid").masonry({
+			itemSelector: '.column:not(.ui)',
+			percentPosition: true
+		});
+		$('.masonry.grid .column').resize(function() {
+			console.log("height change");
+			$(".masonry.grid").masonry('layout');
+		});
+
 		/* Show Body */
 		$("body").show();
 
@@ -417,6 +433,8 @@
 			$(".ui.look.button").removeClass("disabled");
 
 			$(".ui.modal").modal('hide');
+
+			$(".masonry.grid").masonry('layout');
 		}
 
 		/* Download Functionality */
