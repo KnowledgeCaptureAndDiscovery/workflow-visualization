@@ -19,8 +19,9 @@
 }
 
 /* Masonry Layout */
-.masonry.grid {
-	display: block !important;
+.masonry.grid,
+.masonry.grid > .column {
+	display: block;
 }
 
 @media only screen and (min-width: 768px) {
