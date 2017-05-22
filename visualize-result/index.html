@@ -65,210 +65,216 @@
 
 		<!-- The Real Main Content -->
 		<div class="main-content">
-			<!-- Main Content Header -->
-			<div class="ui vertical segment header-content">
-				<div class="ui container">
-					<div class="ui stackable grid">
-						<div class="nine wide column">
-							<h1 class="ui header">
-							Visualize Result
-								<div class="sub header">
-									Visually interpret a single workflow result.
-								</div>
-							</h1>
-						</div>
-						<div class="seven wide column">
-							<div class="ui basic buttons">
-								<div class="ui fluid pointing dropdown button header-dropdown">
-									<span class="text">Data Selection</span>
-									<i class="icon dropdown"></i>
-									<div class="menu">
-										<div class="header"> Sample CSV Data </div>
-										<div class="item" data-value="https://vincentarelbundock.github.io/Rdatasets/csv/datasets/iris.csv">Iris</div>
-										<div class="item" data-value="https://vincentarelbundock.github.io/Rdatasets/csv/datasets/infert.csv">Infertility</div>
-										<div class="item" data-value="https://vincentarelbundock.github.io/Rdatasets/csv/datasets/chickwts.csv">Chick Weights</div>
-
-										<div class="divider"></div>
-
-										<div class="header"> Sample ARFF Data </div>
-										<div class="item" data-value="https://yjy0625.github.io/workflow-visualization/data/contact-lenses.arff">Contact Lenses</div>
-										<div class="item" data-value="https://yjy0625.github.io/workflow-visualization/data/diabetes.arff">Diabetes</div>
-										<div class="item" data-value="https://yjy0625.github.io/workflow-visualization/data/weather.arff">Weather</div>
-
-										<div class="divider"></div>
-
-										<div class="header"> Other Options </div>
-										<div class="item" data-value="upload">Upload Data</div>
+			<div class="dimmable">
+				<!-- Main Content Header -->
+				<div class="ui vertical segment header-content">
+					<div class="ui container">
+						<div class="ui stackable grid">
+							<div class="nine wide column">
+								<h1 class="ui header">
+								Visualize Result
+									<div class="sub header">
+										Visually interpret a single workflow result.
 									</div>
+								</h1>
+							</div>
+							<div class="seven wide column">
+								<div class="ui basic buttons">
+									<div class="ui fluid pointing dropdown button header-dropdown">
+										<span class="text">Data Selection</span>
+										<i class="icon dropdown"></i>
+										<div class="menu">
+											<div class="header"> Sample CSV Data </div>
+											<div class="item" data-value="https://vincentarelbundock.github.io/Rdatasets/csv/datasets/iris.csv">Iris</div>
+											<div class="item" data-value="https://vincentarelbundock.github.io/Rdatasets/csv/datasets/infert.csv">Infertility</div>
+											<div class="item" data-value="https://vincentarelbundock.github.io/Rdatasets/csv/datasets/chickwts.csv">Chick Weights</div>
+
+											<div class="divider"></div>
+
+											<div class="header"> Sample ARFF Data </div>
+											<div class="item" data-value="https://yjy0625.github.io/workflow-visualization/data/contact-lenses.arff">Contact Lenses</div>
+											<div class="item" data-value="https://yjy0625.github.io/workflow-visualization/data/diabetes.arff">Diabetes</div>
+											<div class="item" data-value="https://yjy0625.github.io/workflow-visualization/data/weather.arff">Weather</div>
+
+											<div class="divider"></div>
+
+											<div class="header"> Other Options </div>
+											<div class="item" data-value="upload">Upload Data</div>
+										</div>
+									</div>
+									<button class="ui icon look disabled button">
+										<i class="download icon"></i>
+									</button>
 								</div>
-								<button class="ui icon look disabled button">
-									<i class="download icon"></i>
-								</button>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
 
-			<!-- Graph Content -->
-			<div class="graphs ui container">
-				<div class="ui stackable two column masonry grid graph-content">
-					<!-- Different Graph Modules Start Here -->
+				<!-- Graph Content -->
+				<div class="graphs ui container">
+					<div class="ui stackable two column masonry grid graph-content">
+						<!-- Different Graph Modules Start Here -->
 
-					<div class="column basic">
-						<div class="ui fluid card">
-							<div class="content">
-								<div class="header">
-									Basic Information
-								</div>
-								<div class="meta">
-									Basic statistical information of the data.
-								</div>
-							</div>
-							<div class="content">
-								<span>Column and Row Count</span>
-								<div class="ui two statistics">
-									<div class="ui statistic col-count">
-										<div class="value">-</div>
-										<div class="label">Columns</div>
+						<div class="column basic">
+							<div class="ui fluid card">
+								<div class="content">
+									<div class="header">
+										Basic Information
 									</div>
-									<div class="ui statistic row-count">
-										<div class="value">-</div>
-										<div class="label">Data Points</div>
+									<div class="meta">
+										Basic statistical information of the data.
 									</div>
 								</div>
-							</div>
-							<div class="content">
-								<div class="toggle-container">
-									<div>Column Summary</div>
-									<div class="ui fitted toggle checkbox">
-										<input type="checkbox">
-										<label></label>
+								<div class="content">
+									<span>Column and Row Count</span>
+									<div class="ui two statistics">
+										<div class="ui statistic col-count">
+											<div class="value">-</div>
+											<div class="label">Columns</div>
+										</div>
+										<div class="ui statistic row-count">
+											<div class="value">-</div>
+											<div class="label">Data Points</div>
+										</div>
 									</div>
 								</div>
-								<table class="ui basic unstackable table">
-									<thead>
-										<th>Column Name</th>
-										<th>Data Type</th>
-									</thead>
-									<tbody class="col-type">
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-
-					<div class="column univariate">
-						<div class="ui fluid card">
-							<div class="content">
-								<div class="header">
-									Univariate Analysis
-								</div>
-								<div class="meta">
-									Basic statistics and distribution analysis of a single column in the data.
-								</div>
-								<div class="col-dropdown">
-									<select class="ui fluid dropdown">
-										<option value="">Select Column</option>
-									</select>
-								</div>
-							</div>
-							<div class="content has-menu">
-								<div class="ui secondary pointing two item menu">
-									<a class="active item">Box Plot</a>
-									<a class="item">Histogram</a>
-									<a class="item">Pie Chart</a>
-									<a class="item">Column Chart</a>
-								</div>
-								<div class="box-plot">
-									<div class="chart image"></div>
-									<table class="ui basic unstackable table">
-										<thead>
-											<th>Property</th>
-											<th>Value</th>
-										</thead>
-										<tbody></tbody>
-									</table>
-								</div>
-								<div class="histogram">
-									<div class="chart image"></div>
-									<div class="ui divider"></div>
-									<span>Number of Bins</span>
-									<input class="ui range"></input>
-								</div>
-								<div class="pie-chart">
-									<div class="chart image"></div>
-								</div>
-								<div class="column-chart">
-									<div class="chart image"></div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="column bivariate">
-						<div class="ui fluid card">
-							<div class="content">
-								<div class="header">
-									Bivariate Analysis
-								</div>
-								<div class="meta">
-									Comparison and relationship analysis on two columns of data.
-								</div>
-								<div class="col-dropdown">
-									<select class="ui fluid dropdown">
-										<option value="">Select Column</option>
-									</select>
-									<div class="ui horizontal divider">
-										<i class="resize vertical switch icon"></i>
-									</div>
-									<select class="ui fluid dropdown">
-										<option value="">Select Column</option>
-									</select>
-								</div>
-							</div>
-							<div class="content has-menu">
-								<div class="ui secondary pointing two item menu">
-									<a class="active item">Scatter Plot</a>
-									<a class="item">Line Chart</a>
-									<a class="item">Stacked Histogram</a>
-									<a class="item">Stacked Column Chart</a>
-								</div>
-								<div class="scatter-plot">
-									<div class="chart image"></div>
-									<div class="ui divider"></div>
+								<div class="content">
 									<div class="toggle-container">
-										<div>Regression</div>
+										<div>Column Summary</div>
 										<div class="ui fitted toggle checkbox">
 											<input type="checkbox">
 											<label></label>
 										</div>
 									</div>
-									<select class="ui fluid dropdown">
-										<option value="linear">Linear</option>
-										<option value="polynomial">Quadratic</option>
-										<option value="exponential">Exponential</option>
-										<option value="logarithmic">Logarithmic</option>
-										<option value="power">Power</option>
-									</select>
-								</div>
-								<div class="line-chart">
-									<div class="chart image"></div>
-								</div>
-								<div class="stacked-histogram">
-									<div class="chart image"></div>
-									<div class="ui divider"></div>
-									<span>Number of Bins</span>
-									<input class="ui range"></input>
-								</div>
-								<div class="stacked-column-chart">
-									<div class="chart image"></div>
+									<table class="ui basic unstackable table">
+										<thead>
+											<th>Column Name</th>
+											<th>Data Type</th>
+										</thead>
+										<tbody class="col-type">
+										</tbody>
+									</table>
 								</div>
 							</div>
 						</div>
-					</div>
 
-					<!-- Different Graph Modules End Here -->
+						<div class="column univariate">
+							<div class="ui fluid card">
+								<div class="content">
+									<div class="header">
+										Univariate Analysis
+									</div>
+									<div class="meta">
+										Basic statistics and distribution analysis of a single column in the data.
+									</div>
+									<div class="col-dropdown">
+										<select class="ui fluid dropdown">
+											<option value="">Select Column</option>
+										</select>
+									</div>
+								</div>
+								<div class="content has-menu">
+									<div class="ui secondary pointing two item menu">
+										<a class="active item">Box Plot</a>
+										<a class="item">Histogram</a>
+										<a class="item">Pie Chart</a>
+										<a class="item">Column Chart</a>
+									</div>
+									<div class="box-plot">
+										<div class="chart image"></div>
+										<table class="ui basic unstackable table">
+											<thead>
+												<th>Property</th>
+												<th>Value</th>
+											</thead>
+											<tbody></tbody>
+										</table>
+									</div>
+									<div class="histogram">
+										<div class="chart image"></div>
+										<div class="ui divider"></div>
+										<span>Number of Bins</span>
+										<input class="ui range"></input>
+									</div>
+									<div class="pie-chart">
+										<div class="chart image"></div>
+									</div>
+									<div class="column-chart">
+										<div class="chart image"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="column bivariate">
+							<div class="ui fluid card">
+								<div class="content">
+									<div class="header">
+										Bivariate Analysis
+									</div>
+									<div class="meta">
+										Comparison and relationship analysis on two columns of data.
+									</div>
+									<div class="col-dropdown">
+										<select class="ui fluid dropdown">
+											<option value="">Select Column</option>
+										</select>
+										<div class="ui horizontal divider">
+											<i class="resize vertical switch icon"></i>
+										</div>
+										<select class="ui fluid dropdown">
+											<option value="">Select Column</option>
+										</select>
+									</div>
+								</div>
+								<div class="content has-menu">
+									<div class="ui secondary pointing two item menu">
+										<a class="active item">Scatter Plot</a>
+										<a class="item">Line Chart</a>
+										<a class="item">Stacked Histogram</a>
+										<a class="item">Stacked Column Chart</a>
+									</div>
+									<div class="scatter-plot">
+										<div class="chart image"></div>
+										<div class="ui divider"></div>
+										<div class="toggle-container">
+											<div>Regression</div>
+											<div class="ui fitted toggle checkbox">
+												<input type="checkbox">
+												<label></label>
+											</div>
+										</div>
+										<select class="ui fluid dropdown">
+											<option value="linear">Linear</option>
+											<option value="polynomial">Quadratic</option>
+											<option value="exponential">Exponential</option>
+											<option value="logarithmic">Logarithmic</option>
+											<option value="power">Power</option>
+										</select>
+									</div>
+									<div class="line-chart">
+										<div class="chart image"></div>
+									</div>
+									<div class="stacked-histogram">
+										<div class="chart image"></div>
+										<div class="ui divider"></div>
+										<span>Number of Bins</span>
+										<input class="ui range"></input>
+									</div>
+									<div class="stacked-column-chart">
+										<div class="chart image"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Different Graph Modules End Here -->
+					</div>
+				</div>
+
+				 <div class="ui active dimmer">
+					<div class="ui text loader">Loading</div>
 				</div>
 			</div>
 		</div>
@@ -369,8 +375,18 @@
 				chartTypes.push(classNames[ix]);
 			}
 		});
+		var checkLoaded = (function() {
+			var toLoad = chartTypes.length;
+			var action = function() {
+				toLoad--;
+				if(toLoad == 0) {
+					$(".dimmable .ui.dimmer").removeClass("active");
+				}
+			};
+			return action;
+		}());
 		for(var ix in chartTypes) {
-			$.getScript("graphs/" + chartTypes[ix] + ".js");
+			$.getScript("graphs/" + chartTypes[ix] + ".js", checkLoaded);
 		}
 
 		/* Define Draw Charts Function */

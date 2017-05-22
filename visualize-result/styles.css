@@ -41,6 +41,11 @@
 
 }
 
+/* dimmer layout */
+.dimmable {
+	min-height: 100vh;
+}
+
 /* Content with Toggle */
 .toggle-container {
 	display: -webkit-box;
