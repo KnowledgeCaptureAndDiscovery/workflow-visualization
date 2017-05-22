@@ -29,3 +29,8 @@ body {
 h3 {
 	font-weight: normal;
 }
+
+.inverted.main.menu,
+.toc-copy {
+	z-index: 1001 !important;
+}
