@@ -42,7 +42,7 @@ body {
 
 .inverted.main.menu,
 .toc-copy {
-	z-index: 1001 !important;
+	/*z-index: 1001 !important;*/
 }
 
 /* Header Layout */
