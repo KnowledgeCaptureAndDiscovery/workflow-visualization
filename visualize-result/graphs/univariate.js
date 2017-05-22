@@ -3,7 +3,7 @@ var Univariate = (function(Dashboard, $) {
 	// include histogram and piechart modules
 	var plotTypes = ["box-plot", "histogram", "pie-chart", "column-chart"];
 	for(var ix in plotTypes) {
-		$.getScript("graphs/univariate/" + plotTypes[ix].replace("-","") + ".js");
+		Dashboard.loadScriptSync("graphs/univariate/" + plotTypes[ix].replace("-","") + ".js");
 	}
 
 	var module = Dashboard.univariate = Dashboard.univariate || {},

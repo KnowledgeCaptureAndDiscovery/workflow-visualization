@@ -3,7 +3,7 @@ var Bivariate = (function(Dashboard, $) {
 	// include histogram and piechart modules
 	var plotTypes = ["scatter-plot", "line-chart", "stacked-histogram", "stacked-column-chart"];
 	for(var ix in plotTypes) {
-		$.getScript("graphs/bivariate/" + plotTypes[ix].replace(/-/g,"") + ".js");
+		Dashboard.loadScriptSync("graphs/bivariate/" + plotTypes[ix].replace(/-/g,"") + ".js");
 	}
 
 	var module = Dashboard.bivariate = Dashboard.bivariate || {},
