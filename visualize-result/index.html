@@ -402,7 +402,7 @@
 			return action;
 		}());
 		for(var ix in chartTypes) {
-			$.getScript("graphs/" + chartTypes[ix] + ".js", checkLoaded);
+			$.getScript("graphs/" + chartTypes[ix] + ".js").done(checkLoaded);
 		}
 
 		/* Define Draw Charts Function */
