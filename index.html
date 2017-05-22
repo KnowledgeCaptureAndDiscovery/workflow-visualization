@@ -1,220 +1,80 @@
 <!doctype html>
-<html>
-<link rel="stylesheet" href="assets/css/semantic.min.css"/>
-<style>
-body {
-  background-color: #f9fafb;
-  padding-top: 1rem;
-}
+<html lang="en">
 
-.masonry.grid {
-  display: block;
-}
+<head>
+  <meta charset="utf-8" />
+  <!-- <link rel="icon" type="image/png" href=""> -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
-@media only screen and (min-width: 768px) {
-  .masonry.grid {
-    -webkit-column-count: 2;
-       -moz-column-count: 2;
-            column-count: 2;
-    -webkit-column-gap: 0;
-       -moz-column-gap: 0;
-            column-gap: 0;
-  }
-  
-  .ui.doubling.masonry.grid[class*="three column"] > .column {
-    width: 100% !important;
-  }
-}
+  <title>Workflow Dashboard</title>
 
-@media only screen and (min-width: 992px) {
-  .masonry.grid {
-    -webkit-column-count: 3;
-       -moz-column-count: 3;
-            column-count: 3;
-  }
-}
-</style>
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+  <meta name="viewport" content="width=device-width" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="assets/css/pe-icon-7-stroke.css"/>
+
+  <!-- Semantic UI CSS -->
+  <link rel="stylesheet" href="assets/css/semantic.min.css"/>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="global.css"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
 
 <body>
-  <div class="ui container">
-    <div class="ui three column doubling stackable masonry grid">
-      <div class="column">
-        <div class="ui fluid card">
-          <div class="image">
-            <img src="http://semantic-ui.com/images/avatar2/large/kristy.png">
-          </div>
-          <div class="content">
-            <a class="header">Kristy</a>
-            <div class="meta">
-              <span class="date">Joined in 2013</span>
-            </div>
-            <div class="description">
-              Kristy is an art director living in New York.
-            </div>
-          </div>
-          <div class="extra content">
-            <a>
-              <i class="user icon"></i>
-              22 Friends
-            </a>
-          </div>
-        </div>
+
+  <!-- Sidebar Menu for Mobile Sites -->
+  <div class="ui left vertical inverted sidebar menu blue toc">
+    <a href="/" class="item title">
+      <b>Workflow</b>
+    </a>
+    <a href="visualize-result/" class="item">
+      <i class="pe-7s-graph"></i> <span>Visualize Result</span>
+    </a>
+    <a href="inspect-parameters/" class="item">
+      <i class="pe-7s-edit"></i> <span>Inspect Parameters</span>
+    </a>
+    <a href="compare-workflows" class="item">
+      <i class="pe-7s-graph3"></i> <span>Compare Workflows</span>
+    </a>
+  </div>
+
+  <!-- Navigation Bar for Mobile Sites -->
+  <div class="ui fixed inverted main menu">
+    <div class="ui container">
+      <a class="launch icon item">
+        <i class="content icon"></i>
+      </a>
+  
+      <div class="item">
+        Workflow Visualization
       </div>
-      <div class="column">
-        <div class="ui fluid card">
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="pusher full height">
+
+    <div class="ui visible left vertical inverted sidebar menu blue toc-copy"></div>
+
+    <div class="main-content">
+      <div class="ui segment">
+        <div class="ui active dimmer">
           <div class="content">
-            <div class="right floated meta">14h</div>
-            <img class="ui avatar image" src="http://semantic-ui.com/images/avatar/large/elliot.jpg"> Elliot
-          </div>
-          <div class="image">
-            <img src="http://semantic-ui.com/images/wireframe/image.png" class="ui wireframe image">
-          </div>
-          <div class="content">
-            <span class="right floated">
-              <i class="heart outline like icon"></i>
-              17 likes
-            </span>
-            <i class="comment icon"></i>
-            3 comments
-          </div>
-          <div class="extra content">
-            <div class="ui large transparent left icon input">
-              <i class="heart outline icon"></i>
-              <input placeholder="Add Comment..." type="text">
+            <div class="center">
+              <h1>Workflow Visualization</h1>
+              <h3>A dashboard that automates workflow visualization.</h3>
+              <br/>
+              <form method="get" action="/visualize-result">
+                <button class="huge ui primary button" type="submit">Explore</button>
+              </form>
             </div>
-          </div>
-        </div>
-      </div>
-      <div class="column">
-        <div class="ui fluid card">
-          <div class="content">
-            <img class="right floated mini ui image" src="http://semantic-ui.com/images/avatar/large/elliot.jpg">
-            <div class="header">
-              Elliot Fu
-            </div>
-            <div class="meta">
-              Friends of Veronika
-            </div>
-            <div class="description">
-              Elliot requested permission to view your contact details
-            </div>
-          </div>
-          <div class="extra content">
-            <div class="ui two buttons">
-              <div class="ui basic green button">Approve</div>
-              <div class="ui basic red button">Decline</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="column">
-        <div class="ui fluid card">
-          <div class="content">
-            <img class="right floated mini ui image" src="http://semantic-ui.com/images/avatar/large/jenny.jpg">
-            <div class="header">
-              Jenny Hess
-            </div>
-            <div class="meta">
-              New Member
-            </div>
-            <div class="description">
-              Jenny wants to add you to the group <b>best friends</b>
-            </div>
-          </div>
-          <div class="extra content">
-            <div class="ui two buttons">
-              <div class="ui basic green button">Approve</div>
-              <div class="ui basic red button">Decline</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="column">
-        <div class="ui fluid card">
-          <div class="image">
-            <img src="http://semantic-ui.com/images/avatar2/large/matthew.png">
-          </div>
-          <div class="content">
-            <div class="header">Matt Giampietro</div>
-            <div class="meta">
-              <a>Friends</a>
-            </div>
-            <div class="description">
-              Matthew is an interior designer living in New York.
-            </div>
-          </div>
-          <div class="extra content">
-            <span class="right floated">
-              Joined in 2013
-            </span>
-            <span>
-              <i class="user icon"></i>
-              75 Friends
-            </span>
-          </div>
-        </div>
-      </div>
-      <div class="column">
-        <div class="ui fluid card">
-          <div class="content">
-            <div class="header">Project Timeline</div>
-          </div>
-          <div class="content">
-            <h4 class="ui sub header">Activity</h4>
-            <div class="ui small feed">
-              <div class="event">
-                <div class="content">
-                  <div class="summary">
-                     <a>Elliot Fu</a> added <a>Jenny Hess</a> to the project
-                  </div>
-                </div>
-              </div>
-              <div class="event">
-                <div class="content">
-                  <div class="summary">
-                     <a>Stevie Feliciano</a> was added as an <a>Administrator</a>
-                  </div>
-                </div>
-              </div>
-              <div class="event">
-                <div class="content">
-                  <div class="summary">
-                     <a>Helen Troy</a> added two pictures
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="extra content">
-            <button class="ui button">Join Project</button>
-          </div>
-        </div>
-      </div>
-      <div class="column">
-        <div class="ui fluid card">
-          <div class="content">
-            <div class="header">Veronika Ossi</div>
-            <div class="meta">Friend</div>
-            <div class="description">
-              Veronika Ossi is a set designer living in New York who enjoys kittens, music, and partying.
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="column">
-        <div class="ui fluid card">
-          <div class="content">
-            <div class="header">Cute Dog</div>
-            <div class="meta">
-              <span>2 days ago</span>
-              <a>Animals</a>
-            </div>
-            <p></p>
-            <img class="ui wireframe image" src="http://semantic-ui.com/images/wireframe/paragraph.png">
           </div>
         </div>
       </div>
     </div>
+    
   </div>
 </body>
 
@@ -224,9 +84,20 @@ body {
 <!-- Semantic UI JS -->
 <script type="text/javascript" src="assets/js/semantic.min.js"></script>
 
-<!-- Cascading Layout JS -->
-<script type="text/javascript" src="assets/js/masonry.min.js"></script>
+<!-- D3 Visualization Library -->
+<script type="text/javascript" src="assets/js/d3.min.js"></script>
 
-<script>
+<!-- Initialization Script -->
+<script type="text/javascript">
+  $(document).ready(function(){
+    /* Create a copy of sidebar menu for desktop */
+    $(".toc-copy").html($(".toc").html());
+
+    /* Add sidebar animation for mobile sites */
+    $(".launch.icon").click(function(){
+      $(".sidebar.toc").sidebar('toggle');
+    });
+  });
 </script>
+
 </html>
