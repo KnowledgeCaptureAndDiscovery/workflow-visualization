@@ -49,7 +49,8 @@ Bivariate.stackedhistogram = (function($) {
 			},
 			xAxis: {
 				min: 0,
-				gridLineWidth: 1
+				gridLineWidth: 1,
+				tickmarkPlacement: 'on',
 			},
 			yAxis: [{
 				title: {
@@ -59,7 +60,10 @@ Bivariate.stackedhistogram = (function($) {
 			series: [],
 			plotOptions: {
 				column: {
-					stacking: 'normal'
+					stacking: 'normal',
+					pointPadding: 0,
+					groupPadding: 0,
+					pointPlacement: 'between'
 				}
 			},
 			tooltip: {
@@ -124,9 +128,7 @@ Bivariate.stackedhistogram = (function($) {
 			return {
 				name: item,
 				type: 'column',
-				data: counts,
-				pointPadding: 0,
-				groupPadding: 0
+				data: counts
 			};
 		});
 
