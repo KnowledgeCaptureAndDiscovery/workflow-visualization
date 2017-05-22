@@ -232,6 +232,7 @@
 									<a class="active item">Scatter Plot</a>
 									<a class="item">Line Chart</a>
 									<a class="item">Stacked Histogram</a>
+									<a class="item">Donut Chart</a>
 									<a class="item">Stacked Column Chart</a>
 								</div>
 								<div class="scatter-plot">
@@ -260,6 +261,9 @@
 									<div class="ui divider"></div>
 									<span>Number of Bins</span>
 									<input class="ui range"></input>
+								</div>
+								<div class="donut-chart">
+									<div class="chart image"></div>
 								</div>
 								<div class="stacked-column-chart">
 									<div class="chart image"></div>
@@ -344,6 +348,7 @@
 <!-- Highcharts -->
 <script type="text/javascript" src="../assets/js/highcharts.js"></script>
 <script type="text/javascript" src="../assets/js/highcharts-more.js"></script>
+<script type="text/javascript" src="../assets/js/highcharts-drilldown.js"></script>
 
 <!-- Regression Library -->
 <script type="text/javascript" src="../assets/js/regression.js"></script>
@@ -365,6 +370,7 @@
 <script src="graphs/bivariate/scatterplot.js" type="text/javascript"></script>
 <script src="graphs/bivariate/linechart.js" type="text/javascript"></script>
 <script src="graphs/bivariate/stackedhistogram.js" type="text/javascript"></script>
+<script src="graphs/bivariate/donutchart.js" type="text/javascript"></script>
 <script src="graphs/bivariate/stackedcolumnchart.js" type="text/javascript"></script>
 
 <!-- Initialization Script -->
@@ -391,7 +397,6 @@
 			percentPosition: true
 		});
 		$('.masonry.grid .column').resize(function() {
-			console.log("height change");
 			$(".masonry.grid").masonry('layout');
 		});
 

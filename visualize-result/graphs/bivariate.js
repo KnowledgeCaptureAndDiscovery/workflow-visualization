@@ -119,7 +119,7 @@ var Bivariate = (function(Dashboard, $) {
 			names = ["scatter-plot"];
 		}
 		else if(type == "nominal-nominal") {
-			names = ["stacked-column-chart"];
+			names = ["donut-chart", "stacked-column-chart"];
 		}
 		else if(type == "nominal-numeric") {
 			names = ["line-chart"];

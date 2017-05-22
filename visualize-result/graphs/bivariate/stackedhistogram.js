@@ -6,7 +6,7 @@ Bivariate.stackedhistogram = (function($) {
 		graph,
 		histData = [],
 		names = [],
-		classes = []
+		classes = [],
 		data = [];
 
 	module.init = function(renderTo, seriesNames, dataCopy, classesCopy) {
