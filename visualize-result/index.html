@@ -381,6 +381,7 @@
 				toLoad--;
 				if(toLoad == 0) {
 					$(".dimmable .ui.dimmer").removeClass("active");
+					analyzePageUrl();
 				}
 			};
 			return action;
@@ -468,27 +469,29 @@
 		}
 
 		/* Analyze url parameters, show visualizations if needed */
-		var encodedUrl = getParameterByName("url");
-		if(encodedUrl != null) {
-			var urlSource = decodeURIComponent(encodedUrl);
+		function analyzePageUrl() {
+			var encodedUrl = getParameterByName("url");
+			if(encodedUrl != null) {
+				var urlSource = decodeURIComponent(encodedUrl);
 
-			$("body").css("background-color", "white");
-			$(".full.height").css("background-color", "white");
-			$(".main-content").css("margin", "0").css("background", "none");
-			$(".toc").hide();
-			$(".toc-copy").hide();
-			$(".inverted.main.menu").hide();
-			$(".header-content").hide();
+				$("body").css("background-color", "white");
+				$(".full.height").css("background-color", "white");
+				$(".main-content").css("margin", "0").css("background", "none");
+				$(".toc").hide();
+				$(".toc-copy").hide();
+				$(".inverted.main.menu").hide();
+				$(".header-content").hide();
 
-			$.ajax({
-				type: 'GET',
-				url: urlSource,
-				dataType: "text",
-				success: function(raw) {
-					drawCharts(raw);
-				}
-			});
-		}
+				$.ajax({
+					type: 'GET',
+					url: urlSource,
+					dataType: "text",
+					success: function(raw) {
+						drawCharts(raw);
+					}
+				});
+			}
+		}		
 	});
 </script>
 
