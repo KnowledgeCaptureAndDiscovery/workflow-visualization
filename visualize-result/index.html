@@ -350,6 +350,19 @@
 <!-- Initialization Script -->
 <script type="text/javascript">
 	$(document).ready(function(){
+		/* Hide all menus if url indicates embed mode */
+		var encodedUrl = getParameterByName("url");
+			if(encodedUrl != null) {
+				$("body").css("background-color", "white");
+				$(".full.height").css("background-color", "white");
+				$(".main-content").css("margin", "0").css("background", "none");
+				$(".toc").hide();
+				$(".toc-copy").hide();
+				$(".inverted.main.menu").hide();
+				$(".header-content").hide();
+			}
+		}
+
 		/* Hide All Graphs */
 		$(".graph-content > .column").addClass("hidden");
 
@@ -473,14 +486,6 @@
 			var encodedUrl = getParameterByName("url");
 			if(encodedUrl != null) {
 				var urlSource = decodeURIComponent(encodedUrl);
-
-				$("body").css("background-color", "white");
-				$(".full.height").css("background-color", "white");
-				$(".main-content").css("margin", "0").css("background", "none");
-				$(".toc").hide();
-				$(".toc-copy").hide();
-				$(".inverted.main.menu").hide();
-				$(".header-content").hide();
 
 				$.ajax({
 					type: 'GET',
