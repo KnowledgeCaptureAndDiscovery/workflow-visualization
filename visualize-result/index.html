@@ -27,7 +27,7 @@
 	<link rel="stylesheet" href="../assets/css/range.skinFlat.css">
 </head>
 
-<body>
+<body style="display: none">
 
 	<!-- Sidebar Menu for Mobile Sites -->
 	<div class="ui left vertical inverted sidebar menu blue toc">
@@ -364,6 +364,9 @@
 
 		/* Hide All Graphs */
 		$(".graph-content > .column").addClass("hidden");
+
+		/* Show Body */
+		$("body").show();
 
 		/* Create a copy of sidebar menu for desktop */
 		$(".toc-copy").html($(".toc").html());
