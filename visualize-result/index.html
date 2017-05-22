@@ -390,19 +390,8 @@
 				chartTypes.push(classNames[ix]);
 			}
 		});
-		var checkLoaded = (function() {
-			var toLoad = chartTypes.length;
-			var action = function() {
-				toLoad--;
-				if(toLoad == 0) {
-					$(".dimmable .ui.dimmer").removeClass("active");
-					analyzePageUrl();
-				}
-			};
-			return action;
-		}());
 		for(var ix in chartTypes) {
-			$.getScript("graphs/" + chartTypes[ix] + ".js").done(checkLoaded);
+			Dashboard.loadScriptSync("graphs/" + chartTypes[ix] + ".js");
 		}
 
 		/* Define Draw Charts Function */
@@ -484,21 +473,20 @@
 		}
 
 		/* Analyze url parameters, show visualizations if needed */
-		function analyzePageUrl() {
-			var encodedUrl = getParameterByName("url");
-			if(encodedUrl != null) {
-				var urlSource = decodeURIComponent(encodedUrl);
+		if(encodedUrl != null) {
+			var urlSource = decodeURIComponent(encodedUrl);
 
-				$.ajax({
-					type: 'GET',
-					url: urlSource,
-					dataType: "text",
-					success: function(raw) {
-						drawCharts(raw);
-					}
-				});
-			}
-		}		
+			$.ajax({
+				type: 'GET',
+				url: urlSource,
+				dataType: "text",
+				success: function(raw) {
+					drawCharts(raw);
+				}
+			});
+		}	
+
+		$(".dimmable .ui.dimmer").removeClass("active");
 	});
 </script>
 
