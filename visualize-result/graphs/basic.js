@@ -44,6 +44,8 @@ var Basic = (function(Dashboard, $) {
 		}
 
 		$div.removeClass("hidden");
+
+		$checkbox.checkbox("uncheck");
 		$summaryTable.addClass("hidden");
 	};
 
