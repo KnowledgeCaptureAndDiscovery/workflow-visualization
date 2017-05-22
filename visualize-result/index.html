@@ -347,6 +347,21 @@
 <script type="text/javascript" src="script.js"></script>
 <script type="text/javascript" src="drag-and-drop.js"></script>
 
+<!-- Graph Types-->
+<script src="graphs/basic.js" type="text/javascript"></script>
+
+<script src="graphs/univariate.js" type="text/javascript"></script>
+<script src="graphs/univariate/boxplot.js" type="text/javascript"></script>
+<script src="graphs/univariate/histogram.js" type="text/javascript"></script>
+<script src="graphs/univariate/piechart.js" type="text/javascript"></script>
+<script src="graphs/univariate/columnchart.js" type="text/javascript"></script>
+
+<script src="graphs/bivariate.js" type="text/javascript"></script>
+<script src="graphs/bivariate/scatterplot.js" type="text/javascript"></script>
+<script src="graphs/bivariate/linechart.js" type="text/javascript"></script>
+<script src="graphs/bivariate/stackedhistogram.js" type="text/javascript"></script>
+<script src="graphs/bivariate/stackedcolumnchart.js" type="text/javascript"></script>
+
 <!-- Initialization Script -->
 <script type="text/javascript">
 	$(document).ready(function(){
@@ -376,7 +391,7 @@
 			$(".sidebar.toc").sidebar('toggle');
 		});
 
-		/* Load Graph Drawing Script */
+		/* Load Chart Types */
 		var chartTypes = [];
 		$(".graph-content > .column").each(function() {
 			var classNames = $(this)
@@ -390,23 +405,6 @@
 				chartTypes.push(classNames[ix]);
 			}
 		});
-		var checkLoaded = (function() {
-			var toLoad = chartTypes.length;
-
-			var action = function() {
-				toLoad--;
-			console.log(toLoad);
-				if(toLoad == 0) {
-					$(".dimmable .ui.dimmer").removeClass("active");
-					analyzeUrl();
-				}
-			};
-
-			return action;
-		}());
-		for(var ix in chartTypes) {
-			Dashboard.loadScriptSync("graphs/" + chartTypes[ix] + ".js", checkLoaded);
-		}
 
 		/* Define Draw Charts Function */
 		var drawCharts = function(raw) {
@@ -487,20 +485,20 @@
 		}
 
 		/* Analyze url parameters, show visualizations if needed */
-		function analyzeUrl() {
-			if(encodedUrl != null) {
-				var urlSource = decodeURIComponent(encodedUrl);
+		if(encodedUrl != null) {
+			var urlSource = decodeURIComponent(encodedUrl);
 
-				$.ajax({
-					type: 'GET',
-					url: urlSource,
-					dataType: "text",
-					success: function(raw) {
-						drawCharts(raw);
-					}
-				});
-			}
+			$.ajax({
+				type: 'GET',
+				url: urlSource,
+				dataType: "text",
+				success: function(raw) {
+					drawCharts(raw);
+				}
+			});
 		}
+
+		$(".dimmable .ui.dimmer").removeClass("active");
 	});
 </script>
 
