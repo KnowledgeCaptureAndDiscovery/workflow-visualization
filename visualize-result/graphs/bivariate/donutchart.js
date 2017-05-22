@@ -19,21 +19,22 @@ Bivariate.donutchart = (function($) {
 
 		var dataStore = {};
 
+		classes[0].forEach(function(item1) {
+			dataStore[item1] = {};
+			classes[1].forEach(function(item2) {
+				dataStore[item1][item2] = 0;
+			});
+		});
+
 		data[0].forEach(function(val, ix) {
-			if(dataStore[val] == null) dataStore[val] = {};
-			if(dataStore[val][data[1][ix]] == null) {
-				dataStore[val][data[1][ix]] = 0;
-			}
-			else {
-				dataStore[val][data[1][ix]]++;
-			}
+			dataStore[val][data[1][ix]]++;
 		});
 
 		var colors = (function () {
 			var colors = [],
 				base = '#3198f7',
 				i,
-				len = classes[0].length;
+				len = classes[0].length * classes[1].length;
 
 			for (i = 0; i < len; i += 1) {
 				colors.push(Highcharts.Color(base).brighten((i - len / 2) / (len / 2 + 2)).get());
@@ -50,29 +51,28 @@ Bivariate.donutchart = (function($) {
 			return {
 				name: item,
 				y: count,
-				color: colors[ix],
+				color: colors[ix * classes[1].length],
 				drilldown: item
 			};
 		});
 
 		var detailData = [];
-		classes[0].forEach(function(item1, ix) {
-			classes[1].forEach(function(item2) {
+		classes[0].forEach(function(item1, ix1) {
+			classes[1].forEach(function(item2, ix2) {
 				detailData.push({
-					name: item1 + ', ' + item2,
 					name1: item1,
 					name2: item2,
-					color: colors[ix],
+					color: colors[ix1 * classes[1].length + ix2],
 					y: dataStore[item1][item2]
 				});
 			});
 		});
 
-		var drilldownData = classes[0].map(function(item1) {
+		var drilldownData = classes[0].map(function(item1, ix) {
 			return {
 				name: item1,
 				id: item1,
-				colors: colors,
+				colors: colors.slice(ix * classes[1].length, (ix + 1) * classes[1].length),
 				tooltip: {
 					headerFormat: '<b>Drilldown</b><br/>' + names[0] + ': <b>{series.name}</b><br>',
 					pointFormat: names[1] + ': <b>{point.name}</b><br/>Percentage: <b>{point.percentage:.1f}%</b>'
