@@ -52,43 +52,10 @@ var Dashboard = (function ($) {
     }
 
     module.readCsvData = function(csvString) {
-      // list of possible delimiters of csv string
-      var possibleDelimiters = [",", "\t", "\s"];
-
-      // function that guesses possible delimiter of given data
-      function guessDelimiters (text, possibleDelimiters) {
-          return possibleDelimiters.filter(weedOut);
-
-          function weedOut (delimiter) {
-              var cache = -1;
-              return text.split('\n').every(checkLength);
-
-              function checkLength (line) {
-                  if (!line) {
-                      return true;
-                  }
-
-                  var exp = new RegExp('(".*?"|[^"' + delimiter + '\s]+)(?=\s*' + delimiter + '|\s*$)', "g");
-                  var matches = line.match(exp) || [];
-                  var length = matches.length;
-                  if (cache < 0) {
-                      cache = length;
-                  }
-                  return cache === length && length > 1;
-              }
-          }
-      }
-
-      // check if the given data is a single column of data
-      // in which case guess delimiters fails
-      function checkSingleColumnData (text) {
-          var splitted = text.split('\n');
-
-          for(var ix = 0; ix < splitted.length; ix++) {
-            if(splitted[ix].trim().match(/\s/g)) return false;
-          }
-
-          return true;
+      // function to decide if parsing returns deadly result
+      function parseErrorIsOk(error) {
+        return (error.length == 0 || 
+        (error.length == 1 && error[0].code == "UndetectableDelimiter"));
       }
 
       // check if the first row is header
@@ -115,72 +82,85 @@ var Dashboard = (function ($) {
         return false;
       }
 
-      // guess delimiters
-      possibleDelimiters = guessDelimiters(csvString, possibleDelimiters);
+      // trial round: try parsing to guess delimiter and linebreak
+      var previewResults = Papa.parse(csvString, {
+        header: false,
+        dynamicTyping: true,
+        preview: 10,
+        skipEmptyLines: true
+      });
 
-      // if guess delimiters fails, check single column or exit
-      if(possibleDelimiters.length == 0) {
-        if(checkSingleColumnData(csvString)) {
-          possibleDelimiters[0] = ',';
-        }
-        else {
-          var msg = "Your file seems to be a CSV file "
-            + "but has unclear delimiter. "
-            + "Please check the format of your file "
-            + "and upload again.";
-          module.handleError(msg);
-          return;
-        }
+      // if parse result if not ok, then terminate and return
+      if(!parseErrorIsOk(previewResults.errors)) {
+        module.handleError(previewResults.errors[0].message);
+        return;
       }
 
-      // prepare for csv parsing
-      var csvArray  = [];
-      var csvRows   = csvString.match(/[^\r\n]+/g);
-      var csvHeader = [];
+      // get delimiter and line break from preview parse result
+      var delimiter = previewResults.meta.delimiter;
+      var linebreak = previewResults.meta.linebreak;
 
+      // check if the csv string represent a dataset with header row
+      // note that csv header need not be right at this time
+      var rowSplitRegex = new RegExp("[^" + linebreak + "]+", "g");
+      var csvRows = csvString.match(rowSplitRegex);
+      var csvHeader = csvRows[0].split(delimiter);
       var csvHasHeader = hasHeader(
-        csvRows.map(function(val) { return val.split(possibleDelimiters[0]); }),
-        csvRows[0].split(possibleDelimiters[0]), 
-        csvRows[1].split(possibleDelimiters[0])
+        csvRows.splice(10).map(function(val) { return val.split(delimiter); }),
+        csvHeader, 
+        csvRows[1].split(delimiter)
       );
 
       if(csvHasHeader) {
-        csvHeader = csvRows.shift().split(possibleDelimiters[0]).map(module.formatString);
+        // if csv has header, then format the header and append it to the csv string
+        csvString = csvHeader.map(module.formatString).join(delimiter) + linebreak
+          + csvString.split(linebreak).splice(1).join(linebreak);
+
+        // if the first column index is empty, then add one named "index"
+        if(previewResults.data[0][0].trim() == "") {
+          csvString = "Index" + csvString;
+        }
       }
       else {
-        var columnCount = csvRows[0].split(possibleDelimiters[0]).length;
-        for(var ix = 0; ix < columnCount; ix++) {
-          csvHeader.push("Column " + (ix+1));
-        }
+        // if csv doesn't have header, then add one to the csv string
+        csvHeader = csvHeader.map(function(item, ix) {
+          return "Column " + (ix + 1);
+        });
+        csvString = csvHeader.join(delimiter) + linebreak + csvString;
       }
 
-      // prepare empty result object
-      data = { 'relation': [], 'attribute': [], 'data': [] };
+      // generate entire parse result
+      var parseResults = Papa.parse(csvString, {
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true
+      });
 
-      // parse each row into the result
-      for(var rowIndex = 0; rowIndex < csvRows.length; rowIndex++) {
-        var delimiter = possibleDelimiters[0];
-        var exp = new RegExp('(".*?"|[^"' + delimiter + '\s]+)(?=\s*' + delimiter + '|\s*$)', "g");
-        var rowArray = csvRows[rowIndex].match(exp) || [];
-        var parsed = {};
-        for(var colIndex = 0; colIndex < rowArray.length; colIndex++) {
-          // check if the data is number or string
-          if(!isNaN(rowArray[colIndex])) {
-            parsed[csvHeader[colIndex]] = parseFloat(rowArray[colIndex]);
-          }
-          else {
-            parsed[csvHeader[colIndex]] = module.formatString(rowArray[colIndex]);
-          }
-        }
-        csvArray.push(parsed);
+      csvHeader = Object.keys(parseResults.data[0]);
+
+      if(!parseErrorIsOk(parseResults.errors)) {
+        module.handleError(parseResults.errors[0].message);
+        return;
       }
 
       // set module's data member
-      data['data'] = csvArray;
+      data['data'] = parseResults.data;
+      data['attribute'] = [];
 
       // set attribute types
-      for(colIndex = 0; colIndex < rowArray.length; colIndex++) {
-        if(!isNaN(rowArray[colIndex])) {
+      for(colIndex = 0; colIndex < csvHeader.length; colIndex++) {
+        // view index as string and not include it in data analysis
+        if(colIndex == 0 && csvHeader[0] == 'Index') {
+          data['attribute'].push({
+            "name": csvHeader[colIndex],
+            "type": {
+              "type": "string"
+            }
+          });
+        }
+
+        // identify numeric column
+        else if(typeof data['data'][0][csvHeader[colIndex]] === 'number') {
           data['attribute'].push({
             "name": csvHeader[colIndex],
             "type": {
@@ -188,6 +168,8 @@ var Dashboard = (function ($) {
             }
           });
         }
+
+        // in other cases, check whether string represents nominal data
         else {
           function onlyUnique(value, index, self) { 
             return self.indexOf(value) === index;
