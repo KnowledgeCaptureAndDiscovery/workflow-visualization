@@ -86,7 +86,7 @@
 										<div class="header"> Sample CSV Data </div>
 										<div class="item" data-value="https://vincentarelbundock.github.io/Rdatasets/csv/datasets/iris.csv">Iris</div>
 										<div class="item" data-value="https://vincentarelbundock.github.io/Rdatasets/csv/datasets/infert.csv">Infertility</div>
-										<div class="item" data-value="https://vincentarelbundock.github.io/Rdatasets/csv/datasets/chickwts.csv">Chick Weights</div>
+										<div class="item" data-value="https://vincentarelbundock.github.io/Rdatasets/csv/datasets/airquality.csv">Missing Values</div>
 
 										<div class="divider"></div>
 
@@ -179,6 +179,7 @@
 									</select>
 								</div>
 							</div>
+							<div class="content missing-notice"></div>
 							<div class="content has-menu">
 								<div class="ui secondary pointing two item menu">
 									<a class="active item">Box Plot</a>
@@ -201,6 +202,23 @@
 									<div class="ui divider"></div>
 									<span>Number of Bins</span>
 									<input class="ui range"></input>
+									<div class="ui divider"></div>
+									<div class="toggle-container exclude">
+										<div>Exclude Outliers</div>
+										<div class="ui fitted toggle checkbox">
+											<input type="checkbox">
+											<label></label>
+										</div>
+									</div>
+									<div class="meta exclude-detail"></div>
+									<div class="ui divider"></div>
+									<div class="toggle-container perc">
+										<div>Show Percentage Instead</div>
+										<div class="ui fitted toggle checkbox">
+											<input type="checkbox">
+											<label></label>
+										</div>
+									</div>
 								</div>
 								<div class="pie-chart">
 									<div class="chart image"></div>
@@ -233,6 +251,7 @@
 									</select>
 								</div>
 							</div>
+							<div class="content missing-notice"></div>
 							<div class="content has-menu">
 								<div class="ui secondary pointing two item menu">
 									<a class="active item">Scatter Plot</a>

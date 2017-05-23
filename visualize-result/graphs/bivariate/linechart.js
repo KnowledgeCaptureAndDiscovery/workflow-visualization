@@ -22,6 +22,9 @@ Bivariate.linechart = (function($) {
 			var values = data[1].filter(function(val, ix) {
 				return data[0][ix] == item;
 			});
+			if(values.length == 0) {
+				return 0;
+			}
 			return d3.mean(values);
 		});
 

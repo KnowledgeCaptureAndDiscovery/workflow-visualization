@@ -5,7 +5,7 @@ Univariate.boxplot = (function($) {
 		$graph,
 		$rows;
 
-	module.init = function(renderTo, dataCopy) {
+	module.init = function(renderTo, dataCopy, meta) {
 		module.reset();
 		
 		$div = renderTo;
@@ -13,12 +13,12 @@ Univariate.boxplot = (function($) {
 		$graph = $div.find('.chart.image');
 		$rows = $div.find('.table').find('tbody');
 
-		var median = d3.median(data);
-		var q1 = d3.quantile(data, 0.25);
-		var q3 = d3.quantile(data, 0.75);
-		var iqr = q3 - q1;
-		var upperFence = Math.min(q3 + 1.5*iqr, d3.max(data));
-		var lowerFence = Math.max(q1 - 1.5*iqr, d3.min(data));
+		var median = meta.median;
+		var q1 = meta.q1;
+		var q3 = meta.q3;
+		var iqr = meta.iqr;
+		var upperFence = meta.upperFence;
+		var lowerFence = meta.lowerFence;
 
 		var outliers = data.filter(function(val) {
 			return (val < lowerFence || val > upperFence);

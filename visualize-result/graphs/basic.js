@@ -30,8 +30,22 @@ var Basic = (function(Dashboard, $) {
 	module.render = function() {
 		var attributeLen = data["attribute"].length;
 		var dataLen = data["data"].length;
+
 		$div.find(".col-count").find(".value").html('' + attributeLen);
+		if(attributeLen > 1) {
+			$div.find(".col-count").find(".label").html('Columns');
+		}
+		else {
+			$div.find(".col-count").find(".label").html('Column');
+		}
+
 		$div.find(".row-count").find(".value").html('' + dataLen);
+		if(dataLen > 1) {
+			$div.find(".row-count").find(".label").html('Data Points');
+		}
+		else {
+			$div.find(".row-count").find(".label").html('Data Point');
+		}
 
 		for(var ix in data["attribute"]) {
 			var typeStr = data["attribute"][ix]["type"]["type"];
