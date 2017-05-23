@@ -9,7 +9,7 @@ Univariate.boxplot = (function($) {
 		module.reset();
 		
 		$div = renderTo;
-		data = dataCopy.sort();
+		data = dataCopy.sort(function(a,b) { return a-b; });
 		$graph = $div.find('.chart.image');
 		$rows = $div.find('.table').find('tbody');
 
