@@ -57,6 +57,7 @@ DragAndDrop = (function ($, document, window) {
 			if ($form.hasClass('is-uploading')) return false;
 
 			$(".ui.modal").modal('hide');
+			Dashboard.progress.set(0);
 
 			$form.addClass('is-uploading').removeClass('is-error');
 

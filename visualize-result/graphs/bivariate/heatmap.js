@@ -67,10 +67,16 @@ Bivariate.heatmap = (function($) {
 				heatmapData.push([+ix1+0.5, +ix2+0.5, 0]);
 			}
 		}
+		console.log(heatmapData.length);
 		d3.transpose(data).forEach(function(point) {
 			var bin1 = Math.floor((point[0]-ticks[0][0]) / tickIntervals[0]);
 			var bin2 = Math.floor((point[1]-ticks[1][0]) / tickIntervals[1]);
-			heatmapData[bin1 * ticks[1].length + bin2][2]++;
+			try {
+				heatmapData[bin1 * ticks[1].length + bin2][2]++;
+			}
+			catch(e) {
+				console.log(bin1, bin2);
+			}
 		});
 
 		var countValues = heatmapData
