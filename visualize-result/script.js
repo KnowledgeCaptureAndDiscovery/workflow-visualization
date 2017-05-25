@@ -374,6 +374,8 @@ var Dashboard = (function ($) {
           if(val == 0) {
             $(".graphs").addClass("hidden");
             $(".graphs + .ui.dimmer").addClass("active");
+            $(".header-dropdown").addClass("disabled");
+            $(".look.button").addClass("disabled");
             text = "Downloading File";
           }
           else if(val == 1) {
@@ -385,10 +387,14 @@ var Dashboard = (function ($) {
           else if(val == 3) {
             $(".graphs + .ui.dimmer").removeClass("active");
             $(".graphs").removeClass("hidden");
+            $(".header-dropdown").removeClass("disabled");
+            $(".look.button").removeClass("disabled");
           }
           else {
             $(".graphs").removeClass("hidden");
             $(".graphs + .ui.dimmer").removeClass("active");
+            $(".header-dropdown").removeClass("disabled");
+            $(".look.button").removeClass("disabled");
             progress = 0;
             text = "";
           }
