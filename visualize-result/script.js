@@ -22,7 +22,7 @@ var Dashboard = (function ($) {
 
       chartTypes = types;
       module.reset();
-      module.initWithType(inputData, module.identifyType(inputData));
+      return module.initWithType(inputData, module.identifyType(inputData));
 
       // TIME_KEEPING
       // console.log("Dashboard init: " + ((new Date())-window.ST));
@@ -32,14 +32,12 @@ var Dashboard = (function ($) {
     module.initWithType = function(inputData, type) {
       switch(type) {
       case "csv":
-        module.readCsvData(inputData);
-        break;
+        return module.readCsvData(inputData);
       case "arff":
-        module.readArffData(inputData);
-        break;
+        return module.readArffData(inputData);
       default:
         console.log("Error document type!");
-        return;
+        return false;
       }
     };
 
@@ -106,7 +104,7 @@ var Dashboard = (function ($) {
       // if parse result if not ok, then terminate and return
       if(!parseErrorIsOk(previewResults.errors)) {
         module.handleError(previewResults.errors[0].message);
-        return;
+        return false;
       }
 
       // TIME_KEEPING
@@ -119,13 +117,22 @@ var Dashboard = (function ($) {
       // check if the csv string represent a dataset with header row
       // note that csv header need not be right at this time
       var rowSplitRegex = new RegExp("[^" + linebreak + "]+", "g");
-      var csvRows = csvString.match(rowSplitRegex);
+      var csvRows = csvString.match(rowSplitRegex) || [];
+      console.log(csvRows.length);
+      if(csvRows.length <= 1) {
+        module.handleError("Data must have at least 2 rows.");
+        return false;
+      }
       var csvHeader = csvRows[0].split(delimiter);
       var csvHasHeader = hasHeader(
         csvRows.splice(10).map(function(val) { return val.split(delimiter); }),
         csvHeader, 
         csvRows[1].split(delimiter)
       );
+      if(csvHasHeader && csvRows.length == 2) {
+        module.handleError("Data must have at least 2 rows.");
+        return false;
+      }
 
       if(csvHasHeader) {
         // if csv has header, then format the header and append it to the csv string
@@ -159,7 +166,7 @@ var Dashboard = (function ($) {
 
       if(!parseErrorIsOk(parseResults.errors)) {
         module.handleError(parseResults.errors[0].message);
-        return;
+        return false;
       }
 
       // set module's data member
@@ -229,6 +236,8 @@ var Dashboard = (function ($) {
 
       // for debug: print the parsed data
       // console.log(data);
+
+      return true;
     };
 
     module.readArffData = function(csvString) {
@@ -328,7 +337,7 @@ var Dashboard = (function ($) {
 
       for(lineIndex in lines) {
           if((lines[lineIndex].replace(/\s/g,''))[0] == '%') continue;
-          if(readLine(lines[lineIndex]) == false) return;
+          if(readLine(lines[lineIndex]) == false) return false;
       }
 
       // TIME_KEEPING
@@ -338,6 +347,8 @@ var Dashboard = (function ($) {
       // console.log(parsed);
 
       data = parsed;
+
+      return true;
     };
 
     /* handle error */

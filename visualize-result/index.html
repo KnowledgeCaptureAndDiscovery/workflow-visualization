@@ -491,8 +491,9 @@
 				return new Promise(function(resolve, reject) {
 					Dashboard.progress.set(1);
 					setTimeout(function() {
-						Dashboard.init(raw, chartTypes);
-						resolve("");
+						if(Dashboard.init(raw, chartTypes)) {
+							resolve();
+						}
 					}, 1);
 				});
 			};
@@ -502,12 +503,13 @@
 					Dashboard.progress.set(2);
 					setTimeout(function() {
 						Dashboard.draw();
-						resolve("");
+						resolve();
 					}, 1);
 				});
 			};
 
 			var finishUp = function() {
+				console.log("ding");
 				return new Promise(function(resolve, reject) {
 					Dashboard.progress.set(3);
 					setTimeout(function() {
@@ -520,12 +522,13 @@
 
 						$(".masonry.grid").masonry('layout');
 
-						resolve("");
+						resolve();
 					}, 1);
 				});
 			};
 
 			parseFile()
+				.catch(function(e) {})
 				.then(generatePlots)
 				.then(finishUp);
 		};
