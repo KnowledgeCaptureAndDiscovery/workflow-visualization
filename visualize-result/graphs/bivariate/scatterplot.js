@@ -129,6 +129,7 @@ Bivariate.scatterplot = (function($) {
 		else {
 			$regDropdown.addClass("hidden");
 		}
+
 		graph.series[1].update({
 			data: newSeries,
 			tooltip: {

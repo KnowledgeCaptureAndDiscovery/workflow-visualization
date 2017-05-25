@@ -56,14 +56,14 @@ DragAndDrop = (function ($, document, window) {
 		function submitForm() {
 			if ($form.hasClass('is-uploading')) return false;
 
+			$(".ui.modal").modal('hide');
+
 			$form.addClass('is-uploading').removeClass('is-error');
 
 			var reader = new FileReader();
 			reader.readAsText(droppedFiles[0], "UTF-8");
 			reader.onload = function (e) {
 				$form.removeClass('is-uploading');
-
-				$(".ui.modal").modal('hide');
 
 				var data = e.target.result;
 				action(data);

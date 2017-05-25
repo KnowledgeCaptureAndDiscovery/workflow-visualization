@@ -1,4 +1,5 @@
 var Dashboard = (function ($) {
+
     var module = {};
 
     var data = {};
@@ -11,13 +12,22 @@ var Dashboard = (function ($) {
         str = str.substring(1, str.length - 1);
       }
       return str.replace(/([a-zA-Z]+)[.]([a-zA-Z]+)/g, "$1 $2");
-    }
+    };
 
     module.init = function(inputData, types) {
+      // TIME_KEEPING
+      // console.log("--- Dashboard Script Starts Loading ---");
+      // window.ST = (new Date());
+      // console.log("Dashboard init: " + 0);
+
       chartTypes = types;
       module.reset();
       module.initWithType(inputData, module.identifyType(inputData));
-    }
+
+      // TIME_KEEPING
+      // console.log("Dashboard init: " + ((new Date())-window.ST));
+      // console.log("--- Dashboard Script Ends Loading ---");
+    };
 
     module.initWithType = function(inputData, type) {
       switch(type) {
@@ -31,7 +41,7 @@ var Dashboard = (function ($) {
         console.log("Error document type!");
         return;
       }
-    }
+    };
 
     module.identifyType = function(inputData) {
       function isArffData(data) {
@@ -49,9 +59,12 @@ var Dashboard = (function ($) {
 
       if(isArffData(inputData)) return "arff";
       else return "csv";
-    }
+    };
 
     module.readCsvData = function(csvString) {
+      // TIME_KEEPING
+      // console.log("Dashboard read data #1: " + ((new Date())-window.ST));
+
       // function to decide if parsing returns deadly result
       function parseErrorIsOk(error) {
         return (error.length == 0 || 
@@ -96,6 +109,9 @@ var Dashboard = (function ($) {
         return;
       }
 
+      // TIME_KEEPING
+      // console.log("Dashboard read data preview end #2: " + ((new Date())-window.ST));
+
       // get delimiter and line break from preview parse result
       var delimiter = previewResults.meta.delimiter;
       var linebreak = previewResults.meta.linebreak;
@@ -129,6 +145,9 @@ var Dashboard = (function ($) {
         csvString = csvHeader.join(delimiter) + linebreak + csvString;
       }
 
+      // TIME_KEEPING
+      // console.log("Dashboard read data parsing start #3: " + ((new Date())-window.ST));
+
       // generate entire parse result
       var parseResults = Papa.parse(csvString, {
         header: true,
@@ -146,6 +165,9 @@ var Dashboard = (function ($) {
       // set module's data member
       data['data'] = parseResults.data;
       data['attribute'] = [];
+
+      // TIME_KEEPING
+      // console.log("Dashboard read data parsing end #4: " + ((new Date())-window.ST));
 
       // set attribute types
       for(colIndex = 0; colIndex < csvHeader.length; colIndex++) {
@@ -171,17 +193,23 @@ var Dashboard = (function ($) {
 
         // in other cases, check whether string represents nominal data
         else {
-          function onlyUnique(value, index, self) { 
-            return self.indexOf(value) === index;
-          }
-          var uniqueArray = data['data'].map(function(item) { return item[csvHeader[colIndex]]; });
-          uniqueArray = uniqueArray.filter(onlyUnique);
-          if(uniqueArray.length < 10) {
+          // count unique elements
+          // Code source: https://stackoverflow.com/questions/21661686/fastest-way-to-get-count-of-unique-elements-in-javascript-array
+          var uniqueElements = data['data'].reduce(function(values, item) {
+            var v = item[csvHeader[colIndex]];
+            if (!values.set[v]) {
+              values.set[v] = 1;
+              values.count++;
+            }
+            return values;
+          }, { set: {}, count: 0 });
+
+          if(uniqueElements.count <= 10) {
             data['attribute'].push({
               "name": csvHeader[colIndex],
               "type": {
                 "type": "nominal",
-                "oneof": uniqueArray
+                "oneof": Object.keys(uniqueElements.set)
               }
             });
           }
@@ -196,11 +224,17 @@ var Dashboard = (function ($) {
         }
       }
 
+      // TIME_KEEPING
+      // console.log("Dashboard read data end #5: " + ((new Date())-window.ST));
+
       // for debug: print the parsed data
       // console.log(data);
-    }
+    };
 
     module.readArffData = function(csvString) {
+      // TIME_KEEPING
+      // console.log("Dashboard read data #1: " + ((new Date())-window.ST));
+
       var section;
       var parsed = { 'relation': [], 'attribute': [], 'data': [] };
 
@@ -297,11 +331,14 @@ var Dashboard = (function ($) {
           if(readLine(lines[lineIndex]) == false) return;
       }
 
+      // TIME_KEEPING
+      // console.log("Dashboard read data end #5: " + ((new Date())-window.ST));
+
       // for debug: log parsed data
       // console.log(parsed);
 
       data = parsed;
-    }
+    };
 
     /* handle error */
     module.handleError = function(errMsg) {
@@ -313,7 +350,7 @@ var Dashboard = (function ($) {
       }).modal('show');
       module.reset();    
       $(".header-dropdown").dropdown('restore defaults');
-    }
+    };
 
     /* plotting */
 
@@ -324,7 +361,37 @@ var Dashboard = (function ($) {
         var funcName = chartTypes[ix];
         module[funcName].init($(div + ' .' + funcName), data);
       }
-    }
+    };
+
+    module.progress = (function() {
+      var progress = 0;
+      var text = "";
+      return {
+        set: function(val) {
+          progress = val;
+
+          if(val == 0) {
+            $(".graphs").addClass("hidden");
+            $(".graphs + .ui.dimmer").addClass("active");
+            text = "Downloading File";
+          }
+          else if(val == 1) {
+            text = "Parsing Data";
+          }
+          else if(val == 2) {
+            text = "Loading Visualizations";
+          }
+          else if(val == 3) {
+            $(".graphs + .ui.dimmer").removeClass("active");
+            $(".graphs").removeClass("hidden");
+          }
+          $(".graphs + .ui.dimmer > .text.loader").text(text);
+        },
+        get: function() {
+          return progress;
+        }
+      };
+    }());
 
     module.reset = function() {
       data = {};
@@ -337,7 +404,7 @@ var Dashboard = (function ($) {
         var funcName = chartTypes[ix];
         module[funcName].reset();
       }
-    }
+    };
 
     return module;
 

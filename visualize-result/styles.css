@@ -18,9 +18,9 @@
 	padding-bottom: 10px;
 }
 
-/* dimmer layout */
-.dimmable {
-	min-height: 100vh;
+/* progress bar layout */
+.attached.progress {
+	border-radius: 0 !important;
 }
 
 /* Content with Toggle */

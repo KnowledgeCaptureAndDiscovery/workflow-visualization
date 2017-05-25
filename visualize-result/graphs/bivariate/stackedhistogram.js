@@ -45,15 +45,12 @@ Bivariate.stackedhistogram = (function($) {
 			}()),
 			xAxis: {
 				categories: [],
-				gridLineWidth: 1
-			},
-			xAxis: {
 				title: {
 					text: names[0]
 				},
 				min: 0,
 				gridLineWidth: 1,
-				tickmarkPlacement: 'on',
+				tickmarkPlacement: 'on'
 			},
 			yAxis: [{
 				title: {

@@ -117,187 +117,202 @@
 			</div>
 
 			<!-- Graph Content -->
-			<div class="graphs ui container">
-				<div class="ui stackable two column masonry grid graph-content">
-					<!-- Different Graph Modules Start Here -->
+			<div class="ui vertical segment dimmable">
+				<div class="graphs ui container">
+					<div class="ui stackable two column masonry grid graph-content">
+						<!-- Different Graph Modules Start Here -->
 
-					<div class="column basic">
-						<div class="ui fluid card">
-							<div class="content">
-								<div class="header">
-									Basic Information
-								</div>
-								<div class="meta">
-									Basic statistical information of the data.
-								</div>
-							</div>
-							<div class="content">
-								<span>Column and Row Count</span>
-								<div class="ui two statistics">
-									<div class="ui statistic col-count">
-										<div class="value">-</div>
-										<div class="label">Columns</div>
+						<div class="column basic">
+							<div class="ui fluid card">
+								<div class="content">
+									<div class="header">
+										Basic Information
 									</div>
-									<div class="ui statistic row-count">
-										<div class="value">-</div>
-										<div class="label">Data Points</div>
+									<div class="meta">
+										Basic statistical information of the data.
 									</div>
 								</div>
-							</div>
-							<div class="content">
-								<div class="toggle-container">
-									<div>Column Summary</div>
-									<div class="ui fitted toggle checkbox">
-										<input type="checkbox">
-										<label></label>
+								<div class="content">
+									<span>Column and Row Count</span>
+									<div class="ui two statistics">
+										<div class="ui statistic col-count">
+											<div class="value">-</div>
+											<div class="label">Columns</div>
+										</div>
+										<div class="ui statistic row-count">
+											<div class="value">-</div>
+											<div class="label">Data Points</div>
+										</div>
 									</div>
 								</div>
-								<table class="ui basic unstackable table">
-									<thead>
-										<th>Column Name</th>
-										<th>Data Type</th>
-									</thead>
-									<tbody class="col-type">
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-
-					<div class="column univariate">
-						<div class="ui fluid card">
-							<div class="content">
-								<div class="header">
-									Univariate Analysis
-								</div>
-								<div class="meta">
-									Basic statistics and distribution analysis of a single column in the data.
-								</div>
-								<div class="col-dropdown">
-									<select class="ui fluid dropdown">
-										<option value="">Select Column</option>
-									</select>
-								</div>
-							</div>
-							<div class="content missing-notice"></div>
-							<div class="content has-menu">
-								<div class="ui secondary pointing two item menu">
-									<a class="active item">Box Plot</a>
-									<a class="item">Histogram</a>
-									<a class="item">Pie Chart</a>
-									<a class="item">Column Chart</a>
-								</div>
-								<div class="box-plot">
-									<div class="chart image"></div>
+								<div class="content">
+									<div class="toggle-container">
+										<div>Column Summary</div>
+										<div class="ui fitted toggle checkbox">
+											<input type="checkbox">
+											<label></label>
+										</div>
+									</div>
 									<table class="ui basic unstackable table">
 										<thead>
-											<th>Property</th>
-											<th>Value</th>
+											<th>Column Name</th>
+											<th>Data Type</th>
 										</thead>
-										<tbody></tbody>
+										<tbody class="col-type">
+										</tbody>
 									</table>
 								</div>
-								<div class="histogram">
-									<div class="chart image"></div>
-									<div class="ui divider"></div>
-									<span>Number of Bins</span>
-									<input class="ui range"></input>
-									<div class="ui divider"></div>
-									<div class="toggle-container exclude">
-										<div>Exclude Outliers</div>
-										<div class="ui fitted toggle checkbox">
-											<input type="checkbox">
-											<label></label>
-										</div>
+							</div>
+						</div>
+
+						<div class="column univariate">
+							<div class="ui fluid card">
+								<div class="content">
+									<div class="header">
+										Univariate Analysis
 									</div>
-									<div class="meta exclude-detail"></div>
-									<div class="ui divider"></div>
-									<div class="toggle-container perc">
-										<div>Show Percentage Instead</div>
-										<div class="ui fitted toggle checkbox">
-											<input type="checkbox">
-											<label></label>
-										</div>
+									<div class="meta">
+										Basic statistics and distribution analysis of a single column in the data.
+									</div>
+									<div class="col-dropdown">
+										<select class="ui fluid dropdown">
+											<option value="">Select Column</option>
+										</select>
 									</div>
 								</div>
-								<div class="pie-chart">
-									<div class="chart image"></div>
-								</div>
-								<div class="column-chart">
-									<div class="chart image"></div>
+								<div class="content missing-notice"></div>
+								<div class="content has-menu">
+									<div class="ui secondary pointing two item menu">
+										<a class="active item">Box Plot</a>
+										<a class="item">Histogram</a>
+										<a class="item">Pie Chart</a>
+										<a class="item">Column Chart</a>
+									</div>
+									<div class="box-plot">
+										<div class="chart image"></div>
+										<table class="ui basic unstackable table">
+											<thead>
+												<th>Property</th>
+												<th>Value</th>
+											</thead>
+											<tbody></tbody>
+										</table>
+									</div>
+									<div class="histogram">
+										<div class="chart image"></div>
+										<div class="ui divider"></div>
+										<span>Number of Bins</span>
+										<input class="ui range"></input>
+										<div class="ui divider"></div>
+										<div class="toggle-container exclude">
+											<div>Exclude Outliers</div>
+											<div class="ui fitted toggle checkbox">
+												<input type="checkbox">
+												<label></label>
+											</div>
+										</div>
+										<div class="meta exclude-detail"></div>
+										<div class="ui divider"></div>
+										<div class="toggle-container perc">
+											<div>Show Percentage Instead</div>
+											<div class="ui fitted toggle checkbox">
+												<input type="checkbox">
+												<label></label>
+											</div>
+										</div>
+									</div>
+									<div class="pie-chart">
+										<div class="chart image"></div>
+									</div>
+									<div class="column-chart">
+										<div class="chart image"></div>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
 
-					<div class="column bivariate">
-						<div class="ui fluid card">
-							<div class="content">
-								<div class="header">
-									Bivariate Analysis
-								</div>
-								<div class="meta">
-									Comparison and relationship analysis on two columns of data.
-								</div>
-								<div class="col-dropdown">
-									<select class="ui fluid dropdown">
-										<option value="">Select Column</option>
-									</select>
-									<div class="ui horizontal divider">
-										<i class="resize vertical switch icon"></i>
+						<div class="column bivariate">
+							<div class="ui fluid card">
+								<div class="content">
+									<div class="header">
+										Bivariate Analysis
 									</div>
-									<select class="ui fluid dropdown">
-										<option value="">Select Column</option>
-									</select>
-								</div>
-							</div>
-							<div class="content missing-notice"></div>
-							<div class="content has-menu">
-								<div class="ui secondary pointing two item menu">
-									<a class="active item">Scatter Plot</a>
-									<a class="item">Line Chart</a>
-									<a class="item">Stacked Histogram</a>
-									<a class="item">Donut Chart</a>
-									<a class="item">Stacked Column Chart</a>
-								</div>
-								<div class="scatter-plot">
-									<div class="chart image"></div>
-									<div class="ui divider"></div>
-									<div class="toggle-container">
-										<div>Regression</div>
-										<div class="ui fitted toggle checkbox">
-											<input type="checkbox">
-											<label></label>
+									<div class="meta">
+										Comparison and relationship analysis on two columns of data.
+									</div>
+									<div class="col-dropdown">
+										<select class="ui fluid dropdown">
+											<option value="">Select Column</option>
+										</select>
+										<div class="ui horizontal divider">
+											<i class="resize vertical switch icon"></i>
 										</div>
+										<select class="ui fluid dropdown">
+											<option value="">Select Column</option>
+										</select>
 									</div>
-									<select class="ui fluid dropdown">
-										<option value="linear">Linear</option>
-										<option value="polynomial">Quadratic</option>
-										<option value="exponential">Exponential</option>
-										<option value="logarithmic">Logarithmic</option>
-										<option value="power">Power</option>
-									</select>
 								</div>
-								<div class="line-chart">
-									<div class="chart image"></div>
-								</div>
-								<div class="stacked-histogram">
-									<div class="chart image"></div>
-									<div class="ui divider"></div>
-									<span>Number of Bins</span>
-									<input class="ui range"></input>
-								</div>
-								<div class="donut-chart">
-									<div class="chart image"></div>
-								</div>
-								<div class="stacked-column-chart">
-									<div class="chart image"></div>
+								<div class="content missing-notice"></div>
+								<div class="content has-menu">
+									<div class="ui secondary pointing two item menu">
+										<a class="active item">Heatmap</a>
+										<a class="item">Scatter Plot</a>
+										<a class="item">Line Chart</a>
+										<a class="item">Stacked Histogram</a>
+										<a class="item">Donut Chart</a>
+										<a class="item">Stacked Column Chart</a>
+									</div>
+									<div class="heatmap">
+										<div class="chart image"></div>
+										<div class="ui divider"></div>
+										<span>X-Axis Ticks</span>
+										<input class="ui range"></input>
+										<div class="ui divider"></div>
+										<span>Y-Axis Ticks</span>
+										<input class="ui range"></input>
+									</div>
+									<div class="scatter-plot">
+										<div class="chart image"></div>
+										<div class="ui divider"></div>
+										<div class="toggle-container">
+											<div>Regression</div>
+											<div class="ui fitted toggle checkbox">
+												<input type="checkbox">
+												<label></label>
+											</div>
+										</div>
+										<select class="ui fluid dropdown">
+											<option value="linear">Linear</option>
+											<option value="polynomial">Quadratic</option>
+											<option value="exponential">Exponential</option>
+											<option value="logarithmic">Logarithmic</option>
+											<option value="power">Power</option>
+										</select>
+									</div>
+									<div class="line-chart">
+										<div class="chart image"></div>
+									</div>
+									<div class="stacked-histogram">
+										<div class="chart image"></div>
+										<div class="ui divider"></div>
+										<span>Number of Bins</span>
+										<input class="ui range"></input>
+									</div>
+									<div class="donut-chart">
+										<div class="chart image"></div>
+									</div>
+									<div class="stacked-column-chart">
+										<div class="chart image"></div>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
 
-					<!-- Different Graph Modules End Here -->
+						<!-- Different Graph Modules End Here -->
+					</div>
+				</div>
+				<div class="ui dimmer">
+					<div class="ui text loader"></div>
 				</div>
 			</div>
 		</div>
@@ -376,6 +391,7 @@
 <!-- Highcharts -->
 <script type="text/javascript" src="../assets/js/highcharts.js"></script>
 <script type="text/javascript" src="../assets/js/highcharts-more.js"></script>
+<script type="text/javascript" src="../assets/js/highcharts-heatmap.js"></script>
 <script type="text/javascript" src="../assets/js/highcharts-drilldown.js"></script>
 
 <!-- Regression Library -->
@@ -396,6 +412,7 @@
 
 <script src="graphs/bivariate.js" type="text/javascript"></script>
 <script src="graphs/bivariate/scatterplot.js" type="text/javascript"></script>
+<script src="graphs/bivariate/heatmap.js" type="text/javascript"></script>
 <script src="graphs/bivariate/linechart.js" type="text/javascript"></script>
 <script src="graphs/bivariate/stackedhistogram.js" type="text/javascript"></script>
 <script src="graphs/bivariate/donutchart.js" type="text/javascript"></script>
@@ -454,20 +471,64 @@
 			}
 		});
 
+		var downloadData = function(url) {
+			Dashboard.progress.set(0);
+			setTimeout(function() {
+				$.ajax({
+					type: 'GET',
+					url: url,
+					dataType: "text",
+					success: function(raw) {
+						drawCharts(raw);
+					}
+				});
+			}, 1);
+		};
+
 		/* Define Draw Charts Function */
 		var drawCharts = function(raw) {
-			Dashboard.init(raw, chartTypes);
-			Dashboard.draw();
+			var parseFile = function() {
+				return new Promise(function(resolve, reject) {
+					Dashboard.progress.set(1);
+					setTimeout(function() {
+						Dashboard.init(raw, chartTypes);
+						resolve("");
+					}, 1);
+				});
+			};
 
-			$(".ui.look.button").click(function () {
-				saveFile('data.txt', raw);
-			});
-			$(".ui.look.button").removeClass("disabled");
+			var generatePlots = function() {
+				return new Promise(function(resolve, reject) {
+					Dashboard.progress.set(2);
+					setTimeout(function() {
+						Dashboard.draw();
+						resolve("");
+					}, 1);
+				});
+			};
 
-			$(".ui.modal").modal('hide');
+			var finishUp = function() {
+				return new Promise(function(resolve, reject) {
+					Dashboard.progress.set(3);
+					setTimeout(function() {
+						$(".ui.look.button").click(function () {
+							saveFile('data.txt', raw);
+						});
+						$(".ui.look.button").removeClass("disabled");
 
-			$(".masonry.grid").masonry('layout');
-		}
+						$(".ui.modal").modal('hide');
+
+						$(".masonry.grid").masonry('layout');
+
+						resolve("");
+					}, 1);
+				});
+			};
+
+			parseFile()
+				.then(generatePlots)
+				.then(finishUp);
+		};
 
 		/* Download Functionality */
 		var saveFile = function(filename, data) {
@@ -484,7 +545,7 @@
 				elem.click();        
 				document.body.removeChild(elem);
 			}
-		}
+		};
 
 		/* Data Selection Dropdown */
 		$('.header-dropdown').dropdown('setting', 'onChange', function(){
@@ -501,14 +562,7 @@
 				}).modal("show");
 			}
 			else if(newValue != "") {
-				$.ajax({
-					type: 'GET',
-					url: newValue,
-					dataType: "text",
-					success: function(raw) {
-						drawCharts(raw);
-					}
-				});
+				downloadData(newValue);
 			}
 		});
 
@@ -537,18 +591,10 @@
 		/* Analyze url parameters, show visualizations if needed */
 		if(encodedUrl != null) {
 			var urlSource = decodeURIComponent(encodedUrl);
-
-			$.ajax({
-				type: 'GET',
-				url: urlSource,
-				dataType: "text",
-				success: function(raw) {
-					drawCharts(raw);
-				}
-			});
+			downloadData(urlSource);
 		}
 
-		$(".dimmable .ui.dimmer").removeClass("active");
+		$("body.dimmable > .ui.dimmer").removeClass("active");
 	});
 </script>
 

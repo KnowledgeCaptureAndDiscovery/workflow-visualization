@@ -201,7 +201,12 @@ var Bivariate = (function(Dashboard, $) {
 		var names = [];
 		var type = type1 + "-" + type2;
 		if(type == "numeric-numeric") {
-			names = ["scatter-plot"];
+			if(columnData[0].length > 1000) {
+				names.push("heatmap");
+			}
+			if(columnData[0].length < 10000) {
+				names.push("scatter-plot");
+			}
 		}
 		else if(type == "nominal-nominal") {
 			names = ["donut-chart", "stacked-column-chart"];
@@ -218,6 +223,9 @@ var Bivariate = (function(Dashboard, $) {
 
 		// initialize necessary modules
 		names.forEach(function(name) {
+			// TIME_KEEPING
+			// console.log("Bivariate " + name + " Starts: " + ((new Date())-window.ST));
+
 			var moduleName = name.replace(/-/g,"");
 			var $divToRender = $div.find("." + name);
 			var columnNames = [data["attribute"][ix1]["name"], data["attribute"][ix2]["name"]];
@@ -244,6 +252,9 @@ var Bivariate = (function(Dashboard, $) {
 					data["attribute"][ix2]["type"]["oneof"]
 				);
 			}
+
+			// TIME_KEEPING
+			// console.log("Bivariate " + name + " Ends: " + ((new Date())-window.ST));
 		});
 
 		// toggle show and hide
