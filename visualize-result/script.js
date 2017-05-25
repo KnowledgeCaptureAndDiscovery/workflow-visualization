@@ -348,6 +348,7 @@ var Dashboard = (function ($) {
       $errmsg.modal('settings', {
         closable  : false
       }).modal('show');
+      module.progress.set(-1);
       module.reset();    
       $(".header-dropdown").dropdown('restore defaults');
     };
@@ -384,6 +385,12 @@ var Dashboard = (function ($) {
           else if(val == 3) {
             $(".graphs + .ui.dimmer").removeClass("active");
             $(".graphs").removeClass("hidden");
+          }
+          else {
+            $(".graphs").removeClass("hidden");
+            $(".graphs + .ui.dimmer").removeClass("active");
+            progress = 0;
+            text = "";
           }
           $(".graphs + .ui.dimmer > .text.loader").text(text);
         },
