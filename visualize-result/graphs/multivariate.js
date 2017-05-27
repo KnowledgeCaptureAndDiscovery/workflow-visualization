@@ -6,7 +6,8 @@ var Multivariate = (function(Dashboard, $) {
 		$dropdown,
 		$menu,
 		data = {},
-		plotTypes = [];
+		plotTypes = [],
+		maxSelection = 10;
 
 	/* Helper Functions */
 
@@ -61,8 +62,12 @@ var Multivariate = (function(Dashboard, $) {
 				module.render();
 			});
 
+			var count = 0;
 			availableIx.forEach(function(item) {
-				$dropdown.dropdown("set selected", item);
+				if(count < 10) {
+					$dropdown.dropdown("set selected", item);
+					count++;
+				}
 			});
 
 			module.render();
