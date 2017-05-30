@@ -173,7 +173,7 @@ var Multivariate = (function(Dashboard, $) {
 		// obtain modules that needs rendering
 		var names = [];
 		if(types.find(function(type) { return type != "numeric"; }) == null) {
-			names = ["parallel-coordinate"];
+			names = ["parallel-coordinate", "heatmap"];
 		}
 		else {
 			return;

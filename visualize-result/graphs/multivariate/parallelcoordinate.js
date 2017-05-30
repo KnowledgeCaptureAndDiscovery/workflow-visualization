@@ -4,6 +4,7 @@ Multivariate.parallelcoordinate = (function($) {
 		$graph,
 		dimensions = [],
 		data = [],
+		currentWidth = 0,
 		resizeTimeout = false,
 		rtime;
 
@@ -18,7 +19,8 @@ Multivariate.parallelcoordinate = (function($) {
 
 		module.render();
 
-		window.addEventListener("resize", function() {
+		$graph.resize(function() {
+			var divWidth = $graph.width();
 			var delta = 120;
 			function checkResizeEnd() {
 	        	if (new Date() - rtime < delta) {
@@ -29,11 +31,14 @@ Multivariate.parallelcoordinate = (function($) {
 			    }  
 			}
 			rtime = new Date();
-			if (resizeTimeout === false) {
+			if (divWidth != 0 && divWidth != currentWidth && resizeTimeout === false) {
 		        resizeTimeout = true;
+		        currentWidth = divWidth;
 		        setTimeout(checkResizeEnd, delta);
 		    }
 		});
+
+		$graph.trigger('resize');
 	};
 
 	// Code adapted from https://bl.ocks.org/jasondavies/1341281
@@ -180,6 +185,7 @@ Multivariate.parallelcoordinate = (function($) {
 		if(!$div) return;
 
 		data = [];
+		currentWidth = 0;
 		$graph.html("");
 	};
 

@@ -327,9 +327,21 @@
 								<div class="content has-menu">
 									<div class="ui secondary pointing two item menu">
 										<a class="active item">Parallel Coordinate</a>
+										<a class="item">Heatmap</a>
 									</div>
 									<div class="parallel-coordinate">
 										<div class="chart image"></div>
+									</div>
+									<div class="heatmap">
+										<div class="chart image"></div>
+										<div class="ui divider"></div>
+										<div class="toggle-container">
+											<div>Independent Scales</div>
+											<div class="ui fitted toggle checkbox">
+												<input type="checkbox">
+												<label></label>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -447,6 +459,7 @@
 
 <script src="graphs/multivariate.js" type="text/javascript"></script>
 <script src="graphs/multivariate/parallelcoordinate.js" type="text/javascript"></script>
+<script src="graphs/multivariate/heatmap.js" type="text/javascript"></script>
 
 <!-- Initialization Script -->
 <script type="text/javascript">
@@ -556,9 +569,6 @@
 						$(".ui.look.button").removeClass("disabled");
 
 						$(".ui.modal").modal('hide');
-
-						// trigger a resize event to draw d3 graphs
-						window.dispatchEvent(new Event('resize'));
 
 						$(".masonry.grid").masonry('layout');
 
