@@ -11,6 +11,11 @@ Multivariate.heatmap = (function($) {
 		scaledData = [];
 
 	module.init = function(renderTo, seriesNames, dataCopy) {
+      // TIME_KEEPING
+      console.log("--- Heatmap Script Starts Loading ---");
+      window.ST = (new Date());
+      console.log("Heatmap init: " + 0);
+
 		module.reset();
 
 		$div = renderTo;
@@ -32,10 +37,17 @@ Multivariate.heatmap = (function($) {
 			});
 		});
 		graphData = [].concat.apply([], graphData);
+
+		// TIME_KEEPING
+		console.log("Heatmap data process 1: " + (new Date() - window.ST));
+
 		scaledData = graphData.map(function(point) {
 			var respectiveScale = scales[point[0]];
 			return [point[0], point[1], respectiveScale(point[2])];
 		});
+
+		// TIME_KEEPING
+		console.log("Heatmap data process 2: " + (new Date() - window.ST));
 
 		module.initCheckbox();
 		module.render();
@@ -73,13 +85,10 @@ Multivariate.heatmap = (function($) {
 				title: {
 					text: ''
 				},
-				labels: {
-					formatter: function() {
-						return names[this.value];
-					}
-				},
+				categories: names,
 				min: 0,
-				max: names.length - 1
+				max: names.length - 1,
+				tickInterval: 1
 			},
 			yAxis: [{
 				title: {
@@ -95,8 +104,12 @@ Multivariate.heatmap = (function($) {
 			}],
 			color: ['#3198f7'],
 			colorAxis: {
-				minColor: '#fff',
-				maxColor: '#3198f7',
+				stops: [
+					[0, '#3060cf'],
+	                [0.5, '#fffbbc'],
+	                [0.9, '#c4463a'],
+	                [1, '#c4463a']
+				],
 				labels: {
 			        formatter: function() {
 			        	return this.value + (independentScale? '%': '');
@@ -127,6 +140,8 @@ Multivariate.heatmap = (function($) {
 				enabled: false
 			}
 		});
+		// TIME_KEEPING
+		console.log("Heatmap render: " + (new Date() - window.ST));
 	};
 
 	module.reset = function() {
