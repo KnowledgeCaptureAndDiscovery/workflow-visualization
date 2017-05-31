@@ -4,9 +4,11 @@ Multivariate.parallelcoordinate = (function($) {
 		$graph,
 		dimensions = [],
 		data = [],
+		renderer = null,
 		currentWidth = 0,
 		resizeTimeout = false,
-		rtime;
+		rtime,
+		actives = {};
 
 	module.init = function(renderTo, seriesNames, dataCopy) {
 		module.reset();
@@ -79,12 +81,17 @@ Multivariate.parallelcoordinate = (function($) {
 			.attr("d", path);  
 
 		// Add blue foreground lines for focus.
-		foreground = svg.append("g")
-			.attr("class", "foreground")
-		  .selectAll("path")
-			.data(data)
-		  .enter().append("path")
-			.attr("d", path);
+		foregroundWrapper = svg.append("g")
+					.attr("class", "foreground");
+		renderer = renderQueue(function(item) {
+			foregroundWrapper.append("path")
+						.attr("d", path(item))
+						.attr("display", calcDisplay(item));
+			foreground = foregroundWrapper.selectAll("path");
+		}).clear(function() {
+			foregroundWrapper.selectAll("*").remove();
+		}).rate(1000);
+		renderer(data);
 
 		// Add a group element for each dimension.
 		var g = svg.selectAll(".dimension")
@@ -92,30 +99,6 @@ Multivariate.parallelcoordinate = (function($) {
 		  .enter().append("g")
 			.attr("class", "dimension")
 			.attr("transform", function(d) { return "translate(" + x(d) + ")"; });
-			// .call(d3.drag()
-			// .subject(function(d) { return {x: x(d)}; })
-			// .on("start", function(d) {
-			// 	dragging[d] = x(d);
-			// 	background.attr("visibility", "hidden");
-			// })
-			// .on("drag", function(d) {
-			// 	dragging[d] = Math.min(width, Math.max(0, d3.event.x));
-			// 	foreground.attr("d", path);
-			// 	dimensions.sort(function(a, b) { return position(a) - position(b); });
-			// 	x.domain(dimensions);
-			// 	g.attr("transform", function(d) { return "translate(" + position(d) + ")"; })
-			// })
-			// .on("end", function(d) {
-			// 	delete dragging[d];
-			// 	transition(d3.select(this)).attr("transform", "translate(" + x(d) + ")");
-			// 	transition(foreground).attr("d", path);
-			// 	background
-			// 		.attr("d", path)
-			// 		.transition()
-			// 		.delay(500)
-			// 		.duration(0)
-			// 		.attr("visibility", null);
-			// }));
 
 		// Add an axis and title.
 		g.append("g")
@@ -134,9 +117,9 @@ Multivariate.parallelcoordinate = (function($) {
 			.each(function(d) {
 				d3.select(this).call(y[d].brush = d3.brushY()
 					.extent([[-10,0], [10,height]])
-					.on("start", brushstart)
+					.on("start", brushStart)
 					.on("brush", brush)
-					.on("end", brush));
+					.on("end", brushEnd));
 			})
 		.selectAll("rect")
 			.attr("x", -8)
@@ -155,28 +138,42 @@ Multivariate.parallelcoordinate = (function($) {
 		function path(d) {
 			return line(dimensions.map(function(p, ix) { return [position(p), y[p](d[ix])]; }));
 		}
+		
+		function calcDisplay(d) {
+			var count = 0;
+			Object.keys(actives).forEach(function(p) {
+				var ix = dimensions.indexOf(p);
+				if(!(actives[p][0] <= y[p](d[ix]) && y[p](d[ix]) <= actives[p][1])) {
+					count++;
+				}
+			});
+			return (count == 0) ? null : "none";
+		}
 
-		function brushstart() {
+		function brushStart() {
 			d3.event.sourceEvent.stopPropagation();
 		}
 
 		// Handles a brush event, toggling the display of foreground lines.
 		function brush() {
-			var actives = {};
+			actives = {};
 			svg.selectAll(".brush")
 				.filter(function(p) { return d3.brushSelection(this); })
 				.each(function(p) { actives[p] = d3.brushSelection(this); });
-			console.log(actives);
-			foreground.style("display", function(d) {
-				var count = 0;
-				Object.keys(actives).forEach(function(p) {
-					var ix = dimensions.indexOf(p);
-					if(!(actives[p][0] <= y[p](d[ix]) && y[p](d[ix]) <= actives[p][1])) {
-						count++;
-					}
-				});
-				return (count == 0) ? null : "none";
-			});
+			renderer(data);
+		}
+
+		// Update render if the brush event clears a brush
+		function brushEnd() {
+			newActives = {};
+			svg.selectAll(".brush")
+				.filter(function(p) { return d3.brushSelection(this); })
+				.each(function(p) { newActives[p] = d3.brushSelection(this); });
+			// compares the previous and current applied brushes count
+			if(Object.keys(actives).length != Object.keys(newActives).length) {
+				actives = newActives;
+				renderer(data);
+			}
 		}
 	};
 
@@ -185,6 +182,7 @@ Multivariate.parallelcoordinate = (function($) {
 		if(!$div) return;
 
 		data = [];
+		renderer.invalidate();
 		currentWidth = 0;
 		$graph.html("");
 	};

@@ -2,25 +2,26 @@ Multivariate.heatmap = (function($) {
 	var module = {},
 		$div,
 		$graph,
+		graph,
 		$independentScaleCheckbox,
 		independentScale,
+		$renderCheckbox,
+		renderAllData,
+		sampleDataThreshold = 600,
 		names = [],
 		data = [],
 		scales,
 		graphData = [],
-		scaledData = [];
+		scaledData = [],
+		renderer = null;
 
 	module.init = function(renderTo, seriesNames, dataCopy) {
-      // TIME_KEEPING
-      console.log("--- Heatmap Script Starts Loading ---");
-      window.ST = (new Date());
-      console.log("Heatmap init: " + 0);
-
 		module.reset();
 
 		$div = renderTo;
 		$graph = $div.find('.chart.image');
-		$independentScaleCheckbox = $div.find('.fitted.toggle.checkbox');
+		$independentScaleCheckbox = $div.find('.scale.fitted.toggle.checkbox');
+		$renderCheckbox = $div.find('.render.fitted.toggle.checkbox');
 
 		names = seriesNames;
 		data = dataCopy;
@@ -36,24 +37,18 @@ Multivariate.heatmap = (function($) {
 				return [ix1, ix2, val];
 			});
 		});
-		graphData = [].concat.apply([], graphData);
-
-		// TIME_KEEPING
-		console.log("Heatmap data process 1: " + (new Date() - window.ST));
+		graphData = [].concat.apply([], d3.transpose(graphData));
 
 		scaledData = graphData.map(function(point) {
 			var respectiveScale = scales[point[0]];
 			return [point[0], point[1], respectiveScale(point[2])];
 		});
 
-		// TIME_KEEPING
-		console.log("Heatmap data process 2: " + (new Date() - window.ST));
-
-		module.initCheckbox();
+		module.initCheckboxes();
 		module.render();
 	};
 
-	module.initCheckbox = function() {
+	module.initCheckboxes = function() {
 		independentScale = $independentScaleCheckbox
 							.checkbox("is checked");
 		$independentScaleCheckbox.checkbox({
@@ -66,9 +61,35 @@ Multivariate.heatmap = (function($) {
 				module.render();
 			}
 		});
+
+		if(data[0].length < sampleDataThreshold) {
+			renderAllData = true;
+			$renderCheckbox.checkbox("set checked");
+			$div.find(".render").addClass("hidden");
+			$div.find(".render-detail").addClass("hidden");
+		}
+		else {
+			renderAllData = false;
+			$renderCheckbox.checkbox("set unchecked");
+			$div.find(".render").removeClass("hidden");
+			$div.find(".render-detail").removeClass("hidden");
+			$div.find(".render-detail").css("margin-top", "5px");
+			$div.find(".render-detail").css("padding-bottom", "0");
+		}
+		$renderCheckbox.checkbox({
+			onChecked: function() {
+				renderAllData = true;
+				module.render();
+			},
+			onUnchecked: function() {
+				renderAllData = false;
+				module.render();
+			}
+		});
 	};
 
 	module.render = function() {
+		if(renderer != null) renderer.invalidate();
 		graph = new Highcharts.Chart({
 			chart: {
 				renderTo: $graph.get(0),
@@ -125,7 +146,7 @@ Multivariate.heatmap = (function($) {
 			series: [{
 				name: "Heatmap",
 				borderColor: '#eeeeee',
-				data: (independentScale? scaledData: graphData),
+				data: [],
 				turboThreshold: graphData.length + 1
 			}],
 			tooltip: {
@@ -140,8 +161,20 @@ Multivariate.heatmap = (function($) {
 				enabled: false
 			}
 		});
-		// TIME_KEEPING
-		console.log("Heatmap render: " + (new Date() - window.ST));
+
+		// configure progressive rendering
+		var dataToRender = (independentScale? scaledData: graphData);
+		if(!renderAllData) dataToRender.splice(sampleDataThreshold * names.length);
+		renderer = renderQueue(function(point) {
+			graph.series[0].addPoint(point, false);
+		}).redraw(function() {
+			graph.yAxis[0].setExtremes(0, Math.floor(renderer.completed() / names.length) - 1);
+			graph.redraw();
+		}).clear(function() {
+			graph.series[0].setData([]);
+		}).rate(1000);
+		renderer(dataToRender);
+
 	};
 
 	module.reset = function() {
@@ -149,6 +182,7 @@ Multivariate.heatmap = (function($) {
 		if(!$div) return;
 
 		data = [];
+		renderer.invalidate();
 		$graph.html("");
 	};
 

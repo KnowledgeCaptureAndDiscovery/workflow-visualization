@@ -337,11 +337,20 @@
 										<div class="ui divider"></div>
 										<div class="toggle-container">
 											<div>Independent Scales</div>
-											<div class="ui fitted toggle checkbox">
+											<div class="scale ui fitted toggle checkbox">
 												<input type="checkbox">
 												<label></label>
 											</div>
 										</div>
+										<div class="ui divider render"></div>
+										<div class="toggle-container render">
+											<div>Show All Data</div>
+											<div class="render ui fitted toggle checkbox">
+												<input type="checkbox">
+												<label></label>
+											</div>
+										</div>
+										<div class="meta render-detail"><i class="info circle icon"></i> The data size is too large for this type of visualization. Currently, only a set of sample data is rendered. If you want to view all data, turn the switch on. The rendering process might be very slow.</div>
 									</div>
 								</div>
 							</div>
@@ -435,6 +444,9 @@
 
 <!-- Regression Library -->
 <script type="text/javascript" src="../assets/js/regression.js"></script>
+
+<!-- Progressive Rendering -->
+<script type="text/javascript" src="../assets/js/render-queue.js"></script>
 
 <!-- Custom Script -->
 <script type="text/javascript" src="script.js"></script>
@@ -559,7 +571,6 @@
 			};
 
 			var finishUp = function() {
-				console.log("ding");
 				return new Promise(function(resolve, reject) {
 					Dashboard.progress.set(3);
 					setTimeout(function() {
