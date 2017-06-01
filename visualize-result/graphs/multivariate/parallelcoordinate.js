@@ -2,8 +2,12 @@ Multivariate.parallelcoordinate = (function($) {
 	var module = {},
 		$div,
 		$graph,
+		$renderCheckbox,
+		renderAllData,
+		sampleDataThreshold = 2000,
 		dimensions = [],
 		data = [],
+		sampleData = [],
 		renderer = null,
 		currentWidth = 0,
 		resizeTimeout = false,
@@ -16,9 +20,12 @@ Multivariate.parallelcoordinate = (function($) {
 		$div = renderTo;
 		dimensions = seriesNames;
 		data = d3.transpose(dataCopy);
+		sampleData = data.slice(0, sampleDataThreshold);
+		$renderCheckbox = $div.find('.render.fitted.toggle.checkbox');
 
 		$graph = $div.find('.chart.image');
 
+		module.initCheckbox();
 		module.render();
 
 		$graph.resize(function() {
@@ -43,6 +50,37 @@ Multivariate.parallelcoordinate = (function($) {
 		$graph.trigger('resize');
 	};
 
+	module.initCheckbox = function() {
+		if(data.length < sampleDataThreshold) {
+			renderAllData = true;
+			$renderCheckbox.checkbox("set checked");
+			$div.find(".render").addClass("hidden");
+			$div.find(".render-detail").addClass("hidden");
+		}
+		else {
+			renderAllData = false;
+			$renderCheckbox.checkbox("set unchecked");
+			$div.find(".render").removeClass("hidden");
+			$div.find(".render-detail").removeClass("hidden");
+			$div.find(".render-detail").css("margin-top", "5px");
+			$div.find(".render-detail").css("padding-bottom", "0");
+		}
+		$renderCheckbox.checkbox({
+			onChecked: function() {
+				renderAllData = true;
+				module.render();
+			},
+			onUnchecked: function() {
+				renderAllData = false;
+				module.render();
+			}
+		});
+	};
+
+	module.dataToRender = function() {
+		return (renderAllData? data: sampleData);
+	};
+
 	// Code adapted from https://bl.ocks.org/jasondavies/1341281
 	module.render = function() {
 		$graph.html("");
@@ -57,7 +95,7 @@ Multivariate.parallelcoordinate = (function($) {
 
 		dimensions.forEach(function(item, ix) {
 			y[item] = d3.scaleLinear()
-				.domain(d3.extent(data, function(p) { return +p[ix]; }))
+				.domain(d3.extent(module.dataToRender(), function(p) { return +p[ix]; }))
 				.range([height, 0]);
 		});
 
@@ -76,7 +114,7 @@ Multivariate.parallelcoordinate = (function($) {
 		background = svg.append("g")
 			.attr("class", "background")
 		  .selectAll("path")
-			.data(data)
+			.data(module.dataToRender())
 		  .enter().append("path")
 			.attr("d", path);  
 
@@ -91,7 +129,7 @@ Multivariate.parallelcoordinate = (function($) {
 		}).clear(function() {
 			foregroundWrapper.selectAll("*").remove();
 		}).rate(1000);
-		renderer(data);
+		renderer(module.dataToRender());
 
 		// Add a group element for each dimension.
 		var g = svg.selectAll(".dimension")
@@ -160,7 +198,7 @@ Multivariate.parallelcoordinate = (function($) {
 			svg.selectAll(".brush")
 				.filter(function(p) { return d3.brushSelection(this); })
 				.each(function(p) { actives[p] = d3.brushSelection(this); });
-			renderer(data);
+			renderer(module.dataToRender());
 		}
 
 		// Update render if the brush event clears a brush
@@ -172,7 +210,7 @@ Multivariate.parallelcoordinate = (function($) {
 			// compares the previous and current applied brushes count
 			if(Object.keys(actives).length != Object.keys(newActives).length) {
 				actives = newActives;
-				renderer(data);
+				renderer(module.dataToRender());
 			}
 		}
 	};
