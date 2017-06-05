@@ -176,11 +176,6 @@ var Trivariate = (function(Dashboard, $) {
 			return getType(data["attribute"][columnIx]["type"]);
 		});
 
-		if(types[0] == "numeric" && types[1] == "nominal") {
-			types[0] = "nominal"; types[1] = "numeric";
-			var temp = ix[0]; ix[0] = ix[1]; ix[1] = temp;
-		}
-
 		// set dropdown disable states
 		$dropdown1.dropdown().find(".menu").find(".item").each(function() { $(this).removeClass("disabled"); });
 		$dropdown1.dropdown().find(".menu").find(".item[data-value='" + ix[2] + "']")
@@ -191,10 +186,19 @@ var Trivariate = (function(Dashboard, $) {
 		$dropdown2.dropdown().find(".menu").find(".item[data-value='" + ix[1] + "']")
 			.addClass("disabled");
 
+		if(types[0] == "numeric" && types[1] == "nominal") {
+			types[0] = "nominal"; types[1] = "numeric";
+			var temp = ix[0]; ix[0] = ix[1]; ix[1] = temp;
+		}
+		if(types[0] == "nominal" && types[1] == "numeric" && types[2] == "numeric") {
+			types[0] = "numeric"; types[2] = "nominal";
+			var temp = ix[0]; ix[0] = ix[2]; ix[2] = temp;
+		}
+
 		var columnData = ix.map(function(columnIx) {
 			return module.getColumn(columnIx);
 		});
-		module.trimBadData(columnData, types);
+		columnData = module.trimBadData(columnData, types);
 
 		// obtain modules that needs rendering
 		var names = [];
@@ -209,6 +213,9 @@ var Trivariate = (function(Dashboard, $) {
 		}
 		else if(types.join("-") == "nominal-nominal-numeric") {
 			names = ["heatmap"];
+		}
+		else if(types.join("-") == "nominal-numeric-nominal") {
+			names = ["grouped-column-chart"];
 		}
 		else {
 			module.renderNoGraph();
