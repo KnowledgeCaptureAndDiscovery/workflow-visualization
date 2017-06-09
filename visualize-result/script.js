@@ -414,8 +414,18 @@ var Dashboard = (function ($) {
 
       for(ix in chartTypes) {
         var funcName = chartTypes[ix];
-        module[funcName].init($(div + ' .' + funcName), data);
+        $(div + ' .column.' + funcName).each(function() {
+          $(this)["dashboard_" + funcName](data);
+        });
       }
+    };
+
+    // @brief draw a single module only
+    // @param divCode         the div selector name where graph drawing modules reside
+    // @param moduleTypeCode  the identifier of the module type
+    module.drawModule = function(divCode, moduleTypeCode) {
+      console.log(divCode.html());
+      $(divCode)["dashboard_" + moduleTypeCode](data);
     };
 
     // @brief variable to deal with visualizing loading indicator
@@ -476,7 +486,9 @@ var Dashboard = (function ($) {
       /* reset all graphs */
       for(ix in chartTypes) {
         var funcName = chartTypes[ix];
-        module[funcName].reset();
+        $(div + ' .column.' + funcName).each(function() {
+          $(this)["dashboard_" + funcName]("reset");
+        });
       }
     };
 

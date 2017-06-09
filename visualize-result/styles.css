@@ -51,7 +51,8 @@
 }
 
 /* Graph Option Section Layout */
-.graph-content .content span {
+.graph-content .content > span,
+.graph-content .content *:not(.ui.dropdown) > span {
 	display: block;
 	margin-bottom: 10px !important;
 }
@@ -73,6 +74,43 @@
 	color: #888;
 	text-align: center;
 	line-height: 400px;
+}
+
+/* Customization Functionalities Layout */
+.column.hoarded {
+	display: none !important;
+}
+.column.folded > .fluid.card {
+	padding-top: 4px;
+}
+.column.folded .content:not(.has-menu):not(.folding.state):not(.has-statistics) {
+	display: none !important;
+}
+.column.folded .content.has-menu > .pointing.menu {
+	display: none !important;
+}
+.column.folded .content > div:not(.pointing.menu) > *:not(.chart.image):not(.statistic) {
+	display: none !important;
+}
+.folding.state.content > .header {
+	text-align: center;
+	font-size: 14px !important;
+	display: block;
+	padding: 0 40px;
+}
+.add.module.dropdown {
+
+}
+.add.module.buttons {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+.add.module.buttons > div {
+	-webkit-box-flex: 1;
+	-webkit-flex: 1 1 auto;
+	-ms-flex: 1 1 auto;
+	flex: 1 1 auto;
 }
 
 /* D3 SVG Graph Layout */

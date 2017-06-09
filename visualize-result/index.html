@@ -122,6 +122,57 @@
 					<div class="ui stackable two column masonry grid graph-content">
 						<!-- Different Graph Modules Start Here -->
 
+						<div class="column settings">
+							<div class="ui fluid card">
+								<div class="content">
+									<div class="header">
+										Settings
+									</div>
+									<div class="meta">
+										Visualization customization.
+									</div>
+								</div>
+								<div class="content">
+									<span>Modules</span>
+									<div class="ui one column grid">
+										<div class="column not-masonry">
+											<div class="ui basic add module buttons">
+												<div class="ui fluid add module pointing dropdown button">
+													<span class="text">Select Module</span>
+													<i class="icon dropdown"></i>
+													<div class="menu"></div>
+												</div>
+												<!-- <select class="ui fluid pointing add module dropdown button">
+													<option value="">Select Module</option>
+												</select> -->
+												<button class="ui add module button">Add Module</button>
+											</div>
+										</div>
+										<div class="column not-masonry">
+											<button class="ui basic fluid restore default button">Restore Default</button>
+										</div>
+									</div>
+								</div>
+								<div class="content">
+									<span>Layout</span>
+									<div class="ui two column grid">
+										<div class="column not-masonry">
+											<button class="ui basic fluid fold all button">Fold All</button>
+										</div>
+										<div class="column not-masonry">
+											<button class="ui basic fluid unfold all button">Unfold All</button>
+										</div>
+									</div>
+								</div>
+								<div class="content">
+									<span>Linking</span>
+									<div class="column not-masonry">
+										<button class="ui basic fluid disabled link button">Coming Soon</button>
+									</div>
+								</div>
+							</div>
+						</div>
+
 						<div class="column basic">
 							<div class="ui fluid card">
 								<div class="content">
@@ -132,7 +183,7 @@
 										Basic statistical information of the data.
 									</div>
 								</div>
-								<div class="content">
+								<div class="content has-statistics">
 									<span>Column and Row Count</span>
 									<div class="ui two statistics">
 										<div class="ui statistic col-count">
@@ -563,7 +614,7 @@
 
 		/* Initialize Masonry */
 		$(".masonry.grid").masonry({
-			itemSelector: '.column:not(.ui)',
+			itemSelector: '.column:not(.ui):not(.not-masonry)',
 			percentPosition: true
 		});
 		$('.masonry.grid .column').resize(function() {
@@ -590,17 +641,135 @@
 
 		/* Load Chart Types */
 		var chartTypes = [];
+		var chartTypeHtml = {};
 		$(".graph-content > .column").each(function() {
 			var classNames = $(this)
 				.attr("class")
 				.split(' ')
 				.filter(function(val) {
 					return val != "column"
-						&& val != "hidden";
+						&& val != "hidden"
+						&& val != "settings"
+						&& val != "default-module";
 				});
 			for(var ix in classNames) {
 				chartTypes.push(classNames[ix]);
+				chartTypeHtml[classNames[ix]] = $(this).html();
 			}
+		});
+		
+		/* Populate Add Module Dropdown */
+		chartTypes.forEach(function(type, ix) {
+			function toTitleCase(txt) {
+				return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+			}
+			// $(".settings .add.module.dropdown > .menu").append(
+			// 	"<div class='item' value='" + ix + "'>" + toTitleCase(type) + "</div>"
+			// );
+			$(".settings .add.module.dropdown > .menu").append(
+				"<div class='item' value='" + ix + "'>" + toTitleCase(type) + "</div>"
+			);
+		});
+		$(".settings .add.module.dropdown").dropdown();
+		$(".add.module.button:not(.dropdown)").click(function() {
+			var chartType = $(".settings .add.module.dropdown").dropdown("get value");
+			if(chartType == null) return;
+			$(".graph-content").append(
+				"<div class='column " + chartType + "'>"
+				+ chartTypeHtml[chartType]
+				+ "</div>"
+			);
+			var $moduleToDraw = $(".graph-content").children().last(".column");
+			Dashboard.drawModule($moduleToDraw, chartType);
+			$moduleToDraw.addControlButtons();
+			$(".masonry.grid").masonry('appended', $moduleToDraw);
+			$('.masonry.grid .column').resize(function() {
+				$(".masonry.grid").masonry('layout');
+			});
+		});
+
+		/* Add Customization Elements */
+		$.fn.addControlButtons = function() {
+			var customizationButtons = ""
+			+	"<div style='position: absolute; top: 10px; right: 5px; display: block'>"
+			+		"<i class='right floated close link icon close-module-button'></i>"
+			+		"<i class='right floated circle link icon fold-module-button'></i>"
+			+	"</div>"
+			;
+			$(this).find(".fluid.card").prepend(customizationButtons);
+			$(this).find(".fold-module-button").on("click", function() {
+				var $column = $(this).closest(".column");
+
+				if($column.hasClass("folded")) {
+					unfoldModule($column);
+				}
+				else {
+					foldModule($column);
+				}
+			});
+			$(this).find(".close-module-button").on("click", function() {
+				var $column = $(this).closest(".column");
+				if($column.hasClass("default-module")) {
+					$column.addClass("hoarded");
+				}
+				else {
+					$column.remove();
+				}
+				$(".masonry.grid").masonry('layout');
+			});
+		};
+		$(".graph-content > .column:not(.settings)").each(function() {
+			$(this).addClass("default-module");
+			$(this).addControlButtons();
+		});
+
+		/* Module Folding Mechanism */
+		var foldModule = function($divToFold) {
+			var $button = $divToFold.find(".fold-module-button");
+			$button.addClass("thin");
+			$divToFold.addClass("folded");
+			var description = jQuery.data($divToFold[0], "module-data").description();
+			$divToFold.find(".ui.card").prepend(
+				"<div class='folding state content'><div class='header'>" 
+				+ description 
+				+ "</div></div>"
+			);
+		}
+		var unfoldModule = function($divToUnfold) {
+			var $button = $divToUnfold.find(".fold-module-button");
+			$button.removeClass("thin");
+			$divToUnfold.removeClass("folded");
+			$divToUnfold.find(".folding.state.content").remove();
+		}
+
+		/* Settings Section Buttons Behavior */
+		$(".fold.all.button").click(function() {
+			$(".graph-content > .column:not(.settings)").each(function() {
+				if(!$(this).hasClass("folded")) {
+					foldModule($(this));
+				}
+			});
+		});
+		$(".unfold.all.button").click(function() {
+			$(".graph-content > .column:not(.settings)").each(function() {
+				if($(this).hasClass("folded")) {
+					unfoldModule($(this));
+				}
+			});
+		});
+		$(".restore.default.button").click(function() {
+			$(".graph-content > .column:not(.settings)").each(function() {
+				$(this).removeClass("hoarded");
+				if($(this).hasClass("default-module")) {
+					if($(this).hasClass("folded")) {
+						unfoldModule($(this));
+					}
+				}
+				else {
+					$(this).remove();
+				}
+			});
+			$(".masonry.grid").masonry('layout');
 		});
 
 		var downloadData = function(url) {
@@ -649,9 +818,13 @@
 						});
 						$(".ui.look.button").removeClass("disabled");
 
-						$(".ui.modal").modal('hide');
+						$(".column.settings").removeClass("hidden");
+
+						$(".unfold.all.button").trigger("click");
 
 						$(".masonry.grid").masonry('layout');
+
+						$(".ui.modal").modal('hide');
 
 						resolve();
 					}, 1);
@@ -690,7 +863,7 @@
 					closable  	: false,
 					onDeny		: function() {
 						$(".header-dropdown").dropdown('restore defaults');
-						$(".graph-content > .column").addClass("hidden");
+						$(".graph-content > .column:not(.settings)").addClass("hidden");
 						$(".ui.look.button").addClass("disabled");
 					}
 				}).modal("show");
