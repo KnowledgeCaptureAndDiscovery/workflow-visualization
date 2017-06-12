@@ -45,10 +45,12 @@
 						step: 1,
 						postfix: ' bins',
 						max_postfix: "+",
-						grid: false,
-						onFinish: function(data) {
-							// to avoid scope issues, we call something that is not related to scope
-							$div.dashboard_bivariate_heatmap("setNumBins", ix, data.from);
+						grid: false
+					});
+
+					$item.data("ionRangeSlider").update({
+						onFinish: function(sliderData) {
+							module.setNumBins(ix, sliderData.from);
 						}
 					});
 				});

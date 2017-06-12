@@ -99,10 +99,12 @@
 					step: 1,
 					postfix: ' bins',
 					max_postfix: "+",
-					grid: false,
+					grid: false
+				});
+
+				$rangeSelector.data("ionRangeSlider").update({
 					onFinish: function(sliderData) {
-						// to avoid scope issues, we call something that is not related to scope
-						$div.dashboard_bivariate_stackedhistogram("render", sliderData.from);
+						module.render(sliderData.from);
 					}
 				});
 			}

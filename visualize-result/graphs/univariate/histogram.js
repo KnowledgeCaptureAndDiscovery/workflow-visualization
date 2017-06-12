@@ -104,7 +104,7 @@
 				$div.find(".exclude.toggle-container").removeClass("hidden");
 				$div.find(".ui.divider:last").removeClass("hidden");
 			}
-		}
+		};
 
 		module.initPercCheckbox = function() {
 			showPerc = $percCheckbox.checkbox("is checked");
@@ -118,7 +118,7 @@
 					module.update();
 				}
 			});
-		}
+		};
 
 		module.render = function(numBins) {
 			var dataToShow = data;
@@ -156,10 +156,12 @@
 					step: 1,
 					postfix: ' bins',
 					max_postfix: "+",
-					grid: false,
+					grid: false
+				});
+
+				$rangeSelector.data("ionRangeSlider").update({
 					onFinish: function(sliderData) {
-						// to avoid scope issues, we call something that is not related to scope
-						$div.dashboard_univariate_histogram("render", sliderData.from);
+						module.render(sliderData.from);
 					}
 				});
 			}
@@ -224,7 +226,7 @@
 		module.update = function() {
 			var numBins = $rangeSelector.data("ionRangeSlider").old_from;
 			module.render(numBins);
-		}
+		};
 
 		module.reset = function() {
 			// if init has not been run, do nothing

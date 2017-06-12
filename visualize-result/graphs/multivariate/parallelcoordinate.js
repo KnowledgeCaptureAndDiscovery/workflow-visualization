@@ -16,7 +16,8 @@
 			resizeTimeout = false,
 			rtime,
 			actives = {},
-			svg = null;
+			svg = null,
+			sec;
 
 		module.init = function(renderTo, seriesNames, dataCopy) {
 			$div = renderTo;
@@ -198,6 +199,7 @@
 			// Handles a brush event, toggling the display of foreground lines.
 			function brush() {
 				actives = {};
+				svg = d3.select($graph.get(0)).select("svg");
 				svg.selectAll(".brush")
 					.filter(function(p) { return d3.brushSelection(this); })
 					.each(function(p) { actives[p] = d3.brushSelection(this); });
