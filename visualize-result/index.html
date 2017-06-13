@@ -867,13 +867,13 @@
 		/* Data Selection Dropdown */
 		$('.header-dropdown').dropdown('setting', 'onChange', function(){
 			var newValue = $('.header-dropdown').dropdown('get value');
+			$(".sample-notice").addClass("hidden");
 			if(newValue == "upload") {
 				DragAndDrop.init(drawCharts);
 				$(".ui.upload.modal").modal('setting', {
 					closable  	: false,
 					onDeny		: function() {
 						$(".header-dropdown").dropdown('restore defaults');
-						$(".sample-notice").addClass("hidden");
 						$(".graph-content > .column:not(.settings)").addClass("hidden");
 						$(".ui.look.button").addClass("disabled");
 					}
