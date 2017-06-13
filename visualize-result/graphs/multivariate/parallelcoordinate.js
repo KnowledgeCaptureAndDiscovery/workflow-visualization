@@ -200,6 +200,7 @@
 			function brush() {
 				actives = {};
 				svg = d3.select($graph.get(0)).select("svg");
+				console.log(svg);
 				svg.selectAll(".brush")
 					.filter(function(p) { return d3.brushSelection(this); })
 					.each(function(p) { actives[p] = d3.brushSelection(this); });

@@ -6,21 +6,33 @@
 			$div,
 			$graph,
 			graph,
+			$renderCheckbox,
+			renderAllData,
+			sampleDataThreshold = 2000,
 			graphData = [],
 			names = [],
-			data = [];
+			data = [],
+			sampleData = [];
 
 		module.init = function(renderTo, seriesNames, dataCopy) {
 			$div = renderTo;
 			$div.data("dashboard.trivariate.bubblechart", module);
 			names = seriesNames;
 			data = dataCopy;
+			sampleData = d3.transpose(d3.transpose(data).slice(0, sampleDataThreshold));
+			$renderCheckbox = $div.find('.render.fitted.toggle.checkbox');
 			$graph = $div.find('.chart.image');	
 
 			module.reset();
+			module.initCheckbox();
 
-			graphData = data[0].map(function(val, ix) {
-				return {x: data[0][ix], y: data[1][ix], z: data[2][ix]};
+			var dataToShow = module.dataToRender();
+			graphData = dataToShow[0].map(function(val, ix) {
+				return {
+					x: parseFloat(dataToShow[0][ix].toFixed(3)), 
+					y: parseFloat(dataToShow[1][ix].toFixed(3)), 
+					z: parseFloat(dataToShow[2][ix].toFixed(3))
+				};
 			});
 
 			graph = new Highcharts.Chart({
@@ -66,6 +78,37 @@
 				  enabled: false
 				}
 			});
+		};
+
+		module.initCheckbox = function() {
+			if(d3.transpose(data).length < sampleDataThreshold) {
+				renderAllData = true;
+				$renderCheckbox.checkbox("set checked");
+				$div.find(".render").addClass("hidden");
+				$div.find(".render-detail").addClass("hidden");
+			}
+			else {
+				renderAllData = false;
+				$renderCheckbox.checkbox("set unchecked");
+				$div.find(".render").removeClass("hidden");
+				$div.find(".render-detail").removeClass("hidden");
+				$div.find(".render-detail").css("margin-top", "5px");
+				$div.find(".render-detail").css("padding-bottom", "0");
+			}
+			$renderCheckbox.checkbox({
+				onChecked: function() {
+					renderAllData = true;
+					module.render();
+				},
+				onUnchecked: function() {
+					renderAllData = false;
+					module.render();
+				}
+			});
+		};
+
+		module.dataToRender = function() {
+			return (renderAllData? data: sampleData);
 		};
 
 		module.reset = function() {
