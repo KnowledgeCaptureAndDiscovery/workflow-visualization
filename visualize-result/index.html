@@ -120,8 +120,8 @@
 
 			<!-- Graph Content -->
 			<div class="ui vertical segment dimmable">
-				<div class="graphs ui container">
-					<div class="ui stackable two column masonry grid graph-content">
+				<div class="graphs">
+					<div class="ui stackable three column masonry grid graph-content">
 						<!-- Different Graph Modules Start Here -->
 
 						<div class="column settings">
@@ -136,22 +136,22 @@
 								</div>
 								<div class="content">
 									<span>Modules</span>
-									<div class="ui one column grid">
-										<div class="column not-masonry">
+									<div class="ui grid">
+										<div class="sixteen wide column not-masonry">
 											<div class="ui basic add module buttons">
 												<div class="ui fluid add module pointing dropdown button">
 													<span class="text">Select Module</span>
 													<i class="icon dropdown"></i>
 													<div class="menu"></div>
 												</div>
-												<!-- <select class="ui fluid pointing add module dropdown button">
-													<option value="">Select Module</option>
-												</select> -->
 												<button class="ui add module button">Add Module</button>
 											</div>
 										</div>
-										<div class="column not-masonry">
+										<div class="eight wide column not-masonry">
 											<button class="ui basic fluid restore default button">Restore Default</button>
+										</div>
+										<div class="eight wide column not-masonry">
+											<button class="ui basic fluid clear modules button">Clear Modules</button>
 										</div>
 									</div>
 								</div>
@@ -762,6 +762,11 @@
 				}
 			});
 		});
+		$(".clear.modules.button").click(function() {
+			$(".graph-content > .column:not(.settings)").each(function() {
+				$(this).find(".close-module-button").trigger("click");
+			});
+		});
 		$(".restore.default.button").click(function() {
 			$(".graph-content > .column:not(.settings)").each(function() {
 				$(this).removeClass("hoarded");
@@ -774,6 +779,8 @@
 					$(this).remove();
 				}
 			});
+			Dashboard.progress.set(0);
+			drawCharts();
 			$(".masonry.grid").masonry('layout');
 		});
 
@@ -792,7 +799,7 @@
 		};
 
 		/* Define Draw Charts Function */
-		var drawCharts = function(raw) {
+		var drawCharts = function(raw = null) {
 			var parseFile = function() {
 				return new Promise(function(resolve, reject) {
 					Dashboard.progress.set(1);
@@ -841,10 +848,15 @@
 				});
 			};
 
-			parseFile()
-				.catch(function(e) {})
-				.then(generatePlots)
-				.then(finishUp);
+			if(raw != null) {
+				parseFile()
+					.catch(function(e) {})
+					.then(generatePlots)
+					.then(finishUp);
+			}
+			else {
+				generatePlots().then(finishUp);
+			}
 		};
 
 		/* Download Functionality */

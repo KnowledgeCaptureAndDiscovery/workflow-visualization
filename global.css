@@ -84,6 +84,15 @@ body {
 .header-content {
 	margin-top: 40px !important;
 }
+.header-content:before {
+	content: "";
+	width: 100%;
+	height: 40px;
+	position: absolute;
+	top: -40px;
+	left: 0;
+	background: #444;
+}
 .header-content .column {
 	display: flex !important;
 	flex-direction: row;

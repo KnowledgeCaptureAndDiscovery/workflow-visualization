@@ -414,7 +414,7 @@ var Dashboard = (function ($) {
 
       for(ix in chartTypes) {
         var funcName = chartTypes[ix];
-        $(div + ' .column.' + funcName).each(function() {
+        $(div + ' .column.' + funcName + ':not(hoarded)').each(function() {
           $(this)["dashboard_" + funcName](data);
         });
       }
