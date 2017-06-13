@@ -60,9 +60,6 @@
 
 	<!-- Main Content -->
 	<div class="pusher full height">
-		<!-- Placeholder for Navigation Bar for Desktop Sites -->
-		<div class="ui visible left vertical inverted sidebar menu blue toc-copy"></div>
-
 		<!-- The Real Main Content -->
 		<div class="main-content">
 			<!-- Main Content Header -->
@@ -72,13 +69,10 @@
 						<div class="nine wide column">
 							<h1 class="ui header">
 							Visualize Result
-								<div class="sub header">
-									Visually interpret a single workflow result.
-								</div>
 							</h1>
 						</div>
 						<div class="seven wide column">
-							<div class="ui basic buttons">
+							<div class="ui small basic buttons">
 								<div class="ui fluid pointing dropdown button header-dropdown">
 									<span class="text">Data Selection</span>
 									<i class="icon dropdown"></i>
@@ -112,6 +106,14 @@
 								</button>
 							</div>
 						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="ui vertical segment sample-notice hidden">
+				<div class="ui container">
+					<div class="notice-content">
+						<i class="info circle icon"></i> Due to the size of the data, only a set of sample data is rendered in some visualizations. If you want to view all data in those visualizations, turn the switch "show all data" on. The rendering process might be very slow.
 					</div>
 				</div>
 			</div>
@@ -395,6 +397,15 @@
 									</div>
 									<div class="bubble-chart">
 										<div class="chart image"></div>
+										<div class="ui divider render"></div>
+										<div class="toggle-container render">
+											<div>Show All Data</div>
+											<div class="render ui fitted toggle checkbox">
+												<input type="checkbox">
+												<label></label>
+											</div>
+										</div>
+										<div class="meta render-detail"><i class="info circle icon"></i> Sample data is rendered by default.</div>
 									</div>
 									<div class="stacked-column-chart">
 										<div class="chart image"></div>
@@ -444,7 +455,7 @@
 												<label></label>
 											</div>
 										</div>
-										<div class="meta render-detail"><i class="info circle icon"></i> The data size is too large for this type of visualization. Currently, only a set of sample data is rendered. If you want to view all data, turn the switch on. The rendering process might be very slow.</div>
+										<div class="meta render-detail"><i class="info circle icon"></i> Sample data is rendered by default.</div>
 									</div>
 									<div class="heatmap">
 										<div class="chart image"></div>
@@ -464,7 +475,7 @@
 												<label></label>
 											</div>
 										</div>
-										<div class="meta render-detail"><i class="info circle icon"></i> The data size is too large for this type of visualization. Currently, only a set of sample data is rendered. If you want to view all data, turn the switch on. The rendering process might be very slow.</div>
+										<div class="meta render-detail"><i class="info circle icon"></i> Sample data is rendered by default.</div>
 									</div>
 								</div>
 							</div>
@@ -624,10 +635,7 @@
 		/* Show Body */
 		$("body").show();
 
-		/* Create a copy of sidebar menu for desktop */
-		$(".toc-copy").html($(".toc").html());
-
-		/* Add sidebar animation for mobile sites */
+		/* Add sidebar animation */
 		$(".launch.icon").click(function(){
 			$(".sidebar.toc").sidebar('toggle');
 		});
@@ -663,9 +671,6 @@
 			function toTitleCase(txt) {
 				return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
 			}
-			// $(".settings .add.module.dropdown > .menu").append(
-			// 	"<div class='item' value='" + ix + "'>" + toTitleCase(type) + "</div>"
-			// );
 			$(".settings .add.module.dropdown > .menu").append(
 				"<div class='item' value='" + ix + "'>" + toTitleCase(type) + "</div>"
 			);
@@ -826,6 +831,11 @@
 
 						$(".ui.modal").modal('hide');
 
+						// show sample data notice if needed
+						if($(".render.checkbox:not(.hidden)").length) {
+							$(".sample-notice").removeClass("hidden");
+						}
+
 						resolve();
 					}, 1);
 				});
@@ -863,6 +873,7 @@
 					closable  	: false,
 					onDeny		: function() {
 						$(".header-dropdown").dropdown('restore defaults');
+						$(".sample-notice").addClass("hidden");
 						$(".graph-content > .column:not(.settings)").addClass("hidden");
 						$(".ui.look.button").addClass("disabled");
 					}
