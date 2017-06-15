@@ -1,6 +1,6 @@
 (function($) {
 
-	function Bivariate(renderTo, dataCopy) {
+	function Trivariate(renderTo, dataCopy) {
 
 		/* Private Variables */
 		var module = this,
@@ -42,6 +42,7 @@
 			}
 		};
 
+
 		/* Member Functions */
 
 		// @brief	initialization code
@@ -55,32 +56,30 @@
 			data = dataCopy;
 
 			module.reset();
-
 			$dropdown1 = $div.find(".col-dropdown").find(".fluid.dropdown").first();
 			$dropdown2 = $div.find(".col-dropdown").find(".fluid.dropdown").last();
 			$menu = $div.find(".has-menu").find(".menu");
 
 			module.initPlotTypes();
 
-			module.initSwitchButton();
-
 			var availableIx = module.initGraphOptionDropdown();
 
-			if(availableIx.length >= 2) {
+			if(availableIx.length >= 3) {
 				// define dropdown action events
 				$div.find(".col-dropdown").find(".fluid.dropdown").dropdown("setting", "onChange", function() {
 					module.render();
 				});
 
 				$dropdown1.dropdown("set selected", availableIx[0]);
-				$dropdown2.dropdown("set selected", availableIx[1]);
+				$dropdown1.dropdown("set selected", availableIx[1]);
+				$dropdown2.dropdown("set selected", availableIx[2]);
 
 				module.render();
 
 				$div.removeClass("hidden");
 			}
 			else {
-				console.log("No bivariate graph to show");
+				console.log("No trivariate graph to show");
 				$div.addClass("hidden");
 			}
 		};
@@ -101,18 +100,6 @@
 					});
 					$div.find("." + shownItem).removeClass("hidden");
 				});
-			});
-		};
-
-		// @brief	initialize click event handler for switch button
-		module.initSwitchButton = function() {
-			var $switchBtn = $div.find(".switch.icon");
-			$switchBtn.hover(function() { $(this).css("cursor", "pointer"); });
-			$switchBtn.on("click", function() {
-				var tempSel = $dropdown1.dropdown("get value");
-				$dropdown1.dropdown("set value", $dropdown2.dropdown("get value"));
-				$dropdown2.dropdown("set value", tempSel);
-				module.render();
 			});
 		};
 
@@ -145,7 +132,7 @@
 		module.trimBadData = function(columnData, types) {
 			var $missingNotice = $div.find(".missing-notice");
 
-			if(types[0] != "numeric" && types[1] != "numeric") {
+			if(types.indexOf("numeric") == -1) {
 				$missingNotice.addClass("hidden");
 			}
 
@@ -154,17 +141,13 @@
 
 				var originalLength = columnData.length;
 
-				if(types[0] == "numeric") {
-					columnData = columnData.filter(function(val) {
-						return (typeof val[0] === 'number');
-					});
-				}
-
-				if(types[1] == "numeric") {
-					columnData = columnData.filter(function(val) {
-						return (typeof val[1] === 'number');
-					});
-				}
+				types.forEach(function(type, ix) {
+					if(type == "numeric") {
+						columnData = columnData.filter(function(val) {
+							return (typeof val[ix] === 'number');
+						});
+					}
+				});
 
 				var trimmedLength = columnData.length;
 
@@ -188,81 +171,85 @@
 
 		// @brief	init modules and set module visibility
 		module.render = function() {
-			var ix1 = ($dropdown1.dropdown("get value"))[0];
-			var ix2 = ($dropdown2.dropdown("get value"))[0];
-			ix = [ix1, ix2];
-			var type1 = getType(data["attribute"][ix1]["type"]);
-			var type2 = getType(data["attribute"][ix2]["type"]);
+			ix = $dropdown1.dropdown("get value").slice(0, -1);
+			if(ix.length != 2) {
+				module.renderNoGraph();
+				return;
+			}
+			ix.push(($dropdown2.dropdown("get value"))[0]);
+
+			var types = ix.map(function(columnIx) {
+				return getType(data["attribute"][columnIx]["type"]);
+			});
 
 			// set dropdown disable states
 			$dropdown1.dropdown().find(".menu").find(".item").each(function() { $(this).removeClass("disabled"); });
-			$dropdown1.dropdown().find(".menu").find(".item[data-value='" + $dropdown2.dropdown("get value")[0] + "']")
+			$dropdown1.dropdown().find(".menu").find(".item[data-value='" + ix[2] + "']")
 				.addClass("disabled");
 			$dropdown2.dropdown().find(".menu").find(".item").each(function() { $(this).removeClass("disabled"); });
-			$dropdown2.dropdown().find(".menu").find(".item[data-value='" + $dropdown1.dropdown("get value")[0] + "']")
+			$dropdown2.dropdown().find(".menu").find(".item[data-value='" + ix[0] + "']")
+				.addClass("disabled");
+			$dropdown2.dropdown().find(".menu").find(".item[data-value='" + ix[1] + "']")
 				.addClass("disabled");
 
-			var columnData = [module.getColumn(ix1), module.getColumn(ix2)];
-			columnData = module.trimBadData(columnData, [type1, type2]);
+			if(types[0] == "numeric" && types[1] == "nominal") {
+				types[0] = "nominal"; types[1] = "numeric";
+				var temp = ix[0]; ix[0] = ix[1]; ix[1] = temp;
+			}
+			if(types[0] == "nominal" && types[1] == "numeric" && types[2] == "numeric") {
+				types[0] = "numeric"; types[2] = "nominal";
+				var temp = ix[0]; ix[0] = ix[2]; ix[2] = temp;
+			}
+
+			var columnData = ix.map(function(columnIx) {
+				return module.getColumn(columnIx);
+			});
+			columnData = module.trimBadData(columnData, types);
 
 			// obtain modules that needs rendering
 			var names = [];
-			var type = type1 + "-" + type2;
-			if(type == "numeric-numeric") {
-				if(columnData[0].length > 1000) {
-					names.push("heatmap");
-				}
-				if(columnData[0].length < 10000) {
-					names.push("scatter-plot");
-				}
+			if(types.join("-") == "numeric-numeric-numeric") {
+				names = ["bubble-chart"];
 			}
-			else if(type == "nominal-nominal") {
-				names = ["donut-chart", "stacked-column-chart"];
+			else if(types.join("-") == "nominal-nominal-nominal") {
+				names = ["stacked-column-chart"];
 			}
-			else if(type == "nominal-numeric") {
-				names = ["line-chart"];
+			else if(types.join("-") == "numeric-numeric-nominal") {
+				names = ["scatter-plot"];
 			}
-			else if(type == "numeric-nominal") {
-				names = ["stacked-histogram"];
+			else if(types.join("-") == "nominal-nominal-numeric") {
+				names = ["heatmap"];
+			}
+			else if(types.join("-") == "nominal-numeric-nominal") {
+				names = ["grouped-column-chart"];
 			}
 			else {
+				module.renderNoGraph();
 				return;
 			}
 
 			// initialize necessary modules
 			names.forEach(function(name) {
 				// TIME_KEEPING
-				// console.log("Bivariate " + name + " Starts: " + ((new Date())-window.ST));
+				// console.log("Trivariate " + name + " Starts: " + ((new Date())-window.ST));
 
 				var moduleName = name.replace(/-/g,"");
 				var $divToRender = $div.find("." + name);
-				var columnNames = [data["attribute"][ix1]["name"], data["attribute"][ix2]["name"]];
-				if(type == "numeric-numeric") {
-					$divToRender["dashboard_bivariate_" + moduleName](
-						columnNames, columnData
-					);
-				}
-				else if(type == "nominal-nominal") {
-					$divToRender["dashboard_bivariate_" + moduleName](
-						columnNames, columnData,
-						[data["attribute"][ix1]["type"]["oneof"], data["attribute"][ix2]["type"]["oneof"]]
-					);
-				}
-				else if(type == "nominal-numeric") {
-					$divToRender["dashboard_bivariate_" + moduleName](
-						columnNames, columnData,
-						data["attribute"][ix1]["type"]["oneof"]
-					);
-				}
-				else if(type == "numeric-nominal") {
-					$divToRender["dashboard_bivariate_" + moduleName](
-						columnNames, columnData,
-						data["attribute"][ix2]["type"]["oneof"]
-					);
-				}
+				var columnNames = ix.map(function(columnIx) {
+					return data["attribute"][columnIx]["name"];
+				});
+				var columnCategories = ix.map(function(columnIx) {
+					return data["attribute"][columnIx]["type"]["oneof"] || {};
+				});
+
+				$divToRender["dashboard_trivariate_" + moduleName](
+					columnNames,
+					columnData,
+					columnCategories
+				);
 
 				// TIME_KEEPING
-				// console.log("Bivariate " + name + " Ends: " + ((new Date())-window.ST));
+				// console.log("Trivariate " + name + " Ends: " + ((new Date())-window.ST));
 			});
 
 			// toggle show and hide
@@ -290,6 +277,16 @@
 			}
 		};
 
+		// @brief	hide all graphs and show a no graph message
+		module.renderNoGraph = function() {
+			plotTypes.forEach(function(type) {
+				var typeName = encodingToDisplay(type.replace(/-/g, " "));
+				$div.find("." + type).addClass("hidden");
+				$menu.find("a.item:contains('" + typeName.replace(/-/g, " ") + "')").addClass("hidden");
+			});
+			$div.find(".no-graph").removeClass("hidden");
+		}
+
 		module.getColumn = function(ix) {
 			return data["data"].map(function(val) {
 				return val[data["attribute"][ix]["name"]];
@@ -301,51 +298,53 @@
 			// if init has not been run, do nothing
 			if(!$div) return;
 
-			ix = [];
-
 			$div.find(".col-dropdown").html(""
-				+ "<select class='ui fluid dropdown'>"
-				+   "<option value=''>Select Columns</option>"
-				+ "</select>"
-				+ "<div class='ui horizontal divider'><i class='resize vertical switch icon'></i></div>"
-				+ "<select class='ui fluid dropdown'>"
-				+   "<option value=''>Select Columns</option>"
-				+ "</select>"
+				+ "<div class='field'>"
+					+ "<label>Axes</label>"
+					+ "<select multiple='' class='ui fluid dropdown'>"
+					+   "<option value=''>Select Axes</option>"
+					+ "</select>"
+				+ "</div>"
+				+ "<div class='field'>"
+					+ "<label>Additional Column</label>"
+					+ "<select class='ui fluid dropdown'>"
+					+   "<option value=''>Select Additional Column</option>"
+					+ "</select>"
+				+ "</div>"
 			);
 
-			// plotTypes.forEach(function(name) {
-			// 	name = name.replace(/-/g,"");
-			// 	if(module[name]) {
-			// 		module[name].reset();
-			// 	}
-			// });
+			plotTypes.forEach(function(name) {
+				name = name.replace(/-/g,"");
+				if(module[name]) {
+					module[name].reset();
+				}
+			});
 		};
 
 		module.description = function() {
 			var activeType = $menu.find(".active.item").html();
-			if(ix.length != 2) {
+			if(!$div.find(".no-graph").hasClass("hidden") || ix == null || ix.length != 3) {
 				return "No Graph";
 			}
 			else {
-				var names = ix.map(function(val) { return data["attribute"][val]["name"]});
-				return activeType + " of " + names[0] + " and " + names[1];
+				var names = ix.map(function(val) { return  data["attribute"][val]["name"]});
+				return activeType + " of " + names[0] + " and " + names[1] + " grouped by " + names[2];
 			}
 		};
 
 		module.init(renderTo, dataCopy);
-
 	};
 
-	$.fn.dashboard_bivariate = function () {
+	$.fn.dashboard_trivariate = function () {
 		var args = Array.prototype.slice.call(arguments);
         return this.each(function () {
         	if(typeof args[0] == "string") {
-				if($.data(this, "module-data") !== undefined) {
-        			$.data(this, "module-data")[args[0]].apply(null, args.slice(1));
+				if($.data($(this), "module-data") !== undefined) {
+        			$.data($(this), "module-data")[args[0]].apply(null, args.slice(1));
         		}        	
         	}
         	else {
-        		(new (Function.prototype.bind.apply(Bivariate, [null, $(this)].concat(args))));
+        		(new (Function.prototype.bind.apply(Trivariate, [null, $(this)].concat(args))));
         	}
         });
     };

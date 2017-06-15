@@ -1,7 +1,7 @@
 (function($) {
 
 	var Stackedcolumnchart = function(renderTo, seriesNames, dataCopy, classesCopy) {
-	
+
 		var module = this,
 			$div,
 			$graph,
@@ -12,24 +12,33 @@
 			data = [];
 
 		module.init = function(renderTo, seriesNames, dataCopy, classesCopy) {
+			module.reset();
+
 			$div = renderTo;
-			$.data($div[0], "dashboard.bivariate.stackedcolumnchart", module);
+			$div.data("dashboard.trivariate.stackedcolumnchart", module);
 			names = seriesNames;
 			data = dataCopy;
 			classes = classesCopy;
+
 			$graph = $div.find('.chart.image');
 
-			module.reset();
-
-			graphData = classes[1].map(function (item2) {
-				return {
-					name: item2,  
-					data: classes[0].map(function (item1) {
-						return data[0].filter(function (val, ix) {
-							return (data[0][ix] == item1 && data[1][ix] == item2);
-						}).length;
-					})
-				};
+			graphData = [];
+			classes[2].forEach(function (item3, ix) {
+				classes[1].forEach(function (item2) {
+					graphData.push({
+						name: item2,  
+						data: classes[0].map(function (item1) {
+							return data[0].filter(function (val, ix) {
+								return (data[0][ix] == item1
+								 && data[1][ix] == item2
+								 && data[2][ix] == item3);
+							}).length;
+						}),
+						showInLegend: ix == 0, 
+						stack: item3,
+						stackName: item3
+					});
+				});
 			});
 
 			graph = new Highcharts.Chart({
@@ -69,13 +78,21 @@
 				},
 				plotOptions: {
 					column: {
-						stacking: 'normal'
+						stacking: 'normal',
+						events: {
+							legendItemClick: function () {
+								return false;
+							}
+						}
 					}
 				},
 				series: graphData,
 				tooltip: {
-					headerFormat: names[0] + ': <b>{point.x}</b><br/>',
-					pointFormat: names[1] + ': <b>{series.name}</b><br/>Count: <b>{point.y}</b> of {point.stackTotal}'
+					formatter: function() {
+						return names[0] + ': <b>' + this.point.x + '</b><br/>',
+							+ names[1] + ': <b>' + this.series.name + '</b><br/>Count: <b>' + this.point.y + '</b> of ' + this.point.stackTotal + '<br/>'
+							+ names[2] + ': <b>' + this.series.stackKey.substr(6) + '</b>';
+					}
 				},
 				credits: {
 				  enabled: false
@@ -94,12 +111,12 @@
 
 	};
 
-	$.fn.dashboard_bivariate_stackedcolumnchart = function () {
+	$.fn.dashboard_trivariate_stackedcolumnchart = function () {
         var args = Array.prototype.slice.call(arguments);
         return this.each(function () {
         	if(typeof args[0] == "string") {
-        		if($.data($(this)[0], "dashboard.bivariate.stackedcolumnchart") !== undefined) {
-        			$.data($(this)[0], "dashboard.bivariate.stackedcolumnchart")[args[0]].apply(null, args.slice(1));
+        		if($.data($(this), "dashboard.trivariate.stackedcolumnchart") !== undefined) {
+        			$.data($(this), "dashboardtrivariate.stackedcolumnchart")[args[0]].apply(null, args.slice(1));
         		}
         	}
         	else {

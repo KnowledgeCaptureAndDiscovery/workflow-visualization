@@ -1,7 +1,7 @@
 (function($) {
 
-	var Stackedcolumnchart = function(renderTo, seriesNames, dataCopy, classesCopy) {
-	
+	var Groupedcolumnchart = function(renderTo, seriesNames, dataCopy, classesCopy) {
+		
 		var module = this,
 			$div,
 			$graph,
@@ -13,7 +13,7 @@
 
 		module.init = function(renderTo, seriesNames, dataCopy, classesCopy) {
 			$div = renderTo;
-			$.data($div[0], "dashboard.bivariate.stackedcolumnchart", module);
+			$div.data("dashboard.trivariate.groupedcolumnchart", module);
 			names = seriesNames;
 			data = dataCopy;
 			classes = classesCopy;
@@ -21,16 +21,23 @@
 
 			module.reset();
 
-			graphData = classes[1].map(function (item2) {
-				return {
+			graphData = [];
+			classes[2].forEach(function (item2, groupIx) {
+				graphData.push({
 					name: item2,  
 					data: classes[0].map(function (item1) {
-						return data[0].filter(function (val, ix) {
-							return (data[0][ix] == item1 && data[1][ix] == item2);
-						}).length;
+						return d3.mean(
+							data[1]
+								.filter(function (_, xValue) {
+									return (data[0][xValue] == item1
+									 && data[2][xValue] == item2);
+								})
+						) || 0;
 					})
-				};
+				});
 			});
+
+			console.log(graphData);
 
 			graph = new Highcharts.Chart({
 				chart: {
@@ -47,7 +54,7 @@
 					var colors = [],
 						base = '#3198f7',
 						i,
-						len = classes[1].length;
+						len = classes[2].length;
 
 					for (i = 0; i < len; i += 1) {
 						colors.push(Highcharts.Color(base).brighten((i - len / 2) / (len / 2 + 2)).get());
@@ -64,18 +71,25 @@
 				},
 				yAxis: {
 					title: {
-						text: 'Total ' + names[1]
+						text: 'Average ' + names[1]
 					}
 				},
 				plotOptions: {
 					column: {
-						stacking: 'normal'
+						events: {
+							legendItemClick: function () {
+								return false;
+							}
+						}
 					}
 				},
 				series: graphData,
 				tooltip: {
-					headerFormat: names[0] + ': <b>{point.x}</b><br/>',
-					pointFormat: names[1] + ': <b>{series.name}</b><br/>Count: <b>{point.y}</b> of {point.stackTotal}'
+					formatter: function() {
+						return names[0] + ': <b>' + this.key + '</b><br/>'
+							+ 'Average ' + names[1] + ': <b>' + this.y.toFixed(2) + '</b><br/>'
+							+ names[2] + ': <b>' + this.series.name + '</b>';
+					}
 				},
 				credits: {
 				  enabled: false
@@ -94,16 +108,16 @@
 
 	};
 
-	$.fn.dashboard_bivariate_stackedcolumnchart = function () {
+	$.fn.dashboard_trivariate_groupedcolumnchart = function () {
         var args = Array.prototype.slice.call(arguments);
         return this.each(function () {
         	if(typeof args[0] == "string") {
-        		if($.data($(this)[0], "dashboard.bivariate.stackedcolumnchart") !== undefined) {
-        			$.data($(this)[0], "dashboard.bivariate.stackedcolumnchart")[args[0]].apply(null, args.slice(1));
+        		if($.data($(this), "dashboard.trivariate.groupedcolumnchart") !== undefined) {
+        			$.data($(this), "dashboard.trivariate.groupedcolumnchart")[args[0]].apply(null, args.slice(1));
         		}
         	}
         	else {
-        		(new (Function.prototype.bind.apply(Stackedcolumnchart, [null, $(this)].concat(args))));
+        		(new (Function.prototype.bind.apply(Groupedcolumnchart, [null, $(this)].concat(args))));
         	}
         });
     };

@@ -60,9 +60,6 @@
 
 	<!-- Main Content -->
 	<div class="pusher full height">
-		<!-- Placeholder for Navigation Bar for Desktop Sites -->
-		<div class="ui visible left vertical inverted sidebar menu blue toc-copy"></div>
-
 		<!-- The Real Main Content -->
 		<div class="main-content">
 			<!-- Main Content Header -->
@@ -72,13 +69,13 @@
 						<div class="nine wide column">
 							<h1 class="ui header">
 							Coming soon...
-								<div class="sub header">
-									Explore how parameters influence workflow outputs.
-								</div>
 							</h1>
 						</div>
 					</div>
 				</div>
+			</div>
+
+			<div class="ui vertical segment">
 			</div>
 		</div>
 	</div>
@@ -100,10 +97,7 @@
 <!-- Initialization Script -->
 <script type="text/javascript">
 	$(document).ready(function(){
-		/* Create a copy of sidebar menu for desktop */
-		$(".toc-copy").html($(".toc").html());
-
-		/* Add sidebar animation for mobile sites */
+		/* Add sidebar animation */
 		$(".launch.icon").click(function(){
 			$(".sidebar.toc").sidebar('toggle');
 		});

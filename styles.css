@@ -7,6 +7,18 @@ body {
 	user-select: none;
 }
 
+.full.height .toc-copy {
+	position: fixed;
+	z-index: 1;
+	background-color: #1b1c1d;
+	width: 250px;
+	-webkit-box-flex: 0;
+	-webkit-flex: 0 0 auto;
+	-ms-flex: 0 0 auto;
+	flex: 0 0 auto;
+	min-height: 100vh;
+}
+
 .main-content {
 	width: 100%;
 	height: 100vh;
@@ -33,4 +45,29 @@ h3 {
 .inverted.main.menu,
 .toc-copy {
 	z-index: 1001 !important;
+}
+
+/* Responsive Design */
+@media (min-width: 992px) {
+
+.ui.fixed.inverted.menu {
+	display: none;
+}
+
+.main-content {
+	margin-left: 250px;
+}
+
+}
+
+@media (max-width: 991px) {
+
+.header-content {
+	margin-top: 40px !important;
+}
+
+.toc-copy {
+	display: none !important;
+}
+
 }
