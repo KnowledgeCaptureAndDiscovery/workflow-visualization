@@ -121,7 +121,7 @@
 			<!-- Graph Content -->
 			<div class="ui vertical segment dimmable">
 				<div class="graphs">
-					<div class="ui stackable three column masonry grid graph-content">
+					<div class="ui doubling stackable three column masonry grid graph-content">
 						<!-- Different Graph Modules Start Here -->
 
 						<div class="column settings">
@@ -533,6 +533,42 @@
 		</div>
 	</div>
 
+	<!-- Export Modal -->
+	<div class="ui small modal export">
+		<div class="header">Export Graph</div>
+		<div class="content">
+			<div class="ui form" id="export-form">
+				<div class="ui two fields">
+					<div class="file name field">
+						<label>File Name</label>
+						<input name="file-name" type="text">
+					</div>
+					<div class="file format field">
+						<label>File Format</label>
+						<select name="file-format" class="ui selection dropdown">
+							<option value="">Select File Format</option>
+							<option value="svg">SVG</option>
+							<option value="jpg">JPG</option>
+							<option value="png">PNG</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<button type="submit" class="hidden" form="export-form"></button>
+			<div class="center ui">
+				<canvas class="chart image"></canvas>
+			</div>
+		</div>
+		<div class="actions">
+			<div class="ui black deny button">
+				Cancel
+			</div>
+			<div class="ui primary right button">
+				OK
+			</div>
+		</div>
+	</div>
+
 	<!-- Loader -->
 	<div class="ui active dimmer">
 		<div class="ui text loader">Loading</div>
@@ -572,6 +608,9 @@
 
 <!-- Progressive Rendering -->
 <script type="text/javascript" src="../assets/js/render-queue.js"></script>
+
+<!-- SVG to Canvas -->
+<script type="text/javascript" src="../assets/js/canvg.min.js"></script>
 
 <!-- Custom Script -->
 <script type="text/javascript" src="script.js"></script>
@@ -640,13 +679,6 @@
 			$(".sidebar.toc").sidebar('toggle');
 		});
 
-		/* Highcharts Global Options */
-		Highcharts.setOptions({
-			chart: {
-				backgroundColor:'rgba(255, 255, 255, 0.1)'
-			}
-		});
-
 		/* Load Chart Types */
 		var chartTypes = [];
 		var chartTypeHtml = {};
@@ -693,96 +725,7 @@
 			});
 		});
 
-		/* Add Customization Elements */
-		$.fn.addControlButtons = function() {
-			var customizationButtons = ""
-			+	"<div style='position: absolute; top: 10px; right: 5px; display: block'>"
-			+		"<i class='right floated close link icon close-module-button'></i>"
-			+		"<i class='right floated circle link icon fold-module-button'></i>"
-			+	"</div>"
-			;
-			$(this).find(".fluid.card").prepend(customizationButtons);
-			$(this).find(".fold-module-button").on("click", function() {
-				var $column = $(this).closest(".column");
-
-				if($column.hasClass("folded")) {
-					unfoldModule($column);
-				}
-				else {
-					foldModule($column);
-				}
-			});
-			$(this).find(".close-module-button").on("click", function() {
-				var $column = $(this).closest(".column");
-				if($column.hasClass("default-module")) {
-					$column.addClass("hoarded");
-				}
-				else {
-					$column.remove();
-				}
-				$(".masonry.grid").masonry('layout');
-			});
-		};
-		$(".graph-content > .column:not(.settings)").each(function() {
-			$(this).addClass("default-module");
-			$(this).addControlButtons();
-		});
-
-		/* Module Folding Mechanism */
-		var foldModule = function($divToFold) {
-			var $button = $divToFold.find(".fold-module-button");
-			$button.addClass("thin");
-			$divToFold.addClass("folded");
-			var description = jQuery.data($divToFold[0], "module-data").description();
-			$divToFold.find(".ui.card").prepend(
-				"<div class='folding state content'><div class='header'>" 
-				+ description 
-				+ "</div></div>"
-			);
-		}
-		var unfoldModule = function($divToUnfold) {
-			var $button = $divToUnfold.find(".fold-module-button");
-			$button.removeClass("thin");
-			$divToUnfold.removeClass("folded");
-			$divToUnfold.find(".folding.state.content").remove();
-		}
-
-		/* Settings Section Buttons Behavior */
-		$(".fold.all.button").click(function() {
-			$(".graph-content > .column:not(.settings)").each(function() {
-				if(!$(this).hasClass("folded")) {
-					foldModule($(this));
-				}
-			});
-		});
-		$(".unfold.all.button").click(function() {
-			$(".graph-content > .column:not(.settings)").each(function() {
-				if($(this).hasClass("folded")) {
-					unfoldModule($(this));
-				}
-			});
-		});
-		$(".clear.modules.button").click(function() {
-			$(".graph-content > .column:not(.settings)").each(function() {
-				$(this).find(".close-module-button").trigger("click");
-			});
-		});
-		$(".restore.default.button").click(function() {
-			$(".graph-content > .column:not(.settings)").each(function() {
-				$(this).removeClass("hoarded");
-				if($(this).hasClass("default-module")) {
-					if($(this).hasClass("folded")) {
-						unfoldModule($(this));
-					}
-				}
-				else {
-					$(this).remove();
-				}
-			});
-			Dashboard.progress.set(0);
-			drawCharts();
-			$(".masonry.grid").masonry('layout');
-		});
+		setupCustomizations();
 
 		var downloadData = function(url) {
 			Dashboard.progress.set(0);
@@ -826,7 +769,7 @@
 					Dashboard.progress.set(3);
 					setTimeout(function() {
 						$(".ui.look.button").click(function () {
-							saveFile('data.txt', raw);
+							saveFile('data.txt', raw, 'text/csv');
 						});
 						$(".ui.look.button").removeClass("disabled");
 
@@ -860,8 +803,8 @@
 		};
 
 		/* Download Functionality */
-		var saveFile = function(filename, data) {
-			var blob = new Blob([data], {type: 'text/csv'});
+		var saveFile = function(filename, data, type) {
+			var blob = new Blob([data], {type: type});
 			if(window.navigator.msSaveOrOpenBlob) {
 				window.navigator.msSaveBlob(blob, filename);
 			}
@@ -926,6 +869,171 @@
 
 		$("body.dimmable > .ui.dimmer").removeClass("active");
 	});
+
+	function setupCustomizations() {
+		/* Add Customization Elements */
+		$.fn.addControlButtons = function() {
+			var customizationButtons = ""
+			+	"<div style='position: absolute; top: 10px; right: 5px; display: block'>"
+			+		"<i class='right floated close link icon close-module-button'></i>"
+			+		"<i class='right floated circle link icon fold-module-button'></i>"
+			+		"<i class='right floated save link icon export-graph-button'></i>"
+			+	"</div>"
+			;
+			$(this).find(".fluid.card").prepend(customizationButtons);
+			if($(this).hasClass("basic")) {
+				$(this).find(".fluid.card .save.icon").addClass("disabled").removeClass("link");
+			}
+			$(this).find(".fold-module-button").on("click", function() {
+				var $column = $(this).closest(".column");
+
+				if($column.hasClass("folded")) {
+					unfoldModule($column);
+				}
+				else {
+					foldModule($column);
+				}
+			});
+			$(this).find(".close-module-button").on("click", function() {
+				var $column = $(this).closest(".column");
+				if($column.hasClass("default-module")) {
+					$column.addClass("hoarded");
+				}
+				else {
+					$column.remove();
+				}
+				$(".masonry.grid").masonry('layout');
+			});
+			$(this).find(".link.export-graph-button").on("click", function() {
+				var $chart = $(this).closest(".column").find(".content.has-menu > div:not(.menu):not(.hidden) .chart.image").find("svg").parent();
+				var $canvas = $(".export.modal canvas");
+				$.data($canvas.get(0), "svgdata", $chart.html());
+				$canvas.attr("width", $canvas.width());
+				$canvas.attr("height", $canvas.height());
+				$canvas.css("display", "block");
+				$canvas.css("margin", "auto");
+				canvg($canvas.get(0), $chart.html());
+				$(".export.modal .ui.dropdown").dropdown();
+				$(".export.modal").modal("show");
+			});
+		};
+		$(".graph-content > .column:not(.settings)").each(function() {
+			$(this).addClass("default-module");
+			$(this).addControlButtons();
+		});
+
+		/* Module Folding Mechanism */
+		var foldModule = function($divToFold) {
+			var $button = $divToFold.find(".fold-module-button");
+			$button.addClass("thin");
+			$divToFold.addClass("folded");
+			var description = jQuery.data($divToFold[0], "module-data").description();
+			$divToFold.find(".ui.card").prepend(
+				"<div class='folding state content'><div class='header'>" 
+				+ description 
+				+ "</div></div>"
+			);
+		}
+		var unfoldModule = function($divToUnfold) {
+			var $button = $divToUnfold.find(".fold-module-button");
+			$button.removeClass("thin");
+			$divToUnfold.removeClass("folded");
+			$divToUnfold.find(".folding.state.content").remove();
+		}
+
+		/* Settings Section Buttons Behavior */
+		$(".fold.all.button").click(function() {
+			$(".graph-content > .column:not(.settings)").each(function() {
+				if(!$(this).hasClass("folded")) {
+					foldModule($(this));
+				}
+			});
+		});
+		$(".unfold.all.button").click(function() {
+			$(".graph-content > .column:not(.settings)").each(function() {
+				if($(this).hasClass("folded")) {
+					unfoldModule($(this));
+				}
+			});
+		});
+		$(".clear.modules.button").click(function() {
+			$(".graph-content > .column:not(.settings)").each(function() {
+				$(this).find(".close-module-button").trigger("click");
+			});
+		});
+		$(".restore.default.button").click(function() {
+			$(".graph-content > .column:not(.settings)").each(function() {
+				$(this).removeClass("hoarded");
+				if($(this).hasClass("default-module")) {
+					if($(this).hasClass("folded")) {
+						unfoldModule($(this));
+					}
+				}
+				else {
+					$(this).remove();
+				}
+			});
+			Dashboard.progress.set(0);
+			drawCharts();
+			$(".masonry.grid").masonry('layout');
+		});
+
+		/* Export Module */
+		$(".export.modal .ui.form").form({
+			fields: {
+				"file-name": "empty",
+				"file-format": "empty"
+			},
+			onSuccess: function() {
+				var format = $(".export.modal .ui.dropdown").dropdown("get value");
+				var fileName = $(".export.modal .file.name.field input").text();
+				if(format == "svg") {
+					var svgData = $.data($(".export.modal canvas").get(0), "svgdata");
+					saveFile(fileName + ".svg", svgData, "image/svg+xml");
+				}
+				if(format == "png") {	
+					var pngData = atob($(".export.modal canvas").get(0).toDataURL("image/png").split(',')[1]);
+					var asArray = new Uint8Array(pngData.length);
+					for( var i = 0, len = pngData.length; i < len; i++) {
+						asArray[i] = pngData.charCodeAt(i);
+					}
+					saveFile(fileName + ".png", asArray.buffer, "image/png");
+				}
+				if(format == "jpg") {
+					var jpgData = atob($(".export.modal canvas").get(0).toDataURL("image/jpeg", 1.0).split(',')[1]);
+					var asArray = new Uint8Array(jpgData.length);
+					for( var i = 0, len = jpgData.length; i < len; i++) {
+						asArray[i] = jpgData.charCodeAt(i);
+					}
+					saveFile(fileName + ".jpeg", asArray.buffer, "image/jpeg");
+				}
+				$(".export.modal").modal("hide");
+			}
+		});
+		$(".export.modal .primary.button").click(function() {
+			$(".export.modal .ui.form").submit();
+		});
+		$(".export.modal .deny.button").click(function() {
+			$(".export.modal").modal("hide");
+			$(".export.modal .form").form("reset");
+		});
+
+		var saveFile = function(filename, data, type) {
+			var blob = new Blob([data], {type: type});
+			if(window.navigator.msSaveOrOpenBlob) {
+				window.navigator.msSaveBlob(blob, filename);
+			}
+			else{
+				var elem = window.document.createElement('a');
+				elem.href = window.URL.createObjectURL(blob);
+				elem.target = '_blank';
+				elem.download = filename;
+				document.body.appendChild(elem);
+				elem.click();        
+				document.body.removeChild(elem);
+			}
+		};
+	}
 </script>
 
 </html>
