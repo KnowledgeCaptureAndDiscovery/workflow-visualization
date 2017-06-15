@@ -77,13 +77,13 @@
 .column.folded > .fluid.card {
 	padding-top: 4px;
 }
-.column.folded .content:not(.has-menu):not(.folding.state):not(.has-statistics) {
+.column.folded .content:not(.has-menu):not(.folding):not(.has-statistics) {
 	display: none !important;
 }
 .column.folded .content.has-menu > .pointing.menu {
 	display: none !important;
 }
-.column.folded .content > div:not(.pointing.menu) > *:not(.chart.image):not(.statistic) {
+.column.folded .content > div:not(.pointing) > *:not(.chart):not(.statistic) {
 	display: none !important;
 }
 .folding.state.content > .header {

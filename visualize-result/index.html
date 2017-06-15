@@ -725,8 +725,6 @@
 			});
 		});
 
-		setupCustomizations();
-
 		var downloadData = function(url) {
 			Dashboard.progress.set(0);
 			setTimeout(function() {
@@ -867,10 +865,6 @@
 			downloadData(urlSource);
 		}
 
-		$("body.dimmable > .ui.dimmer").removeClass("active");
-	});
-
-	function setupCustomizations() {
 		/* Add Customization Elements */
 		$.fn.addControlButtons = function() {
 			var customizationButtons = ""
@@ -986,7 +980,8 @@
 			},
 			onSuccess: function() {
 				var format = $(".export.modal .ui.dropdown").dropdown("get value");
-				var fileName = $(".export.modal .file.name.field input").text();
+				var fileName = $(".export.modal input[name='file-name']").val();
+				console.log(fileName);
 				if(format == "svg") {
 					var svgData = $.data($(".export.modal canvas").get(0), "svgdata");
 					saveFile(fileName + ".svg", svgData, "image/svg+xml");
@@ -1005,7 +1000,7 @@
 					for( var i = 0, len = jpgData.length; i < len; i++) {
 						asArray[i] = jpgData.charCodeAt(i);
 					}
-					saveFile(fileName + ".jpeg", asArray.buffer, "image/jpeg");
+					saveFile(fileName + ".jpg", asArray.buffer, "image/jpeg");
 				}
 				$(".export.modal").modal("hide");
 			}
@@ -1018,22 +1013,8 @@
 			$(".export.modal .form").form("reset");
 		});
 
-		var saveFile = function(filename, data, type) {
-			var blob = new Blob([data], {type: type});
-			if(window.navigator.msSaveOrOpenBlob) {
-				window.navigator.msSaveBlob(blob, filename);
-			}
-			else{
-				var elem = window.document.createElement('a');
-				elem.href = window.URL.createObjectURL(blob);
-				elem.target = '_blank';
-				elem.download = filename;
-				document.body.appendChild(elem);
-				elem.click();        
-				document.body.removeChild(elem);
-			}
-		};
-	}
+		$("body.dimmable > .ui.dimmer").removeClass("active");
+	});
 </script>
 
 </html>
