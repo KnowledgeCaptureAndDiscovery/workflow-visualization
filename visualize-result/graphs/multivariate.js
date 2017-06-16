@@ -36,6 +36,9 @@
 			if(type["type"] == "numeric") {
 				return type["type"];
 			}
+			else if(type["type"] == "discrete") {
+				return "numeric";
+			}
 			else {
 				return "others";
 			}

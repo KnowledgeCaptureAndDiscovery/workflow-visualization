@@ -231,12 +231,35 @@ var Dashboard = (function ($) {
 
         // identify numeric column
         else if(typeof data['data'][0][csvHeader[colIndex]] === 'number') {
-          data['attribute'].push({
-            "name": csvHeader[colIndex],
-            "type": {
-              "type": "numeric"
+
+          // count unique elements
+          // Code source: https://stackoverflow.com/questions/21661686/fastest-way-to-get-count-of-unique-elements-in-javascript-array
+          var uniqueElements = data['data'].reduce(function(values, item) {
+            var v = item[csvHeader[colIndex]];
+            if (!values.set[v]) {
+              values.set[v] = 1;
+              values.count++;
             }
-          });
+            return values;
+          }, { set: {}, count: 0 });
+
+          if(uniqueElements.count <= 10) {
+            data['attribute'].push({
+              "name": csvHeader[colIndex],
+              "type": {
+                "type": "discrete",
+                "oneof": Object.keys(uniqueElements.set)
+              }
+            });
+          }
+          else {
+            data['attribute'].push({
+              "name": csvHeader[colIndex],
+              "type": {
+                "type": "numeric"
+              }
+            });
+          }
         }
 
         // in other cases, check whether string represents nominal data

@@ -37,6 +37,9 @@
 			if(type["type"] == "numeric" || type["type"] == "nominal") {
 				return type["type"];
 			}
+			else if(type["type"] == "discrete") {
+				return "nominal";
+			}
 			else {
 				return "others";
 			}
