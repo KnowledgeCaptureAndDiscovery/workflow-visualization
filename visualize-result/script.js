@@ -238,17 +238,18 @@ var Dashboard = (function ($) {
             var v = item[csvHeader[colIndex]];
             if (!values.set[v]) {
               values.set[v] = 1;
-              values.count++;
+              values.arr.push(v);
             }
             return values;
-          }, { set: {}, count: 0 });
+          }, { set: {}, arr: []});
 
-          if(uniqueElements.count <= 10) {
+          var countNonIntegers = uniqueElements.arr.filter(function(val) { Math.floor(val) != val; }).length;
+          if(uniqueElements.arr.length <= 10 && countNonIntegers == 0) {
             data['attribute'].push({
               "name": csvHeader[colIndex],
               "type": {
                 "type": "discrete",
-                "oneof": Object.keys(uniqueElements.set)
+                "oneof": uniqueElements.arr
               }
             });
           }

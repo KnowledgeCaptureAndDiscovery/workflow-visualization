@@ -1,6 +1,6 @@
 (function($) {
 
-	var Parallelcoordinate = function(renderTo, seriesNames, dataCopy) {
+	var Parallelcoordinate = function(renderTo, seriesNames, dataCopy, datatypes) {
 
 		var module = this,
 			$div,
@@ -10,6 +10,7 @@
 			sampleDataThreshold = 2000,
 			dimensions = [],
 			data = [],
+			types = [],
 			sampleData = [],
 			renderer = null,
 			currentWidth = 0,
@@ -19,11 +20,12 @@
 			svg = null,
 			sec;
 
-		module.init = function(renderTo, seriesNames, dataCopy) {
+		module.init = function(renderTo, seriesNames, dataCopy, datatypes) {
 			$div = renderTo;
 			$div.data("dashboard.multivariate.parallelcoordinate", module);
 			dimensions = seriesNames;
 			data = d3.transpose(dataCopy);
+			types = datatypes;
 			sampleData = data.slice(0, sampleDataThreshold);
 			$renderCheckbox = $div.find('.render.fitted.toggle.checkbox');
 			$graph = $div.find('.chart.image');
@@ -36,19 +38,19 @@
 				var divWidth = $graph.width();
 				var delta = 120;
 				function checkResizeEnd() {
-		        	if (new Date() - rtime < delta) {
-				        setTimeout(checkResizeEnd, delta);
-				    } else {
-				        resizeTimeout = false;
-				        module.render();
-				    }  
+					if (new Date() - rtime < delta) {
+						setTimeout(checkResizeEnd, delta);
+					} else {
+						resizeTimeout = false;
+						module.render();
+					}  
 				}
 				rtime = new Date();
 				if (divWidth != 0 && divWidth != currentWidth && resizeTimeout === false) {
-			        resizeTimeout = true;
-			        currentWidth = divWidth;
-			        setTimeout(checkResizeEnd, delta);
-			    }
+					resizeTimeout = true;
+					currentWidth = divWidth;
+					setTimeout(checkResizeEnd, delta);
+				}
 			});
 
 			$graph.trigger('resize');
@@ -98,9 +100,27 @@
 				dragging = {};
 
 			dimensions.forEach(function(item, ix) {
-				y[item] = d3.scaleLinear()
-					.domain(d3.extent(module.dataToRender(), function(p) { return +p[ix]; }))
-					.range([height, 0]);
+				var type = types[ix];
+				if(type == "numeric") {
+					y[item] = d3.scaleLinear()
+						.domain(d3.extent(module.dataToRender(), function(p) { return +p[ix]; }))
+						.range([height, 0]);
+				}
+				else {
+					var dataArray = module.dataToRender().map(function(p) { return p[ix]; });
+					var uniqueElements = dataArray.reduce(function(values, v) {
+						if (!values.set[v]) {
+							values.set[v] = 1;
+							values.arr.push(v);
+						}
+						return values;
+					}, { set: {}, arr: [] });
+					y[item] = d3.scaleOrdinal()
+						.domain(uniqueElements.arr)
+						.range(uniqueElements.arr.map(function(val, ix) {
+							return height * ix / (uniqueElements.arr.length - 1);
+						}));
+				}
 			});
 
 			var line = d3.line(),
@@ -120,7 +140,9 @@
 			  .selectAll("path")
 				.data(module.dataToRender())
 			  .enter().append("path")
-				.attr("d", path);  
+				.attr("d", path)
+				.style("fill", "none")
+				.style("stroke", "#e6e6e6"); 
 
 			// Add blue foreground lines for focus.
 			foregroundWrapper = svg.append("g")
@@ -128,7 +150,9 @@
 			renderer = renderQueue(function(item) {
 				foregroundWrapper.append("path")
 							.attr("d", path(item))
-							.attr("display", calcDisplay(item));
+							.attr("display", calcDisplay(item))
+							.style("fill", "none")
+							.style("stroke", "#3198F7");
 				foreground = foregroundWrapper.selectAll("path");
 			}).clear(function() {
 				foregroundWrapper.selectAll("*").remove();
@@ -146,12 +170,13 @@
 			g.append("g")
 			  .attr("class", "axis")
 			  .each(function(d) { d3.select(this).call(axis.scale(y[d])); })
+			  .style("fill", "none")
 			.append("text")
 			  .style("text-anchor", "middle")
 			  .attr("y", -9)
 			  .html(function(d) { return '<tspan>' + d + '</tspan>'; })
-			  .style("font-size", "12px")
-			  .style("font-family", "'Lato', sans-serif");
+			  .style("font-size", "11px")
+			  .style("fill", "#666");
 
 			// Add and store a brush for each axis.
 			g.append("g")
@@ -178,7 +203,9 @@
 
 			// Returns the path for a given data point.
 			function path(d) {
-				return line(dimensions.map(function(p, ix) { return [position(p), y[p](d[ix])]; }));
+				return line(dimensions.map(function(p, ix) { 
+					return [position(p), y[p](d[ix])]; 
+				}));
 			}
 			
 			function calcDisplay(d) {
@@ -229,22 +256,22 @@
 			$graph.html("");
 		};
 
-		module.init(renderTo, seriesNames, dataCopy);
+		module.init(renderTo, seriesNames, dataCopy, datatypes);
 
 	};
 	
 	$.fn.dashboard_multivariate_parallelcoordinate = function () {
-        var args = Array.prototype.slice.call(arguments);
-        return this.each(function () {
-        	if(typeof args[0] == "string") {
-        		if($.data($(this), "dashboard.multivariate.parallelcoordinate") !== undefined) {
-        			$.data($(this), "dashboard.multivariate.parallelcoordinate")[args[0]].apply(null, args.slice(1));
-        		}
-        	}
-        	else {
-        		(new (Function.prototype.bind.apply(Parallelcoordinate, [null, $(this)].concat(args))));
-        	}
-        });
-    };
+		var args = Array.prototype.slice.call(arguments);
+		return this.each(function () {
+			if(typeof args[0] == "string") {
+				if($.data($(this), "dashboard.multivariate.parallelcoordinate") !== undefined) {
+					$.data($(this), "dashboard.multivariate.parallelcoordinate")[args[0]].apply(null, args.slice(1));
+				}
+			}
+			else {
+				(new (Function.prototype.bind.apply(Parallelcoordinate, [null, $(this)].concat(args))));
+			}
+		});
+	};
 	
 }(jQuery));

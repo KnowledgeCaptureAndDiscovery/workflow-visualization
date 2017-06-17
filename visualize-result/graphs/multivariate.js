@@ -33,11 +33,8 @@
 		// @param	type 	name of a column type
 		// @return	converted column type
 		var getType = function(type) {
-			if(type["type"] == "numeric") {
+			if(type["type"] == "numeric" || type["type"] == "nominal" || type["type"] == "discrete") {
 				return type["type"];
-			}
-			else if(type["type"] == "discrete") {
-				return "numeric";
 			}
 			else {
 				return "others";
@@ -134,7 +131,7 @@
 		module.trimBadData = function(columnData, types) {
 			var $missingNotice = $div.find(".missing-notice");
 
-			if(types.indexOf("numeric") == -1) {
+			if(types.indexOf("numeric") == -1 && types.indexOf("discrete") == -1) {
 				$missingNotice.addClass("hidden");	
 			}
 
@@ -144,9 +141,11 @@
 				var originalLength = columnData.length;
 
 				for(var ix = 0; ix < types.length; ix++) {
-					columnData = columnData.filter(function(val) {
-						return (typeof val[ix] === 'number');
-					});
+					if(types[ix] == "numeric" || types[ix] == "discrete") {
+						columnData = columnData.filter(function(val) {
+							return (typeof val[ix] === 'number');
+						});
+					}
 				}
 
 				var trimmedLength = columnData.length;
@@ -182,6 +181,13 @@
 			if(types.find(function(type) { return type != "numeric"; }) == null) {
 				names = ["parallel-coordinate", "heatmap"];
 			}
+			else if(types.find(function(type) { 
+				return type != "numeric" 
+					&& type != "nominal" 
+					&& type != "discrete"; 
+			}) == null) {
+				names = ["parallel-coordinate"];
+			}
 			else {
 				return;
 			}
@@ -194,12 +200,11 @@
 				var moduleName = name.replace(/-/g,"");
 				var $divToRender = $div.find("." + name);
 				var columnNames = ix.map(function(val) { return data["attribute"][val]["name"] });
-				if(types.find(function(type) { return type != "numeric"; }) == null) {
-					$divToRender["dashboard_multivariate_" + moduleName](
-						columnNames,
-						columnData
-					);
-				}
+				$divToRender["dashboard_multivariate_" + moduleName](
+					columnNames,
+					columnData,
+					types
+				);
 
 				// TIME_KEEPING
 				// console.log("Bivariate " + name + " Ends: " + ((new Date())-window.ST));
