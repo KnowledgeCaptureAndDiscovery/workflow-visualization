@@ -481,6 +481,46 @@
 							</div>
 						</div>
 
+						<div class="column compare">
+							<div class="ui fluid card">
+								<div class="content">
+									<div class="header">
+										Comparison Analysis
+									</div>
+									<div class="meta">
+										Comparison between multiple columns of data.
+									</div>
+									<div class="col-dropdown ui form">
+										<div class="field"></div>
+										<div class="field"></div>
+									</div>
+								</div>
+								<div class="content missing-notice"></div>
+								<div class="content has-menu">
+									<div class="ui secondary pointing two item menu">
+										<a class="active item">Area Plot</a>
+										<a class="item">Multiple Line Chart</a>
+									</div>
+									<div class="area-plot">
+										<div class="chart image"></div>
+										<div class="ui divider"></div>
+										<span>Number of Bins</span>
+										<input class="ui range"></input>
+									</div>
+									<div class="multiple-line-chart">
+										<div class="chart image"></div>
+										<div class="ui divider"></div>
+										<div>Reduce to</div>
+										<select class="ui fluid dropdown">
+											<option value="mean">Mean</option>
+											<option value="median">Median</option>
+											<option value="std">Standard Deviation</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+
 						<!-- Different Graph Modules End Here -->
 					</div>
 				</div>
@@ -643,6 +683,10 @@
 <script src="graphs/multivariate.js" type="text/javascript"></script>
 <script src="graphs/multivariate/parallelcoordinate.js" type="text/javascript"></script>
 <script src="graphs/multivariate/heatmap.js" type="text/javascript"></script>
+
+<script src="graphs/compare.js" type="text/javascript"></script>
+<script src="graphs/compare/areaplot.js" type="text/javascript"></script>
+<script src="graphs/compare/multiplelinechart.js" type="text/javascript"></script>
 
 <!-- Initialization Script -->
 <script type="text/javascript">
