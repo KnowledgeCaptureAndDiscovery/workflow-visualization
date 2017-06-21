@@ -126,7 +126,6 @@
 				if(getType(type) != "others") {
 					$dropdown1.append($("<option>")
 						.attr("value",ix)
-						.attr("disabled", "")
 						.text(data["attribute"][ix]["name"]));
 				}
 			}
@@ -188,9 +187,9 @@
 			var columnTypes = targetTypes;
 			var columnNames = targets.map(function(val) { return data["attribute"][val]["name"]; });
 			if(viewpoint != "none") {
-				columnData = columnData.splice(0, 0, module.getColumn(viewpoint));
-				columnTypes = columnTypes.splice(0, 0, getType(data["attribute"][viewpoint]["type"]));
-				columnNames = columnNames.splice(0, 0, data["attribute"][viewpoint]["name"]);
+				columnData.unshift(module.getColumn(viewpoint));
+				columnTypes.unshift(getType(data["attribute"][viewpoint]["type"]));
+				columnNames.unshift(data["attribute"][viewpoint]["name"]);
 			}
 			columnData = module.trimBadData(columnData, columnTypes);
 
@@ -209,7 +208,7 @@
 				var $divToRender = $div.find("." + name);
 				var columnNames = targets.map(function(val) { return data["attribute"][val]["name"]; });
 				if(viewpoint != "none") {
-					columnNames.splice(0, 0, data["attribute"][viewpoint]["name"]);
+					columnNames.unshift(data["attribute"][viewpoint]["name"]);
 				}
 				$divToRender["dashboard_compare_" + moduleName](
 					columnNames,
@@ -255,9 +254,9 @@
 			if(!$div) return;
 
 			$div.find(".col-dropdown .field").first().html(""
-				+ "<label>Viewpoint</label>"
+				+ "<label>Grouping</label>"
 				+ "<select class='ui fluid dropdown'>"
-				+   "<option value='none'>Coming Soon</option>"
+				+   "<option value='none'>None</option>"
 				+ "</select>"
 			);
 
@@ -271,18 +270,27 @@
 
 		module.description = function() {
 			var activeType = $menu.find(".active.item").html();
-			var activeIx = $dropdown.dropdown("get value").slice(0,-1);
+			var activeIx = $dropdownX.dropdown("get value").slice(0,-1);
 			var activeIxLength = activeIx.length;
 			var firstActiveName = data["attribute"][activeIx[0]]["name"];
 
+			var groupingSuffix = "";
+			if(activeType == "Multiple Line Chart") {
+				groupingSuffix = " grouped by " + data["attribute"][$dropdown1.dropdown("get value")[0]]["name"];
+			}
+			else {
+				groupingSuffix = "";
+			}
+
 			if(activeIxLength >= 3) {
-				return activeType + " of " + firstActiveName + " and " + (activeIxLength-1) + " Other Columns";
+				return activeType + " of " + firstActiveName + " and " + (activeIxLength-1) + " Other Columns" + groupingSuffix;
 			}
 			else {
 				return activeType + " of " 
 					+ activeIx
 						.map(function(val) { return  data["attribute"][val]["name"]})
-						.join(" and ");
+						.join(" and ")
+					+ groupingSuffix
 			}
 		};
 

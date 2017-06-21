@@ -509,13 +509,19 @@
 									</div>
 									<div class="multiple-line-chart">
 										<div class="chart image"></div>
-										<div class="ui divider"></div>
-										<div>Reduce to</div>
-										<select class="ui fluid dropdown">
-											<option value="mean">Mean</option>
-											<option value="median">Median</option>
-											<option value="std">Standard Deviation</option>
-										</select>
+										<div class="reduce options">
+											<div class="ui reduce divider"></div>
+											<div class="toggle-container">
+												<div>Reduce Duplicates</div>
+											</div>
+											<select class="ui fluid dropdown">
+												<option value="mean">Average</option>
+												<option value="median">Median</option>
+												<option value="sum">Sum</option>
+												<option value="variance">Variance</option>
+												<option value="deviation">Standard Deviation</option>
+											</select>
+										</div>
 									</div>
 								</div>
 							</div>
