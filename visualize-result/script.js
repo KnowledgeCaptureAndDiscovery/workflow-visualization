@@ -3,6 +3,7 @@ var Dashboard = (function ($) {
     var module = {};
 
     var data = {};
+    var transposedData = {};
     var div = "";
     var chartTypes = [];
 
@@ -433,13 +434,18 @@ var Dashboard = (function ($) {
 
     // @brief initialize all graph drawing modules
     // @param divCode   the div selector name where graph drawing modules reside
-    module.draw = function(divCode = ".graph-content") {
+    module.draw = function(divCode = ".graph-content", transpose = false) {
       div = divCode;
 
       for(ix in chartTypes) {
         var funcName = chartTypes[ix];
         $(div + ' .column.' + funcName + ':not(.hoarded)').each(function() {
-          $(this)["dashboard_" + funcName](data);
+          if(transpose) {
+            $(this)["dashboard_" + funcName](transposedData);
+          }
+          else {
+            $(this)["dashboard_" + funcName](data);
+          }
         });
       }
     };
@@ -470,6 +476,7 @@ var Dashboard = (function ($) {
             $(".graphs + .ui.dimmer").addClass("active");
             $(".header-dropdown").addClass("disabled");
             $(".look.button").addClass("disabled");
+            $(".downloading.button").addClass("disabled");
             text = "Downloading File";
           }
           else if(val == 1) {
@@ -499,6 +506,80 @@ var Dashboard = (function ($) {
         }
       };
     }());
+
+    // @brief get data currently stored in the module
+    module.getColumns = function(type = "") {
+      return data["attribute"].filter(function(val) {
+        return type == "" || val["type"]["type"] == type;
+      }).map(function(val) {
+        return val["name"];
+      });
+    };
+
+    // @brief transpose dataset and display visualizations for the processed data
+    // @param titleColumn column to be used as new column titles
+    // @param dataType    data types of the rows
+    // @param rows        row names
+    module.setTransposeData = function(titleColumn, dataType, rows) {
+      transposedData = {};
+      var columnNames = data["data"].map(function(dataRow) {
+        return dataRow[titleColumn];
+      });
+      transposedData.data = rows.map(function(rowName, ix) {
+        var row = {};
+        row["Index"] = rowName;
+        data["data"].forEach(function(originalRow) {
+          row[originalRow[titleColumn]] = originalRow[rows[ix]];
+        });
+        return row;
+      });
+      transposedData.attribute = columnNames.map(function(columnName) {
+        var thisAttribute = {
+          name: columnName,
+          type: {
+            type: dataType
+          }
+        };
+        if(dataType == "nominal") {
+          thisAttribute.type.oneof = new Set(transposedData.data.map(function(row) {
+            return row[columnName];
+          })).values();
+        }
+        return thisAttribute;
+      });
+      (function() {
+        return new Promise(function(resolve, reject) {
+          $(".transpose.modal .primary.button").addClass("loading");
+          setTimeout(function() {
+            module.draw(div, true);
+            resolve();
+          }, 1);
+        });
+      })().then(function() {
+        $(".transpose.modal .primary.button").removeClass("loading");
+        $(".transpose.modal").modal("hide");
+      });
+    };
+
+    // @brief get currently rendered data in table format
+    module.getDataTable = function() {
+      var table = $('<table></table>');
+      var thead = $('<thead></thead>').append($('<tr></tr>').append(
+        data["attribute"].map(function(attr) {
+          return "<th>" + attr["name"] + "</th>";
+        }).join("")
+      ));
+      table.append(thead);
+      var tbody = $('<tbody></tbody>').append(
+        data["data"].map(function(row) {
+          return "<tr>" + Object.keys(row).map(function(name) {
+            return "<td>" + row[name] + "</td>"
+          }).join("") + "</tr>";
+        }).join("")
+      );
+      table.append(tbody);
+      return table;
+    };
 
     // @brief reset the module, which includes reseting and hiding all submodules
     module.reset = function() {

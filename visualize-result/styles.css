@@ -46,7 +46,7 @@
 
 /* Graph Option Section Layout */
 .graph-content .content > span,
-.graph-content .content *:not(.ui.dropdown) > span {
+.graph-content .content *:not(.dropdown) > span {
 	display: block;
 	margin-bottom: 10px !important;
 }

@@ -80,15 +80,16 @@
 										<div class="header"> Sample CSV Data </div>
 										<div class="item" data-value="https://vincentarelbundock.github.io/Rdatasets/csv/datasets/iris.csv">Iris</div>
 										<div class="item" data-value="https://vincentarelbundock.github.io/Rdatasets/csv/datasets/infert.csv">Infertility</div>
+										<div class="item" data-value="https://vincentarelbundock.github.io/Rdatasets/csv/datasets/swiss.csv">Transposing</div>
 										<div class="item" data-value="https://vincentarelbundock.github.io/Rdatasets/csv/datasets/airquality.csv">Missing Values</div>
 
 										<div class="divider"></div>
 
-										<div class="header"> Sample ARFF Data </div>
+										<!-- <div class="header"> Sample ARFF Data </div>
 										<div class="item" data-value="https://yjy0625.github.io/workflow-visualization/data/contact-lenses.arff">Contact Lenses</div>
 										<div class="item" data-value="https://yjy0625.github.io/workflow-visualization/data/diabetes.arff">Diabetes</div>
 
-										<div class="divider"></div>
+										<div class="divider"></div> -->
 
 										<div class="header"> Biodata </div>
 										<div class="item" data-value="https://yjy0625.github.io/workflow-visualization/data/heatMapData">Heatmap Data</div>
@@ -102,6 +103,9 @@
 									</div>
 								</div>
 								<button class="ui icon look disabled button">
+									<i class="eye icon"></i>
+								</button>
+								<button class="ui icon downloading disabled button">
 									<i class="download icon"></i>
 								</button>
 							</div>
@@ -163,6 +167,17 @@
 										</div>
 										<div class="column not-masonry">
 											<button class="ui basic fluid unfold all button">Unfold All</button>
+										</div>
+									</div>
+								</div>
+								<div class="content">
+									<span>Data</span>
+									<div class="ui two column grid">
+										<div class="column not-masonry">
+											<button class="ui basic fluid transpose button">Transpose Data</button>
+										</div>
+										<div class="column not-masonry">
+											<button class="ui basic fluid revert button">Revert Changes</button>
 										</div>
 									</div>
 								</div>
@@ -579,6 +594,14 @@
 		</div>
 	</div>
 
+	<!-- Quicklook Modal -->
+	<div class="ui basic modal quicklook">
+		<div class="header">Quicklook</div>
+		<div class="content">
+			<table class="ui compact celled table"></table>
+		</div>
+	</div>
+
 	<!-- Export Modal -->
 	<div class="ui small modal export">
 		<div class="header">Export Graph</div>
@@ -606,12 +629,43 @@
 			</div>
 		</div>
 		<div class="actions">
-			<div class="ui black deny button">
-				Cancel
+			<div class="ui black deny button">Cancel</div>
+			<div class="ui primary right button">OK</div>
+		</div>
+	</div>
+
+	<!-- Transpose Modal -->
+	<div class="ui small modal transpose">
+		<div class="header">Transpose Data</div>
+		<div class="content">
+			<div class="ui form" id="transpose-form">
+				<div class="transpose title field">
+					<label>Title Column</label>
+					<select name="transpose-title" class="ui selection dropdown">
+						<option value="">Select Title Column</option>
+					</select>
+				</div>
+				<div class="transpose type field">
+					<label>Data Type</label>
+					<select name="transpose-type" class="ui selection dropdown">
+						<option value="">Select Column Data Type</option>
+						<option value="numeric">Numeric</option>
+						<option value="discrete">Discrete</option>
+						<option value="nominal">Nominal</option>
+					</select>
+				</div>
+				<div class="transpose rows field">
+					<label>Rows</label>
+					<select name="transpose-rows" multiple="" class="ui selection dropdown">
+						<option value="">Select Rows</option>
+					</select>
+				</div>
 			</div>
-			<div class="ui primary right button">
-				OK
-			</div>
+			<button type="submit" class="hidden" form="transpose-form"></button>
+		</div>
+		<div class="actions">
+			<div class="ui black deny button">Cancel</div>
+			<div class="ui primary right button">OK</div>
 		</div>
 	</div>
 
@@ -760,7 +814,7 @@
 		$(".settings .add.module.dropdown").dropdown();
 		$(".add.module.button:not(.dropdown)").click(function() {
 			var chartType = $(".settings .add.module.dropdown").dropdown("get value");
-			if(chartType == null) return;
+			if(chartType == "") return;
 			$(".graph-content").append(
 				"<div class='column " + chartType + "'>"
 				+ chartTypeHtml[chartType]
@@ -816,10 +870,11 @@
 				return new Promise(function(resolve, reject) {
 					Dashboard.progress.set(3);
 					setTimeout(function() {
-						$(".ui.look.button").click(function () {
+						$(".ui.look.button").removeClass("disabled");
+						$(".ui.downloading.button").click(function () {
 							saveFile('data.txt', raw, 'text/csv');
 						});
-						$(".ui.look.button").removeClass("disabled");
+						$(".ui.downloading.button").removeClass("disabled");
 
 						$(".column.settings").removeClass("hidden");
 
@@ -846,6 +901,7 @@
 					.then(finishUp);
 			}
 			else {
+				Dashboard.progress.set(0);
 				generatePlots().then(finishUp);
 			}
 		};
@@ -877,8 +933,9 @@
 					closable  	: false,
 					onDeny		: function() {
 						$(".header-dropdown").dropdown('restore defaults');
-						$(".graph-content > .column:not(.settings)").addClass("hidden");
+						$(".graph-content > .column").addClass("hidden");
 						$(".ui.look.button").addClass("disabled");
+						$(".ui.downloading.button").addClass("disabled");
 					}
 				}).modal("show");
 			}
@@ -1000,6 +1057,37 @@
 				}
 			});
 		});
+		$(".transpose.button").click(function() {
+			$transposeModal = $(".ui.transpose.modal");
+
+			var $titleDropdown = $transposeModal.find(".transpose.title").find(".dropdown");
+			$titleDropdown.replaceWith("<select name='transpose-title' class='ui selection dropdown'></select>");
+			$titleDropdown = $transposeModal.find(".transpose.title").find(".dropdown");
+			$titleDropdown.html("<option value=''>Select Title Column</option>");
+			Dashboard.getColumns().forEach(function(column) {
+				$titleDropdown.append("<option value='" + column + "'>" + column + "</option>")
+			});
+			$titleDropdown.dropdown();
+
+			var $rowDropdown = $transposeModal.find(".transpose.rows").find(".dropdown");
+			$rowDropdown.replaceWith("<select multiple='' name='transpose-rows' class='ui selection dropdown'></select>");
+			$rowDropdown = $transposeModal.find(".transpose.rows").find(".dropdown");
+			$rowDropdown.html("<option value=''>Select Rows</option>");
+			$rowDropdown.addClass("disabled");
+			$rowDropdown.dropdown();
+
+			$transposeModal.find(".transpose.type").find(".dropdown").dropdown("clear");
+
+			updateForm();
+
+			$transposeModal.modal('setting', {
+				autofocus: false
+			}).modal("show");
+		});
+		$(".revert.button").click(function() {
+			drawCharts();
+			$(".masonry.grid").masonry('layout');
+		});
 		$(".clear.modules.button").click(function() {
 			$(".graph-content > .column:not(.settings)").each(function() {
 				$(this).find(".close-module-button").trigger("click");
@@ -1017,9 +1105,57 @@
 					$(this).remove();
 				}
 			});
-			Dashboard.progress.set(0);
 			drawCharts();
 			$(".masonry.grid").masonry('layout');
+		});
+
+		/* Quicklook Module */
+		$(".ui.look.button").click(function() {
+			$(".quicklook.modal").find("table").html(Dashboard.getDataTable().html());
+			$(".quicklook.modal").modal('setting', {
+				inverted: true,
+				autofocus: false
+			}).modal("show");
+		});
+
+		/* Transpose Module */
+		$(".transpose.modal .type.field .dropdown").dropdown({
+			onChange: function(specifiedType) {
+				if(specifiedType == "") return;
+				var $rowDropdown = $transposeModal.find(".transpose.rows").find(".dropdown");
+				$rowDropdown.replaceWith("<select multiple='' name='transpose-rows' class='ui selection dropdown'></select>");
+				$rowDropdown = $transposeModal.find(".transpose.rows").find(".dropdown");
+				$rowDropdown.append("<option value=''>Select Title Column</option>");
+				Dashboard.getColumns(specifiedType).forEach(function(column) {
+					$rowDropdown.append("<option value='" + column + "'>" + column + "</option>");
+				});
+				$rowDropdown.removeClass("disabled");
+				$rowDropdown.dropdown({
+					onChange: function() {
+						$(".transpose.modal").modal("refresh");
+					}
+				});
+
+				updateForm();
+			}
+		});
+		function updateForm() {
+			$(".transpose.modal .ui.form").form({
+				fields: {
+					"transpose-title": "empty",
+					"transpose-type": "empty",
+					"transpose-rows": "empty"
+				},
+				onSuccess: function() {
+					var titleColumn = $transposeModal.find(".transpose.title").find(".dropdown").dropdown("get value")[0];
+					var dataType = $transposeModal.find(".transpose.type").find(".dropdown").dropdown("get value")[0];
+					var rows = $transposeModal.find(".transpose.rows").find(".dropdown").dropdown("get value").slice(0, -1);
+					Dashboard.setTransposeData(titleColumn, dataType, rows);
+				}
+			});
+		}
+		$(".transpose.modal .primary.button").click(function() {
+			$(".transpose.modal .ui.form").submit();
 		});
 
 		/* Export Module */
