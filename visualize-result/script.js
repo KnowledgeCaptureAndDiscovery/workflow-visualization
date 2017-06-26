@@ -129,6 +129,7 @@ function initAddModuleDropdown() {
 		$('.masonry.grid .column').resize(function() {
 			$(".masonry.grid").masonry('layout');
 		});
+		updateSampleNotice();
 	});
 }
 
@@ -173,9 +174,7 @@ function drawCharts(raw = null) {
 				$(".ui.modal").modal('hide');
 
 				// show sample data notice if needed
-				if($(".render.checkbox:not(.hidden)").length) {
-					$(".sample-notice").removeClass("hidden");
-				}
+				updateSampleNotice();
 
 				resolve();
 			}, 1);
@@ -191,6 +190,18 @@ function drawCharts(raw = null) {
 	else {
 		Dashboard.progress.set(0);
 		generatePlots().then(finishUp);
+	}
+}
+
+function updateSampleNotice() {
+	$(".content.has-menu > div:not(.hidden) .render-detail:not(.hidden)").each(function() {
+		console.log($(this).closest(".column").html());
+	});
+	if($(".content.has-menu > div:not(.hidden) .render-detail:not(.hidden)").length) {
+		$(".sample-notice").removeClass("hidden");
+	}
+	else {
+		$(".sample-notice").addClass("hidden");
 	}
 }
 
@@ -288,6 +299,7 @@ function initControlButtons() {
 			else {
 				$column.remove();
 			}
+			updateSampleNotice();
 			$(".masonry.grid").masonry('layout');
 		});
 		$(this).find(".link.export-graph-button").on("click", function() {
@@ -378,6 +390,7 @@ function initSettings() {
 		$(".graph-content > .column:not(.settings)").each(function() {
 			$(this).find(".close-module-button").trigger("click");
 		});
+		updateSampleNotice();
 	});
 	$(".restore.default.button").click(function() {
 		$(".graph-content > .column:not(.settings)").each(function() {
