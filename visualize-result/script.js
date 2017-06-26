@@ -133,7 +133,7 @@ function initAddModuleDropdown() {
 	});
 }
 
-function drawCharts(raw = null) {
+function drawCharts(raw = null, transpose = false) {
 	var parseFile = function() {
 		return new Promise(function(resolve, reject) {
 			Dashboard.progress.set(1);
@@ -383,6 +383,7 @@ function initSettings() {
 		}).modal("show");
 	});
 	$(".revert.button").click(function() {
+		Dashboard.transposing = false;
 		drawCharts();
 		$(".masonry.grid").masonry('layout');
 	});
@@ -474,6 +475,8 @@ function updateForm() {
 			var dataType = $transposeModal.find(".transpose.type").find(".dropdown").dropdown("get value")[0];
 			var rows = $transposeModal.find(".transpose.rows").find(".dropdown").dropdown("get value").slice(0, -1);
 			Dashboard.setTransposeData(titleColumn, dataType, rows);
+			$(".transpose.modal").modal("hide");
+			drawCharts(null, true);
 		}
 	});
 }

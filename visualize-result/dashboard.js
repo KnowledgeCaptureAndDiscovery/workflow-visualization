@@ -4,6 +4,7 @@ var Dashboard = (function ($) {
 
     var data = {};
     var transposedData = {};
+    var transposing = false;
     var div = "";
     var chartTypes = [];
 
@@ -434,19 +435,10 @@ var Dashboard = (function ($) {
 
     // @brief initialize all graph drawing modules
     // @param divCode   the div selector name where graph drawing modules reside
-    module.draw = function(divCode = ".graph-content", transpose = false) {
+    module.draw = function(divCode = ".graph-content") {
       div = divCode;
-
       for(ix in chartTypes) {
-        var funcName = chartTypes[ix];
-        $(div + ' .column.' + funcName + ':not(.hoarded)').each(function() {
-          if(transpose) {
-            $(this)["dashboard_" + funcName](transposedData);
-          }
-          else {
-            $(this)["dashboard_" + funcName](data);
-          }
-        });
+        module.drawModule(divCode, chartTypes[ix]);
       }
     };
 
@@ -454,8 +446,14 @@ var Dashboard = (function ($) {
     // @param divCode         the div selector name where graph drawing modules reside
     // @param moduleTypeCode  the identifier of the module type
     module.drawModule = function(divCode, moduleTypeCode) {
-      console.log(divCode.html());
-      $(divCode)["dashboard_" + moduleTypeCode](data);
+      $(div + ' .column.' + moduleTypeCode + ':not(.hoarded)').each(function() {
+        if(transposing) {
+          $(this)["dashboard_" + moduleTypeCode](transposedData);
+        }
+        else {
+          $(this)["dashboard_" + moduleTypeCode](data);
+        }
+      });
     };
 
     // @brief variable to deal with visualizing loading indicator
@@ -547,18 +545,7 @@ var Dashboard = (function ($) {
         }
         return thisAttribute;
       });
-      (function() {
-        return new Promise(function(resolve, reject) {
-          $(".transpose.modal .primary.button").addClass("loading");
-          setTimeout(function() {
-            module.draw(div, true);
-            resolve();
-          }, 1);
-        });
-      })().then(function() {
-        $(".transpose.modal .primary.button").removeClass("loading");
-        $(".transpose.modal").modal("hide");
-      });
+      transposing = true;
     };
 
     // @brief get currently rendered data in table format
