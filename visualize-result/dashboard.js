@@ -563,6 +563,10 @@ var Dashboard = (function ($) {
 
     // @brief get currently rendered data in table format
     module.getDataTable = function() {
+      // TIME_KEEPING
+      window.ST = (new Date());
+      console.log("Get Table Starts: " + 0);
+
       var table = $('<table></table>');
       var thead = $('<thead></thead>').append($('<tr></tr>').append(
         data["attribute"].map(function(attr) {
@@ -578,6 +582,9 @@ var Dashboard = (function ($) {
         }).join("")
       );
       table.append(tbody);
+
+      // TIME_KEEPING
+      console.log("Get Table Ends: " + ((new Date())-window.ST));
       return table;
     };
 

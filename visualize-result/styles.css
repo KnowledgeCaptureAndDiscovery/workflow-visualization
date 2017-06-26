@@ -141,6 +141,9 @@
 }
 
 /* Upload Modal Layout */
+.ui.modal {
+	transition: margin-top ease-in-out 0.2s;
+}
 .ui.upload.modal .header,
 .ui.upload.modal .content,
 .ui.upload.modal .actions {
@@ -209,4 +212,9 @@
 .box.is-error .box__input,
 .box.is-error .box__uploading {
 	display: none;
+}
+
+/* Datatable Styling */
+div.dataTables_wrapper .dt-table > .column {
+	overflow-x: scroll;
 }

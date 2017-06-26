@@ -397,12 +397,29 @@ function initSettings() {
 }
 
 function initQuicklook() {
+	var initQuicklookData = function() {
+		return new Promise(function(resolve, reject) {
+			$(".look.button").addClass("loading");
+			setTimeout(function() {
+				$(".quicklook.modal").find(".content").html("<table class='ui compact celled table'></table>");
+				$(".quicklook.modal").find("table").html(Dashboard.getDataTable().html());
+				$(".quicklook.modal").find("table").DataTable();
+				$(".quicklook.modal").resize(function() {
+					$(".quicklook.modal").modal("refresh");
+				});
+				resolve();
+			}, 1);
+		});
+	};
 	$(".ui.look.button").click(function() {
-		$(".quicklook.modal").find("table").html(Dashboard.getDataTable().html());
-		$(".quicklook.modal").modal('setting', {
-			inverted: true,
-			autofocus: false
-		}).modal("show");
+		initQuicklookData()
+			.then(function() {
+				$(".look.button").removeClass("loading");
+				$(".quicklook.modal").modal('setting', {
+					inverted: true,
+					autofocus: false
+				}).modal("show");
+			});
 	});
 }
 
@@ -488,6 +505,10 @@ function initExportModal() {
 		$(".export.modal").modal("hide");
 		$(".export.modal .form").form("reset");
 	});
+}
+
+function showDimmer() {
+	$("body.dimmable > .ui.dimmer").addClass("active");
 }
 
 function removeDimmer() {
