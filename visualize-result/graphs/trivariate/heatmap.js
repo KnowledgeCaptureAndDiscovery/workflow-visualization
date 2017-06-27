@@ -126,7 +126,7 @@
         		}
         	}
         	else {
-        		(new (Function.prototype.bind.apply(Trivariate, [null, $(this)].concat(args))));
+        		(new (Function.prototype.bind.apply(Heatmap, [null, $(this)].concat(args))));
         	}
         });
     };

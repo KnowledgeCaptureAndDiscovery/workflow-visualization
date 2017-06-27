@@ -93,7 +93,7 @@ body {
 	left: 0;
 	background: #444;
 }
-.header-content .column {
+.header-content .column:last-child {
 	display: flex !important;
 	flex-direction: row;
 	align-items: center;

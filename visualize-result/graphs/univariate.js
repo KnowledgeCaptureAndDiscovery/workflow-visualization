@@ -35,7 +35,7 @@
 			if(type["type"] == "numeric" || type["type"] == "nominal") {
 				return type["type"];
 			}
-			else if(type["type"] == "discrete") {
+			else if(type["type"] == "discrete" || type["type"] == "unique") {
 				return "nominal";
 			}
 			else {
@@ -113,7 +113,7 @@
 
 					// populate column selection dropdown
 					$dropdown.append($("<option>")
-						.attr("value",ix)
+						.val(ix)
 						.text(data["attribute"][ix]["name"]));
 				}
 			}

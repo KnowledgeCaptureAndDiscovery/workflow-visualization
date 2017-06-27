@@ -119,7 +119,7 @@
 
 					// populate column selection dropdown
 					$dropdown1.append($("<option>")
-						.attr("value",ix)
+						.val(ix)
 						.text(data["attribute"][ix]["name"]));
 				}
 				$dropdown2.html($dropdown1.html());

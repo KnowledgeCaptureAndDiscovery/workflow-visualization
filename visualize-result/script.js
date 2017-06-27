@@ -115,21 +115,25 @@ function initAddModuleDropdown() {
 	});
 	$(".settings .add.module.dropdown").dropdown();
 	$(".add.module.button:not(.dropdown)").click(function() {
-		var chartType = $(".settings .add.module.dropdown").dropdown("get value");
-		if(chartType == "") return;
-		$(".graph-content").append(
-			"<div class='column " + chartType + "'>"
-			+ chartTypeData.html[chartType]
-			+ "</div>"
-		);
-		var $moduleToDraw = $(".graph-content").children().last(".column");
-		Dashboard.drawModule($moduleToDraw, chartType);
-		$moduleToDraw.addControlButtons();
-		$(".masonry.grid").masonry('appended', $moduleToDraw);
-		$('.masonry.grid .column').resize(function() {
-			$(".masonry.grid").masonry('layout');
-		});
-		updateSampleNotice();
+		$(this).addClass("loading");
+		setTimeout(function() {
+			var chartType = $(".settings .add.module.dropdown").dropdown("get value");
+			if(chartType == "") return;
+			$(".graph-content").append(
+				"<div class='column " + chartType + "'>"
+				+ chartTypeData.html[chartType]
+				+ "</div>"
+			);
+			var $moduleToDraw = $(".graph-content").children().last(".column");
+			Dashboard.drawModule($moduleToDraw, chartType);
+			$moduleToDraw.addControlButtons();
+			$(".masonry.grid").masonry('appended', $moduleToDraw);
+			$('.masonry.grid .column').resize(function() {
+				$(".masonry.grid").masonry('layout');
+			});
+			updateSampleNotice();
+			$(".add.module.button:not(.dropdown)").removeClass("loading");
+		}, 1);
 	});
 }
 
@@ -167,7 +171,7 @@ function drawCharts(raw = null, transpose = false) {
 
 				$(".column.settings").removeClass("hidden");
 
-				$(".unfold.all.button").trigger("click");
+				$(".fold.all.button").trigger("click");
 
 				$(".masonry.grid").masonry('layout');
 
@@ -194,9 +198,6 @@ function drawCharts(raw = null, transpose = false) {
 }
 
 function updateSampleNotice() {
-	$(".content.has-menu > div:not(.hidden) .render-detail:not(.hidden)").each(function() {
-		console.log($(this).closest(".column").html());
-	});
 	if($(".content.has-menu > div:not(.hidden) .render-detail:not(.hidden)").length) {
 		$(".sample-notice").removeClass("hidden");
 	}
@@ -239,6 +240,7 @@ function initDataSelectionDropdown() {
 	$('.header-dropdown').dropdown('setting', 'onChange', function(){
 		var newValue = $('.header-dropdown').dropdown('get value');
 		$(".sample-notice").addClass("hidden");
+		Dashboard.setTransposing(false);
 		if(newValue == "upload") {
 			DragAndDrop.init(drawCharts);
 			$(".ui.upload.modal").modal('setting', {
@@ -279,7 +281,7 @@ function initControlButtons() {
 		;
 		$(this).find(".fluid.card").prepend(customizationButtons);
 		if($(this).hasClass("basic")) {
-			$(this).find(".fluid.card .save.icon").addClass("disabled").removeClass("link");
+			$(this).find(".fluid.card .save.icon").addClass("hidden");
 		}
 		$(this).find(".fold-module-button").on("click", function() {
 			var $column = $(this).closest(".column");
@@ -361,16 +363,16 @@ function initSettings() {
 		var $titleDropdown = $transposeModal.find(".transpose.title").find(".dropdown");
 		$titleDropdown.replaceWith("<select name='transpose-title' class='ui selection dropdown'></select>");
 		$titleDropdown = $transposeModal.find(".transpose.title").find(".dropdown");
-		$titleDropdown.html("<option value=''>Select Title Column</option>");
+		$titleDropdown.html($("<option />").val("").text("Select Title Column"));
 		Dashboard.getColumns().forEach(function(column) {
-			$titleDropdown.append("<option value='" + column + "'>" + column + "</option>")
+			$titleDropdown.append($("<option />").val(column).text(column))
 		});
 		$titleDropdown.dropdown();
 
 		var $rowDropdown = $transposeModal.find(".transpose.rows").find(".dropdown");
 		$rowDropdown.replaceWith("<select multiple='' name='transpose-rows' class='ui selection dropdown'></select>");
 		$rowDropdown = $transposeModal.find(".transpose.rows").find(".dropdown");
-		$rowDropdown.html("<option value=''>Select Rows</option>");
+		$rowDropdown.html($("<option />").val("").text("Select Rows"));
 		$rowDropdown.addClass("disabled");
 		$rowDropdown.dropdown();
 
@@ -383,7 +385,7 @@ function initSettings() {
 		}).modal("show");
 	});
 	$(".revert.button").click(function() {
-		Dashboard.transposing = false;
+		Dashboard.setTransposing(false);
 		drawCharts();
 		$(".masonry.grid").masonry('layout');
 	});
@@ -444,9 +446,9 @@ function initTransposeModal() {
 			var $rowDropdown = $transposeModal.find(".transpose.rows").find(".dropdown");
 			$rowDropdown.replaceWith("<select multiple='' name='transpose-rows' class='ui selection dropdown'></select>");
 			$rowDropdown = $transposeModal.find(".transpose.rows").find(".dropdown");
-			$rowDropdown.append("<option value=''>Select Title Column</option>");
+			$rowDropdown.append($("<option />").val("").text("Select Title Column"));
 			Dashboard.getColumns(specifiedType).forEach(function(column) {
-				$rowDropdown.append("<option value='" + column + "'>" + column + "</option>");
+				$rowDropdown.append($("<option />").val(column).text(column));
 			});
 			$rowDropdown.removeClass("disabled");
 			$rowDropdown.dropdown({
@@ -490,7 +492,6 @@ function initExportModal() {
 		onSuccess: function() {
 			var format = $(".export.modal .ui.dropdown").dropdown("get value");
 			var fileName = $(".export.modal input[name='file-name']").val();
-			console.log(fileName);
 			if(format == "svg") {
 				var svgData = $.data($(".export.modal canvas").get(0), "svgdata");
 				saveFile(fileName + ".svg", svgData, "image/svg+xml");

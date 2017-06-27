@@ -246,12 +246,21 @@ var Dashboard = (function ($) {
           }, { set: {}, arr: []});
 
           var countNonIntegers = uniqueElements.arr.filter(function(val) { Math.floor(val) != val; }).length;
-          if(uniqueElements.arr.length <= 10 && countNonIntegers == 0) {
+          if(uniqueElements.arr.length == 1) {
+            data['attribute'].push({
+              "name": csvHeader[colIndex],
+              "type": {
+                "type": "unique",
+                "oneof": uniqueElements.arr
+              }
+            });
+          }
+          else if(uniqueElements.arr.length <= 10 && countNonIntegers == 0) {
             data['attribute'].push({
               "name": csvHeader[colIndex],
               "type": {
                 "type": "discrete",
-                "oneof": uniqueElements.arr
+                "oneof": uniqueElements.arr.sort(function(a,b) { return a - b; })
               }
             });
           }
@@ -278,7 +287,16 @@ var Dashboard = (function ($) {
             return values;
           }, { set: {}, count: 0 });
 
-          if(uniqueElements.count <= 10) {
+          if(uniqueElements.count == 1) {
+            data['attribute'].push({
+              "name": csvHeader[colIndex],
+              "type": {
+                "type": "unique",
+                "oneof": Object.keys(uniqueElements.set)
+              }
+            });
+          }
+          else if(uniqueElements.count <= 10) {
             data['attribute'].push({
               "name": csvHeader[colIndex],
               "type": {
@@ -437,8 +455,12 @@ var Dashboard = (function ($) {
     // @param divCode   the div selector name where graph drawing modules reside
     module.draw = function(divCode = ".graph-content") {
       div = divCode;
+      console.log("transposing", transposing);
       for(ix in chartTypes) {
-        module.drawModule(divCode, chartTypes[ix]);
+        var funcName = chartTypes[ix];
+        $(div + ' .column.' + funcName + ':not(.hoarded)').each(function() {
+          $(this)["dashboard_" + funcName](transposing ? transposedData : data);
+        });
       }
     };
 
@@ -446,14 +468,7 @@ var Dashboard = (function ($) {
     // @param divCode         the div selector name where graph drawing modules reside
     // @param moduleTypeCode  the identifier of the module type
     module.drawModule = function(divCode, moduleTypeCode) {
-      $(div + ' .column.' + moduleTypeCode + ':not(.hoarded)').each(function() {
-        if(transposing) {
-          $(this)["dashboard_" + moduleTypeCode](transposedData);
-        }
-        else {
-          $(this)["dashboard_" + moduleTypeCode](data);
-        }
-      });
+      $(divCode)["dashboard_" + moduleTypeCode](transposing ? transposedData : data);
     };
 
     // @brief variable to deal with visualizing loading indicator
@@ -548,6 +563,12 @@ var Dashboard = (function ($) {
       transposing = true;
     };
 
+    // @brief set   the transposing flag
+    // @param flag  the new value to be set to transposing
+    module.setTransposing = function(flag) {
+      transposing = flag;
+    };
+
     // @brief get currently rendered data in table format
     module.getDataTable = function() {
       var table = $('<table></table>');
@@ -565,6 +586,7 @@ var Dashboard = (function ($) {
         }).join("")
       );
       table.append(tbody);
+      return table;
     };
 
     // @brief reset the module, which includes reseting and hiding all submodules

@@ -74,6 +74,11 @@
 				credits: {
 				  enabled: false
 				},
+				plotOptions: {
+					bubble: {
+						maxSize: '10%'
+					}
+				},
 				legend: {
 				  enabled: false
 				}
