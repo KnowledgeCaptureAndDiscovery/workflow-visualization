@@ -18,6 +18,12 @@
 			rtime,
 			actives = {},
 			svg = null,
+			x,
+			y,
+			dragging,
+			foreground,
+			background,
+			foregroundWrapper,
 			sec;
 
 		module.init = function(renderTo, seriesNames, dataCopy, datatypes) {
@@ -95,9 +101,9 @@
 				width = $graph.width() - margin.left - margin.right,
 				height = 400 - margin.top - margin.bottom;
 
-			var x = d3.scalePoint().domain(dimensions).range([0, width]).padding(0.5),
-				y = {},
-				dragging = {};
+			x = d3.scalePoint().domain(dimensions).range([0, width]).padding(0.5);
+			y = {};
+			dragging = {};
 
 			dimensions.forEach(function(item, ix) {
 				var type = types[ix];
@@ -123,11 +129,6 @@
 				}
 			});
 
-			var line = d3.line(),
-				axis = d3.axisLeft(),
-				background,
-				foreground;
-
 			svg = d3.select($graph.get(0)).append("svg")
 				.attr("width", width + margin.left + margin.right)
 				.attr("height", height + margin.top + margin.bottom)
@@ -140,7 +141,7 @@
 			  .selectAll("path")
 				.data(module.dataToRender())
 			  .enter().append("path")
-				.attr("d", path)
+				.attr("d", module.path)
 				.style("fill", "none")
 				.style("stroke", "#e6e6e6"); 
 
@@ -149,8 +150,8 @@
 						.attr("class", "foreground");
 			renderer = renderQueue(function(item) {
 				foregroundWrapper.append("path")
-							.attr("d", path(item))
-							.attr("display", calcDisplay(item))
+							.attr("d", module.path(item))
+							.attr("display", module.calcDisplay(item))
 							.style("fill", "none")
 							.style("stroke", "#3198F7");
 				foreground = foregroundWrapper.selectAll("path");
@@ -169,7 +170,7 @@
 			// Add an axis and title.
 			g.append("g")
 			  .attr("class", "axis")
-			  .each(function(d) { d3.select(this).call(axis.scale(y[d])); })
+			  .each(function(d) { d3.select(this).call(d3.axisLeft().scale(y[d])); })
 			  .style("fill", "none")
 			.append("text")
 			  .style("text-anchor", "middle")
@@ -184,65 +185,66 @@
 				.each(function(d) {
 					d3.select(this).call(y[d].brush = d3.brushY()
 						.extent([[-10,0], [10,height]])
-						.on("start", brushStart)
-						.on("brush", brush)
-						.on("end", brushEnd));
+						.on("start", module.brushStart)
+						.on("brush", module.brush)
+						.on("end", module.brushEnd));
 				})
 			.selectAll("rect")
 				.attr("x", -8)
 				.attr("width", 16);
+		};
 
-			function position(d) {
-				var v = dragging[d];
-				return v == null ? x(d) : v;
-			}
+		module.position = function(d) {
+			var v = dragging[d];
+			return v == null ? x(d) : v;
+		}
 
-			function transition(g) {
-				return g.transition().duration(500);
-			}
+		module.transition = function(g) {
+			return g.transition().duration(500);
+		}
 
-			// Returns the path for a given data point.
-			function path(d) {
-				return line(dimensions.map(function(p, ix) { 
-					return [position(p), y[p](d[ix])]; 
-				}));
-			}
+		// Returns the path for a given data point.
+		module.path = function(d) {
+			var line = d3.line();
+			return line(dimensions.map(function(p, ix) {
+				return [module.position(p), y[p](d[ix])]; 
+			}));
+		}
 			
-			function calcDisplay(d) {
-				var count = 0;
-				Object.keys(actives).forEach(function(p) {
-					var ix = dimensions.indexOf(p);
-					if(!(actives[p][0] <= y[p](d[ix]) && y[p](d[ix]) <= actives[p][1])) {
-						count++;
-					}
-				});
-				return (count == 0) ? null : "none";
-			}
-
-			function brushStart() {
-				d3.event.sourceEvent.stopPropagation();
-			}
-
-			// Handles a brush event, toggling the display of foreground lines.
-			function brush() {
-				actives = {};
-				svg.selectAll(".brush")
-					.filter(function(p) { return d3.brushSelection(this); })
-					.each(function(p) { actives[p] = d3.brushSelection(this); });
-				renderer(module.dataToRender());
-			}
-
-			// Update render if the brush event clears a brush
-			function brushEnd() {
-				newActives = {};
-				svg.selectAll(".brush")
-					.filter(function(p) { return d3.brushSelection(this); })
-					.each(function(p) { newActives[p] = d3.brushSelection(this); });
-				// compares the previous and current applied brushes count
-				if(Object.keys(actives).length != Object.keys(newActives).length) {
-					actives = newActives;
-					renderer(module.dataToRender());
+		module.calcDisplay = function(d) {
+			var count = 0;
+			Object.keys(actives).forEach(function(p) {
+				var ix = dimensions.indexOf(p);
+				if(!(actives[p][0] <= y[p](d[ix]) && y[p](d[ix]) <= actives[p][1])) {
+					count++;
 				}
+			});
+			return (count == 0) ? null : "none";
+		}
+
+		module.brushStart = function() {
+			d3.event.sourceEvent.stopPropagation();
+		};
+
+		// Handles a brush event, toggling the display of foreground lines.
+		module.brush = function() {
+			actives = {};
+			svg.selectAll(".brush")
+				.filter(function(p) { return d3.brushSelection(this); })
+				.each(function(p) { actives[p] = d3.brushSelection(this); });
+			renderer(module.dataToRender());
+		};
+
+		// Update render if the brush event clears a brush
+		module.brushEnd = function() {
+			newActives = {};
+			svg.selectAll(".brush")
+				.filter(function(p) { return d3.brushSelection(this); })
+				.each(function(p) { newActives[p] = d3.brushSelection(this); });
+			// compares the previous and current applied brushes count
+			if(Object.keys(actives).length != Object.keys(newActives).length) {
+				actives = newActives;
+				renderer(module.dataToRender());
 			}
 		};
 
