@@ -518,6 +518,7 @@
 								<div class="content has-menu">
 									<div class="ui secondary pointing two item menu">
 										<a class="active item">Area Plot</a>
+										<a class="item">Correlation Plot</a>
 										<a class="item">Multiple Line Chart</a>
 									</div>
 									<div class="area-plot">
@@ -525,6 +526,9 @@
 										<div class="ui divider"></div>
 										<span>Number of Bins</span>
 										<input class="ui range"></input>
+									</div>
+									<div class="correlation-plot">
+										<div class="chart image"></div>
 									</div>
 									<div class="multiple-line-chart">
 										<div class="chart image"></div>
@@ -697,6 +701,9 @@
 <!-- D3 Visualization Library -->
 <script type="text/javascript" src="../assets/js/d3.min.js"></script>
 
+<!-- Multidimentional Scaling -->
+<script type="text/javascript" src="../assets/js/mds.js"></script>
+
 <!-- DSV Parsing JS -->
 <script type="text/javascript" src="../assets/js/papaparse.min.js"></script>
 
@@ -753,6 +760,7 @@
 
 <script src="graphs/compare.js" type="text/javascript"></script>
 <script src="graphs/compare/areaplot.js" type="text/javascript"></script>
+<script src="graphs/compare/correlationplot.js" type="text/javascript"></script>
 <script src="graphs/compare/multiplelinechart.js" type="text/javascript"></script>
 
 <!-- Initialization -->

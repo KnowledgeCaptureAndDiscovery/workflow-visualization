@@ -40,7 +40,8 @@
 					type: 'column',
 					style: {
 						fontFamily: 'Lato'
-					}
+					},
+					zoomType: 'x'
 				},
 				colors: ['#3198f7'],
 				title: {

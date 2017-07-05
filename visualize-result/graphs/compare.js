@@ -196,7 +196,7 @@
 			// obtain modules that needs rendering
 			var names = [];
 			if(viewpoint == "none") {
-				names = ["area-plot"];
+				names = ["area-plot", "correlation-plot"];
 			}
 			else {
 				names = ["multiple-line-chart"];
