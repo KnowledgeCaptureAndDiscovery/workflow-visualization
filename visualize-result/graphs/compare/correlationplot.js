@@ -56,7 +56,7 @@
 				});
 
 				// FOR DEBUG
-				console.log(plotData);
+				// console.log(plotData);
 
 				module.render(plotData);
 			});
@@ -109,7 +109,9 @@
 					}
 				},
 				tooltip: {
-					enabled: false
+					formatter: function() {
+						return '<b>' + this.point.name + '</b>';
+					}
 				}
 			});
 		}
