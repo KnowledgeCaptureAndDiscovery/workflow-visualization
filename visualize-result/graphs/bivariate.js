@@ -34,11 +34,8 @@
 		// @param	type 	name of a column type
 		// @return	converted column type
 		var getType = function(type) {
-			if(type["type"] == "numeric" || type["type"] == "nominal") {
+			if(type["type"] == "numeric" || type["type"] == "nominal" || type["type"] == "discrete") {
 				return type["type"];
-			}
-			else if(type["type"] == "discrete") {
-				return "nominal";
 			}
 			else {
 				return "others";
@@ -148,7 +145,7 @@
 		module.trimBadData = function(columnData, types) {
 			var $missingNotice = $div.find(".missing-notice");
 
-			if(types[0] != "numeric" && types[1] != "numeric") {
+			if(types[0] != "numeric" && types[0] != "discrete" && types[1] != "numeric" && types[1] != "discrete") {
 				$missingNotice.addClass("hidden");
 			}
 
@@ -157,13 +154,13 @@
 
 				var originalLength = columnData.length;
 
-				if(types[0] == "numeric") {
+				if(types[0] == "numeric" || types[0] == "discrete") {
 					columnData = columnData.filter(function(val) {
 						return (typeof val[0] === 'number');
 					});
 				}
 
-				if(types[1] == "numeric") {
+				if(types[1] == "numeric" || types[1] == "discrete") {
 					columnData = columnData.filter(function(val) {
 						return (typeof val[1] === 'number');
 					});
@@ -211,7 +208,7 @@
 			// obtain modules that needs rendering
 			var names = [];
 			var type = type1 + "-" + type2;
-			if(type == "numeric-numeric") {
+			if(type == "numeric-numeric" || type == "discrete-discrete" || type == "numeric-discrete" || type == "discrete-numeric") {
 				if(columnData[0].length > 1000) {
 					names.push("heatmap");
 				}
@@ -219,18 +216,21 @@
 					names.push("scatter-plot");
 				}
 			}
-			else if(type == "nominal-nominal") {
-				names = ["donut-chart", "stacked-column-chart"];
+			if(type == "nominal-nominal" || type == "discrete-discrete" || type == "discrete-nominal" || type == "nominal-discrete") {
+				names.push("donut-chart");
+				names.push("stacked-column-chart");
 			}
-			else if(type == "nominal-numeric") {
-				names = ["line-chart"];
+			if(type == "nominal-numeric" || type == "discrete-numeric" || type == "nominal-discrete") {
+				names.push("line-chart");
 			}
-			else if(type == "numeric-nominal") {
-				names = ["stacked-histogram"];
+			if(type == "numeric-nominal" || type == "numeric-discrete" || type == "discrete-nominal") {
+				names.push("stacked-histogram");
 			}
-			else {
+			if(type1 == "others" || type2 == "others") {
 				return;
 			}
+
+			console.log(names);
 
 			// initialize necessary modules
 			names.forEach(function(name) {
@@ -240,29 +240,10 @@
 				var moduleName = name.replace(/-/g,"");
 				var $divToRender = $div.find("." + name);
 				var columnNames = [data["attribute"][ix1]["name"], data["attribute"][ix2]["name"]];
-				if(type == "numeric-numeric") {
-					$divToRender["dashboard_bivariate_" + moduleName](
-						columnNames, columnData
-					);
-				}
-				else if(type == "nominal-nominal") {
-					$divToRender["dashboard_bivariate_" + moduleName](
-						columnNames, columnData,
-						[data["attribute"][ix1]["type"]["oneof"], data["attribute"][ix2]["type"]["oneof"]]
-					);
-				}
-				else if(type == "nominal-numeric") {
-					$divToRender["dashboard_bivariate_" + moduleName](
-						columnNames, columnData,
-						data["attribute"][ix1]["type"]["oneof"]
-					);
-				}
-				else if(type == "numeric-nominal") {
-					$divToRender["dashboard_bivariate_" + moduleName](
-						columnNames, columnData,
-						data["attribute"][ix2]["type"]["oneof"]
-					);
-				}
+				$divToRender["dashboard_bivariate_" + moduleName](
+					columnNames, columnData,
+					[data["attribute"][ix1]["type"]["oneof"], data["attribute"][ix2]["type"]["oneof"]]
+				);
 
 				// TIME_KEEPING
 				// console.log("Bivariate " + name + " Ends: " + ((new Date())-window.ST));

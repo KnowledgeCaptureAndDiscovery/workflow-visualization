@@ -16,7 +16,7 @@
 			$.data($div[0], "dashboard.bivariate.linechart", module);
 			names = seriesNames;
 			data = dataCopy;
-			classes = classesCopy;
+			classes = classesCopy[0];
 			$graph = $div.find('.chart.image');
 
 			module.reset();

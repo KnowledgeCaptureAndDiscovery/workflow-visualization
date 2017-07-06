@@ -16,7 +16,7 @@
 			$.data($div[0], "dashboard.bivariate.stackedhistogram", module);
 			names = seriesNames;
 			data = dataCopy;
-			classes = classesCopy;
+			classes = classesCopy[1];
 
 			$graph = $div.find('.chart.image');
 			$rangeSelector = $div.find(".ui.range");
