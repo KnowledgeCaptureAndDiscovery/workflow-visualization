@@ -20,6 +20,7 @@ $(document).ready(function() {
 	/* Settings */
 	initSettings();
 	initAddModuleDropdown();
+	initClusteringBlock();
 
 	/* Modals */
 	initTransposeModal();
@@ -134,6 +135,39 @@ function initAddModuleDropdown() {
 			updateSampleNotice();
 			$(".add.module.button:not(.dropdown)").removeClass("loading");
 		}, 1);
+	});
+}
+
+function initClusteringBlock() {
+	$(".settings .clustering.content .checkbox").checkbox({
+		onChecked: function() {
+			$(".settings .clustering.content .range-container").removeClass("hidden");
+			drawCharts();
+		},
+		onUnchecked: function() {
+			$(".settings .clustering.content .range-container").addClass("hidden");
+			drawCharts();
+		}
+	});
+	
+	$(".settings .clustering.content .range-container").css("padding-top", "10px");
+	$(".settings .clustering.content .range-container").addClass("hidden");
+	$(".settings .clustering.content .ui.range").ionRangeSlider({
+		min: 2,
+		max: 10,
+		from: 3,
+		step: 1,
+		postfix: ' clusters',
+		grid: false
+	});
+	$(".settings .clustering.content .ui.range").data("ionRangeSlider").update({
+		onFinish: (function() {
+			var count = 0;
+			return function() {
+				if(count != 0) drawCharts();
+				count++;
+			};
+		})()
 	});
 }
 

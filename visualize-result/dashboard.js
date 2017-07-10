@@ -5,6 +5,7 @@ var Dashboard = (function ($) {
     var data = {};
     var transposedData = {};
     var transposing = false;
+    var currentData = {};
     var div = "";
     var chartTypes = [];
 
@@ -455,11 +456,15 @@ var Dashboard = (function ($) {
     // @param divCode   the div selector name where graph drawing modules reside
     module.draw = function(divCode = ".graph-content") {
       div = divCode;
-      console.log("transposing", transposing);
+      currentData = transposing ? transposedData : data;
+
+      if($(".settings .clustering.content .checkbox").checkbox("is checked")) {
+        currentData = module.addClusterData(currentData);
+      }
       for(ix in chartTypes) {
         var funcName = chartTypes[ix];
         $(div + ' .column.' + funcName + ':not(.hoarded)').each(function() {
-          $(this)["dashboard_" + funcName](transposing ? transposedData : data);
+          $(this)["dashboard_" + funcName](currentData);
         });
       }
     };
@@ -468,7 +473,7 @@ var Dashboard = (function ($) {
     // @param divCode         the div selector name where graph drawing modules reside
     // @param moduleTypeCode  the identifier of the module type
     module.drawModule = function(divCode, moduleTypeCode) {
-      $(divCode)["dashboard_" + moduleTypeCode](transposing ? transposedData : data);
+      $(divCode)["dashboard_" + moduleTypeCode](currentData);
     };
 
     // @brief variable to deal with visualizing loading indicator
@@ -529,6 +534,69 @@ var Dashboard = (function ($) {
       });
     };
 
+    // @brief add clustering data as a column of the original data
+    // @param dataToDraw  data to be visualized
+    // @return            manipulated data
+    module.addClusterData = function(dataToDrawOrigin) {
+      var dataToDraw = module.clone(dataToDrawOrigin);
+
+      // preparation
+      var dataForClustering = [];
+      dataToDraw["attribute"].forEach(function(column) {
+        if(column.type.type == "numeric" || column.type.type == "discrete") {
+          dataForClustering.push(dataToDraw["data"].map(function(item) {
+            return item[column["name"]];
+          }));
+        }
+        else if(column.type.type == "nominal") {
+          column.type.oneof.forEach(function(category) {
+            dataForClustering.push(dataToDraw["data"].map(function(item) {
+              return (item[column["name"]] == category) ? 1 : 0;
+            }));
+          });
+        }
+      });
+      var dataExtremes = dataForClustering.map(function(dimension) {
+        return { min: d3.min(dimension), max: d3.max(dimension) };
+      });
+      dataForClustering = d3.transpose(dataForClustering);
+
+      // init means
+      var numDimensions = dataExtremes.length;
+      var means = [];
+      var numMeans = $(".settings .clustering.content .ui.range").data("ionRangeSlider").result.from;
+      for(var i = 0; i < numMeans; i++) {
+        means.push(dataExtremes.map(function(extremes) {
+          return extremes.min + Math.random() * (extremes.max - extremes.min);
+        }));
+      }
+
+      // clustering
+      var clusters = ML.Clust
+        .kmeans(dataForClustering, numMeans, {initialization: means})
+        .clusters
+        .map(function(val) {
+          return "Cluster " + (val + 1);
+        });
+
+      dataToDraw["attribute"].push({
+        name: "Clusters",
+        type: {
+          type: "nominal",
+          oneof: means.map(function(_, ix) {
+            return "Cluster " + (ix + 1);
+          })
+        }
+      });
+
+      dataToDraw["data"] = dataToDraw["data"].map(function(val, ix) {
+        val["Clusters"] = clusters[ix];
+        return val;
+      });
+
+      return dataToDraw;
+    }
+
     // @brief transpose dataset and display visualizations for the processed data
     // @param titleColumn column to be used as new column titles
     // @param dataType    data types of the rows
@@ -587,6 +655,40 @@ var Dashboard = (function ($) {
       );
       table.append(tbody);
       return table;
+    };
+
+    module.clone = function(obj) {
+      var copy;
+
+      // Handle the 3 simple types, and null or undefined
+      if (null == obj || "object" != typeof obj) return obj;
+
+      // Handle Date
+      if (obj instanceof Date) {
+          copy = new Date();
+          copy.setTime(obj.getTime());
+          return copy;
+      }
+
+      // Handle Array
+      if (obj instanceof Array) {
+          copy = [];
+          for (var i = 0, len = obj.length; i < len; i++) {
+              copy[i] = module.clone(obj[i]);
+          }
+          return copy;
+      }
+
+      // Handle Object
+      if (obj instanceof Object) {
+          copy = {};
+          for (var attr in obj) {
+              if (obj.hasOwnProperty(attr)) copy[attr] = module.clone(obj[attr]);
+          }
+          return copy;
+      }
+
+      throw new Error("Unable to copy obj! Its type isn't supported.");
     };
 
     // @brief reset the module, which includes reseting and hiding all submodules

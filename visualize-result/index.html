@@ -185,10 +185,17 @@
 										</div>
 									</div>
 								</div>
-								<div class="content">
-									<span>Linking</span>
-									<div class="column not-masonry">
-										<button class="ui basic fluid disabled link button">Coming Soon</button>
+								<div class="content clustering">
+									<!-- <span>Clustering</span> -->
+									<div class="toggle-container">
+										<div>Clustering</div>
+										<div class="ui fitted toggle checkbox">
+											<input type="checkbox">
+											<label></label>
+										</div>
+									</div>
+									<div class="hidden range-container">
+										<input class="ui range"></input>
 									</div>
 								</div>
 							</div>
@@ -434,6 +441,15 @@
 									</div>
 									<div class="scatter-plot">
 										<div class="chart image"></div>
+										<div class="ui divider render"></div>
+										<div class="toggle-container render">
+											<div>Show All Data</div>
+											<div class="render ui fitted toggle checkbox">
+												<input type="checkbox">
+												<label></label>
+											</div>
+										</div>
+										<div class="meta render-detail"><i class="info circle icon"></i> Sample data is rendered by default.</div>
 									</div>
 									<div class="grouped-column-chart">
 										<div class="chart image"></div>
@@ -701,7 +717,8 @@
 <!-- D3 Visualization Library -->
 <script type="text/javascript" src="../assets/js/d3.min.js"></script>
 
-<!-- Multidimentional Scaling -->
+<!-- Machine Learning Tools -->
+<script type="text/javascript" src="https://www.lactame.com/lib/ml/2.0.0/ml.min.js"></script>
 <script type="text/javascript" src="../assets/js/mds.js"></script>
 
 <!-- DSV Parsing JS -->

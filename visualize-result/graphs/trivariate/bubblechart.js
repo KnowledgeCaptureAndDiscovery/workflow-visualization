@@ -8,7 +8,7 @@
 			graph,
 			$renderCheckbox,
 			renderAllData,
-			sampleDataThreshold = 2000,
+			sampleDataThreshold = 1000,
 			graphData = [],
 			names = [],
 			data = [],
@@ -26,6 +26,10 @@
 			module.reset();
 			module.initCheckbox();
 
+			module.render();
+		};
+
+		module.render = function() {
 			var dataToShow = module.dataToRender();
 			graphData = dataToShow[0].map(function(val, ix) {
 				return {

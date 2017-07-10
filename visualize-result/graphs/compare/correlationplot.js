@@ -14,7 +14,6 @@
 			$.data($div[0], "dashboard.compare.correlationplot", module);
 			$graph = $div.find(".chart");
 			names = namesCopy;
-			console.log(dataCopy);
 			data = dataCopy;
 			types = typesCopy;
 

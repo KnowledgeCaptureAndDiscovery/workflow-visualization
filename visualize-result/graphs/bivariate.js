@@ -230,8 +230,6 @@
 				return;
 			}
 
-			console.log(names);
-
 			// initialize necessary modules
 			names.forEach(function(name) {
 				// TIME_KEEPING

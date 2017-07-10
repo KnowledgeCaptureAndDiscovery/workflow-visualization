@@ -7,24 +7,34 @@
 			$graph,
 			graph,
 			graphData = [],
+			$renderCheckbox,
+			renderAllData,
+			sampleDataThreshold = 1000,
 			names = [],
 			data = [],
-			categories = [];
+			categories = [],
+			sampleData = [];
 
 		module.init = function(renderTo, seriesNames, dataCopy, oneofs) {			
 			$div = renderTo;
 			$div.data("dashboard.trivariate.scatterplot", module);
 			names = seriesNames;
 			data = d3.transpose(dataCopy);
+			sampleData = data.slice(0, sampleDataThreshold);
 			categories = oneofs[2];
+			$renderCheckbox = $div.find('.render.fitted.toggle.checkbox');
 			$graph = $div.find('.chart.image');
 
 			module.reset();
+			module.initCheckbox();
+			module.render();
+		};
 
+		module.render = function() {
 			graphData = categories.map(function(categoryName) {
 				return {name: categoryName, data: []};
 			});
-			data.forEach(function(row) {
+			module.dataToRender().forEach(function(row) {
 				graphData[categories.indexOf(row[2])]["data"].push(row.slice(0, -1));
 			});
 
@@ -37,18 +47,18 @@
 						fontFamily: 'Lato'
 					}
 				},
-				colors: (function () {
-					var colors = [],
-						base = '#3198f7',
-						i,
-						len = categories.length;
+				// colors: (function () {
+				// 	var colors = [],
+				// 		base = '#3198f7',
+				// 		i,
+				// 		len = categories.length;
 
-					for (i = 0; i < len; i += 1) {
-						colors.push(Highcharts.Color(base).brighten((i - len / 2) / (len / 2 + 2)).get());
-					}
+				// 	for (i = 0; i < len; i += 1) {
+				// 		colors.push(Highcharts.Color(base).brighten((i - len / 2) / (len / 2 + 2)).get());
+				// 	}
 					
-					return colors;
-				}()),
+				// 	return colors;
+				// }()),
 				title: {
 					text: ''
 				},
@@ -77,6 +87,37 @@
 				  enabled: false
 				}
 			});
+		};
+
+		module.initCheckbox = function() {
+			if(data.length < sampleDataThreshold) {
+				renderAllData = true;
+				$renderCheckbox.checkbox("set checked");
+				$div.find(".render").addClass("hidden");
+				$div.find(".render-detail").addClass("hidden");
+			}
+			else {
+				renderAllData = false;
+				$renderCheckbox.checkbox("set unchecked");
+				$div.find(".render").removeClass("hidden");
+				$div.find(".render-detail").removeClass("hidden");
+				$div.find(".render-detail").css("margin-top", "5px");
+				$div.find(".render-detail").css("padding-bottom", "0");
+			}
+			$renderCheckbox.checkbox({
+				onChecked: function() {
+					renderAllData = true;
+					module.render();
+				},
+				onUnchecked: function() {
+					renderAllData = false;
+					module.render();
+				}
+			});
+		};
+
+		module.dataToRender = function() {
+			return (renderAllData? data: sampleData);
 		};
 
 		module.reset = function() {
