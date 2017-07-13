@@ -11,6 +11,29 @@ body {
 	display: none !important;
 }
 
+/* Flexbox */
+.flex-item {
+	-webkit-box-flex: 1 !important;
+	-webkit-flex: 1 1 auto !important;
+	-ms-flex: 1 1 auto !important;
+	flex: 1 1 auto !important;
+}
+.flex-ignore {
+	-webkit-box-flex: 0 !important;
+	-webkit-flex: 0 0 auto !important;
+	-ms-flex: 0 0 auto !important;
+	flex: 0 0 auto !important;
+}
+.flex-container {
+	display: -webkit-box !important;
+	display: -webkit-flex !important;
+	display: -ms-flexbox !important;
+	display: flex !important;
+}
+.flex-column {
+	flex-direction: column !important;
+}
+
 /* Sidebar Layout */
 .ui.inverted.menu.blue a.item.title {
 	padding: 40px 0 !important;
@@ -117,7 +140,7 @@ body {
 
 @media (max-width: 767px) {
 
-.header-content .ui.stackable.grid .column:first-child {
+.header-content > .column:last-child .column:first-child {
 	padding-bottom: 0 !important;
 }
 

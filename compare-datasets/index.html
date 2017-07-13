@@ -27,7 +27,7 @@
 	<link rel="stylesheet" href="../assets/css/range.skinFlat.css">
 </head>
 
-<body>
+<body class="dimmable" style="display: none">
 
 	<!-- Sidebar Menu for Mobile Sites -->
 	<div class="ui left vertical inverted sidebar menu blue toc">
@@ -66,16 +66,173 @@
 			<div class="ui vertical segment header-content">
 				<div class="ui container">
 					<div class="ui stackable grid">
-						<div class="nine wide column">
+						<div class="twelve wide column">
 							<h1 class="ui header">
 							Compare Datasets
 							</h1>
+						</div>
+						<div class="four wide column">
+							<div class="ui basic circular global data floating dropdown button flex-ignore">
+								<i class="database icon"></i>&nbsp;<span class="text">Data Selection</span>
+								<div class="menu">
+									<div class="header"> Sample Data </div>
+									<div class="item" data-value="https://vincentarelbundock.github.io/Rdatasets/csv/datasets/iris.csv,https://vincentarelbundock.github.io/Rdatasets/csv/datasets/iris.csv,https://vincentarelbundock.github.io/Rdatasets/csv/datasets/iris.csv">Iris</div>
+									<div class="item" data-value="https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/DAAG/bomregions2011.csv,https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/DAAG/bomregions2012.csv">Climate Data</div>
+									<div class="item" data-value="https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/DAAG/cps1.csv,https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/DAAG/cps2.csv,https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/DAAG/cps3.csv">Labor Training Data</div>
+									<div class="divider"></div>
+									<div class="header"> Other Options </div>
+									<div class="item" data-value="upload">Upload Data</div>
+								</div>
+							</div>
+							<div class="ui basic circular global settings floating dropdown button flex-ignore disabled">
+								<i class="settings icon"></i>&nbsp;Settings
+								<div class="menu">
+									<div class="header">Module</div>
+									<div class="item" data-value="restoreDefault"><i class="refresh icon"></i>Restore Default</div>
+									<div class="item" data-value="clearModules"><i class="delete icon"></i>Clear Modules</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 
-			<div class="ui vertical segment">
+			<div class="ui vertical segment sample-notice hidden">
+				<div class="ui container">
+					<div class="notice-content">
+						<i class="info circle icon"></i> Due to the size of the data, only a set of sample data is rendered in some visualizations. If you want to view all data in those visualizations, turn the switch "show all data" on. The rendering process might be very slow.
+					</div>
+				</div>
+			</div>
+
+			<div class="ui vertical segment dimmable">
+				<div class="ui graphs container">
+					<div class="ui one column grid graph-content">
+
+						<div class="column univariate">
+							<div class="content">
+								<div class="ui right floated meta flex-ignore">
+									<i class="setting icon link"></i>
+								</div>
+								<div class="header">Univariate Analysis</div>
+								<div class="ui settings popup">
+									<form class="ui form">
+										<div class="field">
+											<label>Columns</label>
+											<div class="col-dropdown">
+												<select class="ui fluid dropdown">
+													<option value="">Select Column</option>
+												</select>
+											</div>
+										</div>
+										<div class="field">
+											<label>Plot Type</label>
+											<div class="plot-dropdown">
+												<select class="ui fluid dropdown">
+													<option value="box-plot">Box Plot</option>
+													<option value="histogram">Histogram</option>
+													<option value="pie-chart">Pie Chart</option>
+													<option value="column-chart">Column Chart</option>
+												</select>
+											</div>
+										</div>
+									</form>
+									<div class="plot options"></div>
+									<div class="ui divider"></div>
+									<div class="control options"></div>
+								</div>
+							</div>
+							<div class="missing notice content"></div>
+							<div class="content">
+								<div class="hidden plot templates">
+									<div class="box-plot">
+										<div class="chart image"></div>
+									</div>
+									<div class="histogram">
+										<div class="chart image"></div>
+										<div class="plot options">
+											<div class="ui divider"></div>
+											<span>Number of Bins</span>
+											<input class="ui range"></input>
+											<div class="ui divider"></div>
+											<div class="toggle-container exclude">
+												<div>Exclude Outliers</div>
+												<div class="ui fitted toggle checkbox">
+													<input type="checkbox">
+													<label></label>
+												</div>
+											</div>
+											<div class="meta exclude-detail"></div>
+											<div class="ui divider"></div>
+											<div class="toggle-container perc">
+												<div>Show Percentage Instead</div>
+												<div class="ui fitted toggle checkbox">
+													<input type="checkbox">
+													<label></label>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="pie-chart">
+										<div class="chart image"></div>
+									</div>
+									<div class="column-chart">
+										<div class="chart image"></div>
+									</div>
+								</div>
+								<div class="plot wrapper"></div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="ui dimmer">
+					<div class="ui text loader"></div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- Data Upload Modal -->
+	<div class="ui modal upload">
+	  <div class="header">
+		Upload Data
+	  </div>
+	  <div class="content">
+		<div class="description">
+			<div class="box">
+				<!-- Drag and Drop Box -->
+				<div class="box__input">
+					<svg class="box__icon" xmlns="http://www.w3.org/2000/svg" width="50" height="43" viewBox="0 0 50 43"><path d="M48.4 26.5c-.9 0-1.7.7-1.7 1.7v11.6h-43.3v-11.6c0-.9-.7-1.7-1.7-1.7s-1.7.7-1.7 1.7v13.2c0 .9.7 1.7 1.7 1.7h46.7c.9 0 1.7-.7 1.7-1.7v-13.2c0-1-.7-1.7-1.7-1.7zm-24.5 6.1c.3.3.8.5 1.2.5.4 0 .9-.2 1.2-.5l10-11.6c.7-.7.7-1.7 0-2.4s-1.7-.7-2.4 0l-7.1 8.3v-25.3c0-.9-.7-1.7-1.7-1.7s-1.7.7-1.7 1.7v25.3l-7.1-8.3c-.7-.7-1.7-.7-2.4 0s-.7 1.7 0 2.4l10 11.6z"></path></svg>
+					<input class="box__file" type="file" name="files[]" id="file" multiple />
+					<label for="file"><strong>Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.</label>
+				</div>
+
+				<!-- State Indicators -->
+				<div class="box__uploading">Uploading&hellip;</div>
+				<div class="box__success">Done!</div>
+				<div class="box__error">Error! <span></span> <br><br><button class="ui button box__restart">Try Again</button></div>
+			</div>
+		</div>
+	  </div>
+	  <div class="actions">
+		<div class="ui black deny button">
+		  Cancel
+		</div>
+	  </div>
+	</div>
+
+	<!-- Error Message Modal -->
+	<div class="ui small modal errmsg">
+		<div class="header">Error</div>
+		<div class="content">
+			<div class="description"></div>
+		</div>
+		<div class="actions">
+			<div class="ui primary right ok button">
+				OK
 			</div>
 		</div>
 	</div>
@@ -87,21 +244,47 @@
 <!-- Semantic UI JS -->
 <script type="text/javascript" src="../assets/js/external/semantic.min.js"></script>
 
+<!-- Div Resize Event JS -->
+<script type="text/javascript" src="../assets/js/external/resize.min.js"></script>
+
+<!-- Range Slider Plugin -->
+<script type="text/javascript" src="../assets/js/external/range.min.js"></script>
+
 <!-- D3 Visualization Library -->
 <script type="text/javascript" src="../assets/js/external/d3.min.js"></script>
+
+<!-- Machine Learning Tools -->
+<script type="text/javascript" src="https://www.lactame.com/lib/ml/2.0.0/ml.min.js"></script>
+<script type="text/javascript" src="../assets/js/external/mds.js"></script>
+
+<!-- DSV Parsing JS -->
+<script type="text/javascript" src="../assets/js/external/papaparse.min.js"></script>
 
 <!-- Highcharts -->
 <script type="text/javascript" src="../assets/js/external/highcharts.js"></script>
 <script type="text/javascript" src="../assets/js/external/highcharts-more.js"></script>
+<script type="text/javascript" src="../assets/js/external/highcharts-heatmap.js"></script>
+<script type="text/javascript" src="../assets/js/external/highcharts-drilldown.js"></script>
 
-<!-- Initialization Script -->
-<script type="text/javascript">
-	$(document).ready(function(){
-		/* Add sidebar animation */
-		$(".launch.icon").click(function(){
-			$(".sidebar.toc").sidebar('toggle');
-		});
-	});
-</script>
+<!-- Regression Library -->
+<script type="text/javascript" src="../assets/js/external/regression.js"></script>
+
+<!-- Progressive Rendering -->
+<script type="text/javascript" src="../assets/js/external/render-queue.js"></script>
+
+<!-- Custom Script -->
+<script type="text/javascript" src="dashboard.js"></script>
+<script type="text/javascript" src="../assets/js/internal/data-reader.js"></script>
+<script type="text/javascript" src="../assets/js/internal/drag-and-drop.js"></script>
+
+<!-- Graph Types-->
+<script src="graphs/univariate.js" type="text/javascript"></script>
+<script src="graphs/univariate/boxplot.js" type="text/javascript"></script>
+<script src="graphs/univariate/histogram.js" type="text/javascript"></script>
+<script src="graphs/univariate/piechart.js" type="text/javascript"></script>
+<script src="graphs/univariate/columnchart.js" type="text/javascript"></script>
+
+<!-- Initialization -->
+<script type="text/javascript" src="script.js"></script>
 
 </html>

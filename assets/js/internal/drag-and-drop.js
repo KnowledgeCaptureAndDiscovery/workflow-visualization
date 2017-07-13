@@ -4,13 +4,15 @@
 DragAndDrop = (function ($, document, window) {
 	var module = {};
 
-	module.init = function (action) {
+	module.init = function (action, multiple = false) {
 		var $form 		= $('.box');
 		var $input 		= $form.find('input[type="file"]');
 		var $label		 = $form.find('label');
 		var $errorMsg	 = $form.find('.box__error span');
 		var $restart	 = $form.find('.box__restart');
 		var droppedFiles = false;
+		var toLoad = 0;
+		var dataLoaded = [];
 
 		$form.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
 			e.preventDefault();
@@ -25,31 +27,48 @@ DragAndDrop = (function ($, document, window) {
 		.on('drop', function(e) {
 			droppedFiles = e.originalEvent.dataTransfer.files;
 			if(!checkFileCount(droppedFiles)) return;
-			$label.text(droppedFiles[0].name);
+			if(multiple) {
+				$label.text("Uploading " + droppedFiles.length + " files.");
+			}
+			else {
+				$label.text(droppedFiles[0].name);
+			}
 			submitForm();
 		});
 
 		$input.on('change', function(e) {
 			droppedFiles = e.target.files;
 			if(!checkFileCount(droppedFiles)) return;
-			$label.text(droppedFiles[0].name);
+			if(multiple) {
+				$label.text("Uploading " + droppedFiles.length + " files.");
+			}
+			else {
+				$label.text(droppedFiles[0].name);
+			}
 			submitForm();
 		});
 
 		var checkFileCount = function(files) {
 			if(files.length == 1) {
-				return true;
+				if(!multiple) {
+					return true;
+				}
+				else {
+					$errorMsg.html('Please upload more than one file.');
+				}
 			}
 			else if(files.length == 0) {
 				$errorMsg.html('No file uploaded.');
-				$form.addClass('is-error');
-				console.log("no file dropped");
 			}
 			else {
-				$errorMsg.html('Please only upload one file.');
-				$form.addClass('is-error');
-				console.log("dropped too many files");
+				if(multiple) {
+					return true;
+				}
+				else {
+					$errorMsg.html('Please only upload one file.');
+				}
 			}
+			$form.addClass('is-error');
 			return false;
 		}
 
@@ -61,13 +80,33 @@ DragAndDrop = (function ($, document, window) {
 
 			$form.addClass('is-uploading').removeClass('is-error');
 
-			var reader = new FileReader();
-			reader.readAsText(droppedFiles[0], "UTF-8");
-			reader.onload = function (e) {
-				$form.removeClass('is-uploading');
+			toLoad = droppedFiles.length;
+			dataLoaded = [];
+			for(var i = 0; i < droppedFiles.length; i++) {
+				dataLoaded.push(null);
+			}
 
-				var data = e.target.result;
-				action(data);
+			dataLoaded.forEach(function (val, ix) {
+				var reader = new FileReader();
+				reader.readAsText(droppedFiles[ix], "UTF-8");
+				reader.onload = function (e) {
+					var data = e.target.result;
+					dataLoaded[ix] = data;
+					checkLoaded();
+				}
+			});
+		}
+
+		function checkLoaded() {
+			toLoad--;
+			if(toLoad == 0) {
+				$form.removeClass('is-uploading');
+				if(multiple) {
+					action(dataLoaded);
+				}
+				else {
+					action(dataLoaded[0]);
+				}
 			}
 		}
 

@@ -1,0 +1,161 @@
+@media (max-width: 767px) {
+	.header-content .column:last-child {
+		justify-content: flex-start;
+	}
+	.global.dropdown > .menu {
+		left: 0 !important;
+		right: auto !important;
+	}
+	.header-content .column:last-child > * {
+		margin-right: 0 !important;
+	}	
+}
+@media (min-width: 768px) {
+	.header-content .column:last-child {
+		justify-content: flex-end;
+	}
+	.global.dropdown > .menu {
+		right: 0 !important;
+		left: auto !important;
+	}
+	.header-content .column:last-child > * {
+		margin-left: 0 !important;
+	}
+}
+
+.right.floated.flex-ignore {
+	float: right;
+}
+.flex-container {
+	align-items: middle;
+}
+.graph-content {
+	padding-top: 20px !important;
+	padding-bottom: 20px !important;
+}
+.graph-content > .column {
+	background-color: white;
+	padding: 0 !important;
+}
+.graph-content > .column > .content {
+	padding: 2em;
+}
+
+.ui.settings.popup:before {
+	display: none;
+}
+.ui.settings.popup {
+	width: 320px;
+}
+.right.floated.meta,
+.right.floated.meta + .header {
+	line-height: 1.2em !important;
+	font-size: 1.2em;
+}
+
+/* Content with Toggle */
+.toggle-container {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+}
+.grid.with-toggle > div {
+	-webkit-box-flex: 1;
+	-webkit-flex: 1 1 auto;
+	-ms-flex: 1 1 auto;
+	flex: 1 1 auto;
+}
+
+/* Graph Option Section Layout */
+.graph-content .content > span,
+.graph-content .content *:not(.dropdown) > span {
+	display: block;
+	margin-bottom: 10px !important;
+}
+
+/* Checkbox Layout */
+.fitted.toggle.checkbox label::before {
+	background-color: rgba(0,0,0,0.2);
+}
+.fitted.toggle.checkbox label::after {
+	background: -webkit-linear-gradient(transparent, rgba(0, 0, 0, .1)) #FFF;
+	background: linear-gradient(transparent, rgba(0, 0, 0, .1)) #FFF;
+}
+
+/* Upload Modal Layout */
+.ui.modal {
+	transition: margin-top ease-in-out 0.2s;
+}
+.ui.upload.modal .header,
+.ui.upload.modal .content,
+.ui.upload.modal .actions {
+	background: #e5edf1;
+}
+.box {
+	font-size: 1.25rem;
+	text-align: center;
+	background-color: #c8dadf;
+    position: relative;
+    padding: 100px 20px;
+    box-sizing: border-box;
+
+	outline: 2px dashed #92b0b3;
+	outline-offset: -10px;
+	-webkit-transition: outline-offset .15s ease-in-out, background-color .15s linear;
+    transition: outline-offset .15s ease-in-out, background-color .15s linear;
+}
+.box__dragndrop,
+.box__uploading,
+.box__success,
+.box__error {
+	display: none;
+}
+.box__icon {
+    width: 100%;
+    height: 80px;
+    fill: #92b0b3;
+    display: block;
+    margin-bottom: 40px;
+}
+.box__file {
+	display: none;
+}
+.box__file + label {
+    max-width: 80%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    display: inline-block;
+    overflow: hidden;
+}
+.box__file + label strong {
+	-webkit-transition: color 0.3s;
+    transition: color 0.3s;
+}
+.box__file + label:hover strong {
+	color: #39bfd3;
+}
+.box__dragndrop {
+	display: inline;
+}
+.box.is-dragover {
+	background-color: white;
+	outline-offset: -20px;
+}
+.box.is-uploading .box__input {
+	visibility: none;
+}
+.box.is-uploading .box__uploading {
+	display: block;
+}
+.box.is-error .box__error {
+	display: block;
+}
+.box.is-error .box__input,
+.box.is-error .box__uploading {
+	display: none;
+}
