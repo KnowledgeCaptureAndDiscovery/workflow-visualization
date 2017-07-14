@@ -78,6 +78,7 @@
 				// define dropdown action events
 				$colDropdown.dropdown("setting", "onChange", function() {
 					module.render();
+					module.updateDescription();
 				});
 
 				$colDropdown.dropdown("set selected", firstAvailableIx);
@@ -98,12 +99,19 @@
 				plotTypes.push($(this).attr("value"));
 			});
 			$plotDropdown.dropdown("setting", "onChange", function(value) {
-				plotTypes.forEach(function(type) {
-					$div.find(".plot.wrapper").find("." + type).addClass("hidden");
-				});
-				$div.find(".plot.wrapper").find("." + value).removeClass("hidden");
+				module.updatePlotVisibility(value);
+				module.updateDescription();
 			});
 			$plotDropdown = $div.find(".ui.settings.popup").find(".plot-dropdown").find(".fluid.dropdown");
+		};
+
+		module.updatePlotVisibility = function(value) {
+			plotTypes.forEach(function(type) {
+				$div.find(".plot.wrapper").find("." + type).addClass("hidden");
+				$div.find(".settings.popup .plot.options").find("." + type).addClass("hidden");
+			});
+			$div.find(".plot.wrapper").find("." + value).removeClass("hidden");
+			$div.find(".settings.popup .plot.options").find("." + value).removeClass("hidden");
 		};
 
 		// @brief	populate graph option dropdown based on column data types
@@ -145,7 +153,7 @@
 			}
 
 			else {
-				$missingNotice.html("<div class='ui " + numberToEnglish(columnData.length) + " column divided grid'></div>");
+				$missingNotice.html("<div class='ui " + numberToEnglish(columnData.length) + " column grid'></div>");
 
 				var showing = false;
 				columnData.forEach(function(_, ix) {
@@ -206,7 +214,8 @@
 			});
 
 			// identify column type inconsistency error
-			if(Array.from(new Set(types)).length != 1) {
+			var typesNotNull = Array.from(new Set(types.filter((val) => (val != null))));
+			if(typesNotNull.length != 1) {
 				$div.find(".plot.wrapper").showModuleError("Error: column data type inconsistent.");
 				return;
 			}
@@ -219,11 +228,11 @@
 				});
 			});
 
-			columnData = module.trimBadData(columnData, types[0]);
+			var type = (types.filter((val) => (val != null)))[0];
+			columnData = module.trimBadData(columnData, type);
 
 			// obtain modules that needs rendering
 			var names = [];
-			var type = types[0];
 			if(type == "numeric") {
 				names = ["box-plot", "histogram"];
 			}
@@ -231,6 +240,7 @@
 				names = ["pie-chart", "column-chart"];
 			}
 			else {
+				$div.find(".plot.wrapper").showModuleError("This data type cannot be plotted.");
 				return;
 			}
 
@@ -249,7 +259,6 @@
 					var oneofs = indices.map(function(colIndex, ix) {
 						return (colIndex == -1) ? null : data[ix]["attribute"][colIndex]["type"]["oneof"];
 					});
-					console.log(oneofs);
 					plotWrapper.find("." + name)["dashboard_univariate_" + moduleName](
 						columnData, 
 						oneofs
@@ -268,12 +277,12 @@
 			});
 
 			// set tab status
-			$plotDropdown.dropdown("set selected", names[0]);
+			if(names.indexOf($plotDropdown.dropdown("get value")) == -1) {
+				$plotDropdown.dropdown("set selected", names[0]);
+			}
 
-			plotTypes.forEach(function(type) {
-				$div.find(".plot.wrapper").find("." + type).addClass("hidden");
-			});
-			$div.find(".plot.wrapper").find("." + names[0]).removeClass("hidden");
+			module.updatePlotVisibility($plotDropdown.dropdown("get value"));
+			module.updateDescription();
 		};
 
 		// @brief	reset the module
@@ -293,8 +302,13 @@
 			});
 		};
 
+		module.updateDescription = function() {
+			$div.find(".header-description").text(module.description());
+		};
+
 		module.description = function() {
-			return $plotDropdown.find(".active.item").html() + " of " 
+			console.log($plotDropdown.html());
+			return $plotDropdown.dropdown("get text") + " of " 
 				+ $colDropdown.dropdown("get text")[0];
 		};
 

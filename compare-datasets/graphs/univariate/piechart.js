@@ -12,7 +12,7 @@
 			$graph = $div.find('.chart.image');
 			module.reset();
 
-			$div.html("<div class='ui " + numberToEnglish(data.length) + " column divided grid'></div>");
+			$div.html("<div class='ui " + numberToEnglish(data.length) + " column grid'></div>");
 			data.forEach(function(singleData, ix) {
 				$div.find(".grid").append($("<div>").addClass("block-" + ix).addClass("column"));
 				module.render($div.find(".block-" + ix), singleData, classes[ix]);
@@ -20,6 +20,11 @@
 		};
 
 		module.render = function(renderTo, dataToRender, classes) {
+			if(dataToRender == null) {
+				renderTo.showNoData();
+				return;
+			}
+			
 			var graphData = classes.map(function(item) {
 				return {
 					name: item,
@@ -79,7 +84,6 @@
 			if(!$div) return;
 
 			$graph.html("");
-			$div.closest(".column").find(".settings.popup .plot.options").html("");
 		};
 
 		module.init(renderTo, dataCopy, classesCopy);

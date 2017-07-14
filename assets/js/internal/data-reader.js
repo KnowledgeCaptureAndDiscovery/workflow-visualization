@@ -209,7 +209,10 @@ DataReader.prototype.readCsvData = function(csvString) {
 		}
 
 		// identify numeric column
-		else if(typeof data['data'][0][csvHeader[colIndex]] === 'number') {
+		else if(data['data'].filter(function(item, ix) { 
+			return (typeof item[csvHeader[colIndex]] === 'number'
+				|| item[csvHeader[colIndex]] == 'NA');
+		}).length >= data['data'].length * 0.9) {
 
 			// count unique elements
 			// Code source: https://stackoverflow.com/questions/21661686/fastest-way-to-get-count-of-unique-elements-in-javascript-array

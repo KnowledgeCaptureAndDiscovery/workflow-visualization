@@ -301,7 +301,7 @@ function initSettings() {
 	$(".global.settings.dropdown").dropdown('setting', 'onChange', function() {
 		var operaton = $('.global.settings.dropdown').dropdown('get value');
 		window[operaton]();
-		$('.global.settings.dropdown').dropdown("restore default");
+		$('.global.settings.dropdown').dropdown("clear");
 	});
 }
 
@@ -355,23 +355,23 @@ function removeDimmer() {
 }
 
 $.fn.showNoData = function() {
-	$(this).html("No Data");
-	$(this)
-		.css("height", "500px")
+	$(this).html("<div>No Data</div>");
+	$(this).find("div")
+		.css("height", "300px")
+		.css("text-align", "center")
 		.css("color", "gray")
-		.css("font-size", "24px")
-		.css("line-height", "500px")
-		.css("font-weight", "bold");
-}
+		.css("font-size", "18px")
+		.css("line-height", "300px");
+};
 
 $.fn.showModuleError = function(msg) {
-	$(this).html(msg);
-	$(this)
-		.css("height", "500px")
+	$(this).html("<div>" + msg + "</div>");
+	$(this).find("div")
+		.css("height", "300px")
+		.css("text-align", "center")
 		.css("color", "gray")
-		.css("font-size", "24px")
-		.css("line-height", "500px")
-		.css("font-weight", "bold");
+		.css("font-size", "18px")
+		.css("line-height", "300px");
 };
 
 // @brief	converts a number to english

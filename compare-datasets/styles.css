@@ -40,7 +40,11 @@
 .graph-content > .column > .content {
 	padding: 2em;
 }
+.graph-content > .column > .content.missing.notice {
+	padding: 0 2em;
+}
 
+/* Settings popup layout */
 .ui.settings.popup:before {
 	display: none;
 }
@@ -76,6 +80,11 @@
 	display: block;
 	margin-bottom: 10px !important;
 }
+.graph-content .content span.header-description {
+	display: inline;
+	color: gray;
+	margin-bottom: 0 !important;
+}
 
 /* Checkbox Layout */
 .fitted.toggle.checkbox label::before {
@@ -84,6 +93,11 @@
 .fitted.toggle.checkbox label::after {
 	background: -webkit-linear-gradient(transparent, rgba(0, 0, 0, .1)) #FFF;
 	background: linear-gradient(transparent, rgba(0, 0, 0, .1)) #FFF;
+}
+
+/* Customization Functionalities Layout */
+.column.hoarded {
+	display: none !important;
 }
 
 /* Upload Modal Layout */

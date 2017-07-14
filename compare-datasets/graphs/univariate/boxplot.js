@@ -15,26 +15,37 @@
 			meta = data.map(module.calculateDataInfo);
 			$graph = $div.find('.chart.image');
 
-			console.log(meta);
-
 			module.reset();
 
-			var median = meta.map(val => val.median);
-			var q1 = meta.map(val => val.q1);
-			var q3 = meta.map(val => val.q3);
-			var iqr = meta.map(val => val.iqr);
-			var upperFence = meta.map(val => val.upperFence);
-			var lowerFence = meta.map(val => val.lowerFence);
+			$div.html("<div class='ui " + numberToEnglish(data.length) + " column grid'></div>");
+			data.forEach(function(singleData, ix) {
+				$div.find(".grid").append($("<div>").addClass("block-" + ix).addClass("column"));
+				module.render($div.find(".block-" + ix), singleData, meta[ix]);
+			});
 
-			var outliers = data.map(function(individualData, ix) {
-				return individualData.filter(function(val) {
-					return (val < lowerFence[ix] || val > upperFence[ix]);
-				});
+			module.equlizeAxis();
+		};
+
+		module.render = function(renderTo, data, meta) {
+			if(data == null) {
+				renderTo.showNoData();
+				return;
+			}
+
+			var median = meta.median;
+			var q1 = meta.q1;
+			var q3 = meta.q3;
+			var iqr = meta.iqr;
+			var upperFence = meta.upperFence;
+			var lowerFence = meta.lowerFence;
+
+			var outliers = data.filter(function(val) {
+				return (val < lowerFence || val > upperFence);
 			});
 
 			var graph = new Highcharts.Chart({
 				chart: {
-					renderTo: $graph.get(0),
+					renderTo: renderTo.get(0),
 					type: 'boxplot',
 					style: {
 						fontFamily: 'Lato'
@@ -45,20 +56,16 @@
 					text: ''
 				},
 				xAxis: {
-					categories: data.map(function(_, ix) { return "Dataset " + (ix + 1); })
+					categories: [''],
+					gridLineWidth: 1
 				},
-				yAxis: [{
-					title: {
-						text: 'Value'
-					}
-				}],
 				series: [{
 					name: 'Observations',
-					data: d3.transpose([lowerFence, q1, median, q3, upperFence])
+					data: [[lowerFence, q1, median, q3, upperFence]]
 				}, {
 					name: 'Outlier',
 					type: 'scatter',
-					data: outliers.map(function(val, ix) { return [ix, val]; }),
+					data: outliers.map(function(val) { return [0, val]; }),
 					tooltip: {
 						pointFormat: 'Value: {point.y}'
 					}
@@ -76,6 +83,10 @@
 		// @param	columnData 	column data
 		// @return	an object including all meta data
 		module.calculateDataInfo = function(columnData) {
+			if(columnData == null) {
+				return null;
+			}
+
 			columnData = columnData.sort(function(a,b) { return a - b; });
 
 			var meta = {};
@@ -98,12 +109,28 @@
 			return meta;
 		};
 
+		module.equlizeAxis = function(flag = true) {
+			if(flag) {
+				var numberMax = d3.max(meta.filter((val) => (val != null)).map((val) => (val.upperFence)));
+				var numberMin = d3.min(meta.filter((val) => (val != null)).map((val) => (val.lowerFence)));
+				$div.find(".grid").find(".column").each(function() {
+					if($(this).highcharts() !== undefined)
+						$(this).highcharts().yAxis[0].setExtremes(numberMin, numberMax);
+				});
+			}
+			else {
+				$div.find(".grid").find(".column").each(function() {
+					if($(this).highcharts() !== undefined)
+						$(this).highcharts().yAxis[0].setExtremes(null, null);
+				});
+			}
+		};
+
 		module.reset = function() {
 			// if init has not been run, do nothing
 			if(!$div) return;
 
 			$graph.html("");
-			$div.closest(".column").find(".settings.popup .plot.options").html("");
 		};
 
 		module.init(renderTo, dataCopy);

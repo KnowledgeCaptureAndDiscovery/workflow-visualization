@@ -20,8 +20,10 @@
 			$.data($div[0], "dashboard.univariate.histogram", module);
 
 			$options = $div.closest(".column").find(".settings.popup .plot.options");
+			$options.find(".histogram").remove();
+			$options.append("<div class='histogram'></div>");
+			$options = $options.find(".histogram");
 			$options.html($div.find(".plot.options").html());
-			$div.find(".plot.options").remove();
 
 			$rangeSelector = $options.find(".ui.range");
 			$graph = $div.find(".chart");
@@ -38,7 +40,7 @@
 			module.reset();
 
 			dataWithoutOutliers = data.map(function(singleData, ix) {
-				return singleData.filter(function(val) {
+				return (singleData || []).filter(function(val) {
 					return (val >= meta[ix].lowerFence && val <= meta[ix].upperFence);
 				});
 			});
@@ -54,6 +56,10 @@
 		// @param	columnData 	column data
 		// @return	an object including all meta data
 		module.calculateDataInfo = function(columnData) {
+			if(columnData == null) {
+				return null;
+			}
+
 			columnData = columnData.sort(function(a,b) { return a - b; });
 
 			var metaInfo = {};
@@ -114,7 +120,7 @@
 		};
 
 		module.initGraphs = function() {
-			$div.html("<div class='ui " + numberToEnglish(data.length) + " column divided grid'></div>");
+			$div.html("<div class='ui " + numberToEnglish(data.length) + " column grid'></div>");
 			data.forEach(function(singleData, ix) {
 				$div.find(".grid").append($("<div>").addClass("block-" + ix).addClass("column"));
 			
@@ -173,6 +179,11 @@
 		};
 
 		module.renderIndividual = function(numBins, dataToShow, index) {
+			if(dataToShow == null) {
+				$div.find(".block-" + index).showNoData();
+				return;
+			}
+
 			// need to suggest number of bins
 			if(numBins == 0) {
 				numBins = d3.thresholdFreedmanDiaconis(

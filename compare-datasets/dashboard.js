@@ -171,6 +171,12 @@ var Dashboard = (function ($) {
           $(this)["dashboard_" + funcName]("reset");
         });
       }
+
+      Highcharts.setOptions({
+        chart: {
+          height: "300px"
+        }
+      });
     };
 
     return module;
