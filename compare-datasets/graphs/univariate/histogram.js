@@ -122,6 +122,10 @@
 		module.initGraphs = function() {
 			$div.html("<div class='ui " + numberToEnglish(data.length) + " column grid'></div>");
 			data.forEach(function(singleData, ix) {
+				if(singleData == null) {
+					return;
+				}
+
 				$div.find(".grid").append($("<div>").addClass("block-" + ix).addClass("column"));
 			
 				var graph = new Highcharts.Chart({

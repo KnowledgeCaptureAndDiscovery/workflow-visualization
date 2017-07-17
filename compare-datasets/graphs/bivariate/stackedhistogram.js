@@ -6,107 +6,128 @@
 			$graph,
 			$rangeSelector,
 			graph,
-			histData = [],
-			names = [],
-			classes = [],
-			data = [];
+			data = [],
+			classes = [];
 
-		module.init = function(renderTo, seriesNames, dataCopy, classesCopy) {
+		module.init = function(renderTo, names, dataCopy, classesCopy) {
 			$div = renderTo;
 			$.data($div[0], "dashboard.bivariate.stackedhistogram", module);
-			names = seriesNames;
+
 			data = dataCopy;
-			classes = classesCopy[1];
+			classes = classesCopy;
+
+			$options = $div.closest(".column").find(".settings.popup .plot.options");
+			$options.find(".stackedhistogram").remove();
+			$options.append("<div class='stackedhistogram'></div>");
+			$options = $options.find(".stackedhistogram");
+			$options.html($div.find(".plot.options").html());
 
 			$graph = $div.find('.chart.image');
-			$rangeSelector = $div.find(".ui.range");
+			$rangeSelector = $options.find(".ui.range");
 
 			module.reset();
 
-			graph = new Highcharts.Chart({
-				chart: {
-					renderTo: $graph.get(0),
-					type: 'column',
-					style: {
-						fontFamily: 'Lato'
-					}
-				},
-				title: {
-					text: ''
-				},
-				colors: (function () {
-					var colors = [],
-						base = '#3198f7',
-						i,
-						len = classes.length;
+			module.initGraphs(names, data, classes);
+		};
 
-					for (i = 0; i < len; i += 1) {
-						colors.push(Highcharts.Color(base).brighten((i - len / 2) / (len / 2 + 2)).get());
-					}
-					
-					return colors;
-				}()),
-				xAxis: {
-					categories: [],
-					title: {
-						text: names[0]
+		module.initGraphs = function(names, data, classes) {
+			$div.html("<div class='ui " + numberToEnglish(data.length) + " column grid'></div>");
+			data.forEach(function(singleData, ix) {
+				if(data[0][0] == null || data[1][0] == null) {
+					renderTo.showNoData();
+					return;
+				}
+
+				$div.find(".grid").append($("<div>").addClass("block-" + ix).addClass("column"));
+
+				graph = new Highcharts.Chart({
+					chart: {
+						renderTo: $div.find(".block-" + ix).get(0),
+						type: 'column',
+						style: {
+							fontFamily: 'Lato'
+						}
 					},
-					min: 0,
-					gridLineWidth: 1,
-					tickmarkPlacement: 'on'
-				},
-				yAxis: [{
 					title: {
-						text: 'Histogram Count'
+						text: ''
+					},
+					colors: (function () {
+						var colors = [],
+							base = '#3198f7',
+							i,
+							len = classes[ix][1].length;
+
+						for (i = 0; i < len; i += 1) {
+							colors.push(Highcharts.Color(base).brighten((i - len / 2) / (len / 2 + 2)).get());
+						}
+						
+						return colors;
+					}()),
+					xAxis: {
+						categories: [],
+						title: {
+							text: names[0]
+						},
+						min: 0,
+						gridLineWidth: 1,
+						tickmarkPlacement: 'on'
+					},
+					yAxis: [{
+						title: {
+							text: 'Histogram Count'
+						}
+					}],
+					series: [],
+					plotOptions: {
+						column: {
+							stacking: 'normal',
+							pointPadding: 0,
+							groupPadding: 0,
+							pointPlacement: 'between'
+						}
+					},
+					tooltip: {
+						headerFormat: names[1] + ': <b>{series.name}</b><br/>',
+						pointFormat: 'Histogram Count: <b>{point.y}</b> of {point.stackTotal}'
+					},
+					credits: {
+					  enabled: false
 					}
-				}],
-				series: [],
-				plotOptions: {
-					column: {
-						stacking: 'normal',
-						pointPadding: 0,
-						groupPadding: 0,
-						pointPlacement: 'between'
-					}
-				},
-				tooltip: {
-					headerFormat: names[1] + ': <b>{series.name}</b><br/>',
-					pointFormat: 'Histogram Count: <b>{point.y}</b> of {point.stackTotal}'
-				},
-				credits: {
-				  enabled: false
+				});
+			});
+
+			var initialNumberOfBins = 8;
+
+			$rangeSelector.ionRangeSlider({
+				min: 2,
+				max: 20,
+				from: initialNumberOfBins,
+				step: 1,
+				postfix: ' bins',
+				max_postfix: "+",
+				grid: false
+			});
+
+			$rangeSelector.data("ionRangeSlider").update({
+				onFinish: function(sliderData) {
+					module.render(sliderData.from);
 				}
 			});
 
-			module.render(0);
+			module.render(initialNumberOfBins);
 		};
 
 		module.render = function(numBins) {
-			// need to suggest number of bins
-			if(numBins == 0) {
-				numBins = d3.thresholdFreedmanDiaconis(
-					data[0], 
-					d3.min(data[0]), 
-					d3.max(data[0])
-				);
-				if(numBins < 2) numBins = 2;
-				else if(numBins > 20) numBins = 20;
+			data.forEach(function(singleData, ix) {
+				module.renderIndividual(numBins, singleData, ix);
+			});
+		};
 
-				$rangeSelector.ionRangeSlider({
-					min: 2,
-					max: 20,
-					from: numBins,
-					step: 1,
-					postfix: ' bins',
-					max_postfix: "+",
-					grid: false
-				});
-
-				$rangeSelector.data("ionRangeSlider").update({
-					onFinish: function(sliderData) {
-						module.render(sliderData.from);
-					}
-				});
+		module.renderIndividual = function(numBins, data, index) {
+			console.log("stackedhist", data, classes);
+			if(data[0][0] == null || data[1][0] == null) {
+				$div.find(".block-" + index).showNoData();
+				return;
 			}
 
 			var min = d3.min(data[0]);
@@ -115,12 +136,8 @@
 			var tickInterval = d3.tickStep(min, max, numBins);
 
 			ticks.splice(0, 0, ticks[0] - tickInterval);
-
-			$rangeSelector.data("ionRangeSlider").update({
-				from: ticks.length
-			});
 			
-			histData = classes.map(function(item) {
+			var histData = classes[index][1].map(function(item) {
 				var counts = [];
 				var itemData = data[0].filter(function(val, ix) {
 					return (data[1][ix] == item);
@@ -137,6 +154,8 @@
 					data: counts
 				};
 			});
+
+			var graph = $div.find(".block-" + index).highcharts();
 
 			while(graph.series.length > 0)
 				graph.series[0].remove(false);

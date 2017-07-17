@@ -62,7 +62,7 @@
 		};
 
 		module.render = function(renderTo, names, data, plotIndex) {
-			if(data == null) {
+			if(data[0][0] == null || data[1][0] == null) {
 				renderTo.showNoData();
 				return;
 			}
@@ -136,7 +136,7 @@
 		};
 
 		module.updateIndividualChart = function(plotIndex) {
-			if(data[plotIndex] == null) {
+			if(data[plotIndex][0][0] == null || data[plotIndex][1][0] == null) {
 				return;
 			}
 

@@ -159,7 +159,7 @@
 				columnData.forEach(function(_, ix) {
 					if(columnData[ix] == null) {
 						$missingNotice.find(".grid").append(
-							"<div class='column'> <i class='warning info icon'></i> No Data </div>"
+							"<div class='column'> <i class='warning circle icon'></i> No Data </div>"
 						);
 						return;
 					}
@@ -183,7 +183,7 @@
 					}
 					else {
 						$missingNotice.find(".grid").append(
-							"<div class='column'> <i class='warning info icon'></i> No Missing Data </div>"
+							"<div class='column'> <i class='info circle icon'></i> No Missing Data </div>"
 						);
 					}
 				});
@@ -240,6 +240,7 @@
 				names = ["pie-chart", "column-chart"];
 			}
 			else {
+				$div.find(".header-description").text("Error");
 				$div.find(".plot.wrapper").showModuleError("This data type cannot be plotted.");
 				return;
 			}

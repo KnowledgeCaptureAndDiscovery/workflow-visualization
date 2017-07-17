@@ -161,9 +161,9 @@
 				columnDataArray = columnDataArray.map((singleData) => (d3.transpose(singleData)));
 
 				columnDataArray.forEach(function(columnData, ix) {
-					if(columnData[0][ix] == null) {
+					if(columnData[0][0] == null || columnData[0][1] == null) {
 						$missingNotice.find(".grid").append(
-							"<div class='column'> <i class='warning info icon'></i> No Data </div>"
+							"<div class='column'> <i class='warning circle icon'></i> No Data </div>"
 						);
 						return;
 					}
@@ -196,7 +196,7 @@
 					}
 					else {
 						$missingNotice.find(".grid").append(
-							"<div class='column'> <i class='warning info icon'></i> No Missing Data </div>"
+							"<div class='column'> <i class='info circle icon'></i> No Missing Data </div>"
 						);
 					}
 
@@ -212,8 +212,6 @@
 
 				columnDataArray = columnDataArray.map((singleData) => (d3.transpose(singleData)));
 			}
-
-			console.log(columnDataArray);
 
 			return columnDataArray;
 		};
@@ -231,8 +229,6 @@
 				});
 			});
 
-			console.log(indices);
-
 			var type1 = indices.map(function(colIndex, ix) {
 				var typeToCheck = (colIndex[0] == -1) ? null : data[ix]["attribute"][colIndex[0]]["type"];
 				return getType(typeToCheck);
@@ -245,6 +241,7 @@
 			var type1NotNull = Array.from(new Set(type1.filter((val) => (val != null))));
 			var type2NotNull = Array.from(new Set(type1.filter((val) => (val != null))));
 			if(type1NotNull.length != 1 || type2NotNull.length != 1) {
+				$div.find(".header-description").text("Error");
 				$div.find(".plot.wrapper").showModuleError("Error: column data type inconsistent.");
 				return;
 			}
@@ -262,14 +259,22 @@
 				});
 			});
 
-			console.log(columnData);
-
 			columnData = module.trimBadData(columnData, [type1, type2]);
 			columnData = columnData.map((singleData) => ((singleData[0] == null) ? null : singleData));
 
 			// obtain modules that needs rendering
 			var names = [];
 			var type = type1 + "-" + type2;
+			if(type == "nominal-nominal" || type == "discrete-discrete" || type == "discrete-nominal" || type == "nominal-discrete") {
+				names.push("donut-chart");
+				names.push("stacked-column-chart");
+			}
+			if(type == "nominal-numeric" || type == "discrete-numeric" || type == "nominal-discrete") {
+				names.push("line-chart");
+			}
+			if(type == "numeric-nominal" || type == "numeric-discrete" || type == "discrete-nominal") {
+				names.push("stacked-histogram");
+			}
 			if(type == "numeric-numeric" || type == "discrete-discrete" || type == "numeric-discrete" || type == "discrete-numeric") {
 				// if(columnData[0].length > 1000) {
 				// 	names.push("heatmap");
@@ -278,18 +283,8 @@
 					names.push("scatter-plot");
 				// }
 			}
-			else {
-			// if(type == "nominal-nominal" || type == "discrete-discrete" || type == "discrete-nominal" || type == "nominal-discrete") {
-			// 	names.push("donut-chart");
-			// 	names.push("stacked-column-chart");
-			// }
-			// if(type == "nominal-numeric" || type == "discrete-numeric" || type == "nominal-discrete") {
-			// 	names.push("line-chart");
-			// }
-			// if(type == "numeric-nominal" || type == "numeric-discrete" || type == "discrete-nominal") {
-			// 	names.push("stacked-histogram");
-			// }
-			// if(type1 == "others" || type2 == "others") {
+			if(type1 == "others" || type2 == "others") {
+				$div.find(".header-description").text("Error");
 				$div.find(".plot.wrapper").showModuleError("This data type cannot be plotted.");
 				return;
 			}
@@ -302,11 +297,23 @@
 				plotWrapper.append($("<div>").addClass(name).html($div.find(".plot.templates").find("." + name).html()));
 				var $divToRender = plotWrapper.find("." + name);
 				var columnNames = [ix1, ix2];
-				var oneofs = indices.map((indice) => (
-					indice.map(function(colIndex, ix) {
-						return (colIndex == -1) ? null : data[ix]["attribute"][colIndex]["type"]["oneof"];
+				var oneofs = indices.map((indice, ix) => (
+					indice.map(function(colIndex) {
+						if(colIndex == -1) {
+							return null;
+						}
+						else {
+							var oneof = data[ix]["attribute"][colIndex]["type"]["oneof"];
+							if(oneof != undefined) {
+								return oneof.map((val) => ("" + val));
+							}
+							else {
+								return null;
+							}
+						}
 					})
 				));
+				console.log("Bivariate > " + moduleName, columnNames, columnData, oneofs);
 				$divToRender["dashboard_bivariate_" + moduleName](
 					columnNames, columnData,
 					oneofs

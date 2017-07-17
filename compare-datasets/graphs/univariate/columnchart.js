@@ -19,7 +19,7 @@
 				module.render($div.find(".block-" + ix), singleData, classes[ix]);
 			});
 
-			module.equlizeAxis();
+			module.equalizeAxis();
 		};
 
 		module.render = function(renderTo, dataToRender, classes) {
@@ -61,7 +61,7 @@
 			});
 		};
 
-		module.equlizeAxis = function() {
+		module.equalizeAxis = function() {
 			var numberMax = d3.max(numbers);
 			$div.find(".grid").find(".column").each(function() {
 				if($(this).highcharts() !== undefined)

@@ -4,21 +4,28 @@
 
 		var module = this,
 			$div,
-			$graph,
-			graph,
-			names = [],
-			classes = [],
-			data = [];
+			$graph;
 
-		module.init = function(renderTo, seriesNames, dataCopy, classesCopy) {
+		module.init = function(renderTo, names, data, classes) {
 			$div = renderTo;
 			$.data($div[0], "dashbaord.bivariate.donutchart", module);
-			names = seriesNames;
-			data = dataCopy;
-			classes = classesCopy;
 			$graph = $div.find('.chart.image');
 
 			module.reset();
+
+			$div.html("<div class='ui " + numberToEnglish(data.length) + " column grid'></div>");
+			data.forEach(function(singleData, ix) {
+				$div.find(".grid").append($("<div>").addClass("block-" + ix).addClass("column"));
+				module.render($div.find(".block-" + ix), names, singleData, classes[ix]);
+			});
+		};
+
+		module.render = function(renderTo, names, data, classes) {
+			console.log("donut", data, classes);
+			if(data[0][0] == null || data[1][0] == null) {
+				renderTo.showNoData();
+				return;
+			}
 
 			var dataStore = {};
 
@@ -88,7 +95,7 @@
 
 			graph = new Highcharts.Chart({
 				chart: {
-					renderTo: $graph.get(0),
+					renderTo: renderTo.get(0),
 					type: 'pie',
 					style: {
 						fontFamily: 'Lato'
