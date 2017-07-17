@@ -1,13 +1,15 @@
 (function($) {
 
-	function Univariate(renderTo, dataCopy) {
-	
+	function Bivariate(renderTo, dataCopy) {
+
 		/* Private Variables */
 		var module = this,
 			$div,
-			$colDropdown,
+			$dropdown1,
+			$dropdown2,
 			$plotDropdown,
-			data = [],
+			ix = [],
+			data = {},
 			plotTypes = [];
 
 		/* Helper Functions */
@@ -35,11 +37,8 @@
 			if(type === undefined || type == null) {
 				return null;
 			}
-			else if(type["type"] == "numeric" || type["type"] == "nominal") {
+			else if(type["type"] == "numeric" || type["type"] == "nominal" || type["type"] == "discrete") {
 				return type["type"];
-			}
-			else if(type["type"] == "discrete" || type["type"] == "unique") {
-				return "nominal";
 			}
 			else {
 				return "others";
@@ -59,14 +58,15 @@
 			data = dataCopy;
 
 			module.reset();
-			
-			$colDropdown = $div.find(".ui.settings.popup").find(".col-dropdown").find(".fluid.dropdown");
+
+			$dropdown1 = $div.find(".col-dropdown").first().find(".fluid.dropdown");
+			$dropdown2 = $div.find(".col-dropdown").last().find(".fluid.dropdown");
 			$plotDropdown = $div.find(".ui.settings.popup").find(".plot-dropdown").find(".fluid.dropdown");
 			module.initPlotTypes();
 
-			var firstAvailableIx = module.initGraphOptionDropdown();
+			var availableIx = module.initGraphOptionDropdown();
 
-			if(firstAvailableIx != null) {
+			if(availableIx.length >= 2) {
 				// init popup
 				$div.find(".right.floated.meta").find(".link.icon").popup({
 					popup: $div.find(".ui.settings.popup"),
@@ -76,19 +76,20 @@
 				});
 
 				// define dropdown action events
-				$colDropdown.dropdown("setting", "onChange", function() {
+				$div.find(".col-dropdown").find(".fluid.dropdown").dropdown("setting", "onChange", function() {
 					module.render();
 					module.updateDescription();
 				});
 
-				$colDropdown.dropdown("set selected", firstAvailableIx);
+				$dropdown1.dropdown("set selected", availableIx[0]);
+				$dropdown2.dropdown("set selected", availableIx[1]);
 
 				module.render();
 
 				$div.removeClass("hidden");
 			}
 			else {
-				console.log("No univariate graph to show");
+				console.log("No bivariate graph to show");
 				$div.addClass("hidden");
 			}
 		};
@@ -115,10 +116,10 @@
 		};
 
 		// @brief	populate graph option dropdown based on column data types
-		// @return	first column index that is shown in the dropdown
+		// @return	column indices that are shown in the dropdown
 		module.initGraphOptionDropdown = function() {
 			var columnOptions = "";
-			var firstAvailableIx = null;
+			var availableIx = [];
 			var columns = [];
 			data.forEach(function(singleData) {
 				singleData["attribute"].forEach(function(singleAttr) {
@@ -130,46 +131,58 @@
 			});
 			var uniqueColumns = Array.from(new Set(columns));
 			uniqueColumns.forEach(function(name) {
-				if(firstAvailableIx == null) firstAvailableIx = name;
+				availableIx.push(name);
 
 				// populate column selection dropdown
-				$colDropdown.append(
+				$dropdown1.append(
 					$("<option>").val(name).text(name)
 				);
 			});
-			return firstAvailableIx;
+			$dropdown2.html($dropdown1.html());
+			return availableIx;
 		};
 
 		// @brief	delete bad data in a numeric data column
 		//			add bad data notice in the module
-		// @param	columnData	the column data to be trimmed
-		// @param	type 		data type of the column
+		// @param	columnDataArray		the array of column data to be trimmed
+		// @param	types 				data types of the 2 columns
 		// @return	trimmed column data
-		module.trimBadData = function(columnData, type) {
-			var $missingNotice = $div.find(".missing.notice");
+		module.trimBadData = function(columnDataArray, types) {
+			var $missingNotice = $div.find(".missing-notice");
 
-			if(type != "numeric") {
+			if(types[0] != "numeric" && types[0] != "discrete" && types[1] != "numeric" && types[1] != "discrete") {
 				$missingNotice.addClass("hidden");
 			}
 
 			else {
-				$missingNotice.html("<div class='ui " + numberToEnglish(columnData.length) + " column grid'></div>");
-
+				$missingNotice.html("<div class='ui " + numberToEnglish(columnDataArray.length) + " column grid'></div>");
 				var showing = false;
-				columnData.forEach(function(_, ix) {
-					if(columnData[ix] == null) {
+
+				columnDataArray = columnDataArray.map((singleData) => (d3.transpose(singleData)));
+
+				columnDataArray.forEach(function(columnData, ix) {
+					if(columnData[0][ix] == null) {
 						$missingNotice.find(".grid").append(
 							"<div class='column'> <i class='warning info icon'></i> No Data </div>"
 						);
 						return;
 					}
 
-					var originalLength = columnData[ix].length;
-					columnData[ix] = columnData[ix].filter(function(val) {
-						return (typeof val === 'number');
-					});
+					var originalLength = columnData.length;
 
-					var trimmedLength = columnData[ix].length;
+					if(types[0] == "numeric" || types[0] == "discrete") {
+						columnData = columnData.filter(function(val) {
+							return (typeof val[0] === 'number');
+						});
+					}
+
+					if(types[1] == "numeric" || types[1] == "discrete") {
+						columnData = columnData.filter(function(val) {
+							return (typeof val[1] === 'number');
+						});
+					}
+
+					var trimmedLength = columnData.length;
 
 					if(trimmedLength != originalLength) {
 						$missingNotice.find(".grid").append(
@@ -186,6 +199,8 @@
 							"<div class='column'> <i class='warning info icon'></i> No Missing Data </div>"
 						);
 					}
+
+					columnDataArray[ix] = columnData;
 				});
 
 				if(showing) {
@@ -194,52 +209,87 @@
 				else {
 					$missingNotice.addClass("hidden");
 				}
+
+				columnDataArray = columnDataArray.map((singleData) => (d3.transpose(singleData)));
 			}
 
-			return columnData;
+			console.log(columnDataArray);
+
+			return columnDataArray;
 		};
 
 		// @brief	init modules and set module visibility
 		module.render = function() {
-			var columnName = ($colDropdown.dropdown("get value"))[0];
+			var ix1 = ($dropdown1.dropdown("get value"))[0];
+			var ix2 = ($dropdown2.dropdown("get value"))[0];
+			ix = [ix1, ix2];
 			var indices = data.map(function(singleData) {
-				return singleData["attribute"].findIndex(function(item) {
-					return item["name"] == columnName;
+				return ix.map(function(ixn) {
+					return singleData["attribute"].findIndex(function(item) {
+						return item["name"] == ixn;
+					});
 				});
 			});
 
-			var types = indices.map(function(colIndex, ix) {
-				var typeToCheck = (colIndex == -1) ? null : data[ix]["attribute"][colIndex]["type"];
+			console.log(indices);
+
+			var type1 = indices.map(function(colIndex, ix) {
+				var typeToCheck = (colIndex[0] == -1) ? null : data[ix]["attribute"][colIndex[0]]["type"];
+				return getType(typeToCheck);
+			});
+			var type2 = indices.map(function(colIndex, ix) {
+				var typeToCheck = (colIndex[1] == -1) ? null : data[ix]["attribute"][colIndex[1]]["type"];
 				return getType(typeToCheck);
 			});
 
-			// identify column type inconsistency error
-			var typesNotNull = Array.from(new Set(types.filter((val) => (val != null))));
-			if(typesNotNull.length != 1) {
+			var type1NotNull = Array.from(new Set(type1.filter((val) => (val != null))));
+			var type2NotNull = Array.from(new Set(type1.filter((val) => (val != null))));
+			if(type1NotNull.length != 1 || type2NotNull.length != 1) {
 				$div.find(".plot.wrapper").showModuleError("Error: column data type inconsistent.");
 				return;
 			}
 
-			var columnData = indices.map(function(colIndex, ix) {
-				var dataObjToExtract = (colIndex == -1) ? null : data[ix]["data"];
-				if(dataObjToExtract == null) return null;
-				return dataObjToExtract.map(function(val) {
-					return val[data[ix]["attribute"][colIndex]["name"]];
+			type1 = (type1.filter((val) => (val != null)))[0];
+			type2 = (type2.filter((val) => (val != null)))[0];
+			var columnData = [];
+			columnData = indices.map(function(indice, ix) {
+				return indice.map(function(colIndex) {
+					var dataObjToExtract = (colIndex == -1) ? null : data[ix]["data"];
+					if(dataObjToExtract == null) return data[ix]["data"].map((_) => (null));
+					return dataObjToExtract.map(function(val) {
+						return val[data[ix]["attribute"][colIndex]["name"]];
+					});
 				});
 			});
 
-			var type = (types.filter((val) => (val != null)))[0];
-			columnData = module.trimBadData(columnData, type);
+			console.log(columnData);
+
+			columnData = module.trimBadData(columnData, [type1, type2]);
+			columnData = columnData.map((singleData) => ((singleData[0] == null) ? null : singleData));
 
 			// obtain modules that needs rendering
 			var names = [];
-			if(type == "numeric") {
-				names = ["box-plot", "histogram"];
-			}
-			else if(type == "nominal") {
-				names = ["pie-chart", "column-chart"];
+			var type = type1 + "-" + type2;
+			if(type == "numeric-numeric" || type == "discrete-discrete" || type == "numeric-discrete" || type == "discrete-numeric") {
+				// if(columnData[0].length > 1000) {
+				// 	names.push("heatmap");
+				// }
+				// if(columnData[0].length < 10000) {
+					names.push("scatter-plot");
+				// }
 			}
 			else {
+			// if(type == "nominal-nominal" || type == "discrete-discrete" || type == "discrete-nominal" || type == "nominal-discrete") {
+			// 	names.push("donut-chart");
+			// 	names.push("stacked-column-chart");
+			// }
+			// if(type == "nominal-numeric" || type == "discrete-numeric" || type == "nominal-discrete") {
+			// 	names.push("line-chart");
+			// }
+			// if(type == "numeric-nominal" || type == "numeric-discrete" || type == "discrete-nominal") {
+			// 	names.push("stacked-histogram");
+			// }
+			// if(type1 == "others" || type2 == "others") {
 				$div.find(".plot.wrapper").showModuleError("This data type cannot be plotted.");
 				return;
 			}
@@ -248,22 +298,19 @@
 			var plotWrapper = $div.find(".plot.wrapper");
 			plotWrapper.html("");
 			names.forEach(function(name) {
-				var moduleName = name.replace("-", "");
+				var moduleName = name.replace(/-/g,"");
 				plotWrapper.append($("<div>").addClass(name).html($div.find(".plot.templates").find("." + name).html()));
-				if(type == "numeric") {
-					plotWrapper.find("." + name)["dashboard_univariate_" + moduleName](
-						columnData
-					);
-				}
-				else {
-					var oneofs = indices.map(function(colIndex, ix) {
+				var $divToRender = plotWrapper.find("." + name);
+				var columnNames = [ix1, ix2];
+				var oneofs = indices.map((indice) => (
+					indice.map(function(colIndex, ix) {
 						return (colIndex == -1) ? null : data[ix]["attribute"][colIndex]["type"]["oneof"];
-					});
-					plotWrapper.find("." + name)["dashboard_univariate_" + moduleName](
-						columnData, 
-						oneofs
-					);
-				}
+					})
+				));
+				$divToRender["dashboard_bivariate_" + moduleName](
+					columnNames, columnData,
+					oneofs
+				);
 			});
 
 			// toggle show and hide
@@ -290,16 +337,20 @@
 			// if init has not been run, do nothing
 			if(!$div) return;
 
+			ix = [];
+
 			$div.find(".col-dropdown").html(""
 				+ "<select class='ui fluid dropdown'>"
 				+   "<option value=''>Select Columns</option>"
 				+ "</select>"
 			);
 
-			plotTypes.forEach(function(name) {
-				var moduleName = name.replace("-", "");
-				$div.find("." + name)["dashboard_univariate_" + moduleName]("reset");
-			});
+			// plotTypes.forEach(function(name) {
+			// 	name = name.replace(/-/g,"");
+			// 	if(module[name]) {
+			// 		module[name].reset();
+			// 	}
+			// });
 		};
 
 		module.updateDescription = function() {
@@ -307,24 +358,32 @@
 		};
 
 		module.description = function() {
-			return $plotDropdown.dropdown("get text") + " of " 
-				+ $colDropdown.dropdown("get text")[0];
+			var activeType = $plotDropdown.dropdown("get text");
+			if(ix.length != 2) {
+				return "No Graph";
+			}
+			else {
+				return activeType + " of " 
+					+ $dropdown1.dropdown("get text")[0] 
+					+ " and " 
+					+ $dropdown2.dropdown("get text")[0];
+			}
 		};
 
 		module.init(renderTo, dataCopy);
 
 	};
 
-	$.fn.dashboard_univariate = function () {
+	$.fn.dashboard_bivariate = function () {
 		var args = Array.prototype.slice.call(arguments);
         return this.each(function () {
         	if(typeof args[0] == "string") {
-				if($.data($(this), "module-data") !== undefined) {
-        			$.data($(this), "module-data")[args[0]].apply(null, args.slice(1));
+				if($.data(this, "module-data") !== undefined) {
+        			$.data(this, "module-data")[args[0]].apply(null, args.slice(1));
         		}        	
         	}
         	else {
-        		(new (Function.prototype.bind.apply(Univariate, [null, $(this)].concat(args))));
+        		(new (Function.prototype.bind.apply(Bivariate, [null, $(this)].concat(args))));
         	}
         });
     };

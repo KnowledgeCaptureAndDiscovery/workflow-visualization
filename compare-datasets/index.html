@@ -110,6 +110,21 @@
 				<div class="ui graphs container">
 					<div class="ui one column grid graph-content">
 
+						<div class="column basic">
+							<div class="content">
+								<div class="ui right floated meta flex-ignore">
+									<i class="setting icon link"></i>
+								</div>
+								<div class="header">
+									Basic Information
+								</div>
+								<div class="ui settings popup">
+									<div class="control options"></div>
+								</div>
+							</div>
+							<div class="content"></div>
+						</div>
+
 						<div class="column univariate">
 							<div class="content">
 								<div class="ui right floated meta flex-ignore">
@@ -119,7 +134,7 @@
 								<div class="ui settings popup">
 									<form class="ui form">
 										<div class="field">
-											<label>Columns</label>
+											<label>Column</label>
 											<div class="col-dropdown">
 												<select class="ui fluid dropdown">
 													<option value="">Select Column</option>
@@ -178,6 +193,105 @@
 										<div class="chart image"></div>
 									</div>
 									<div class="column-chart">
+										<div class="chart image"></div>
+									</div>
+								</div>
+								<div class="plot wrapper"></div>
+							</div>
+						</div>
+
+						<div class="column bivariate">
+							<div class="content">
+								<div class="ui right floated meta flex-ignore">
+									<i class="setting icon link"></i>
+								</div>
+								<div class="header">Bivariate Analysis <i class="angle right icon"></i><span class="header-description"></span></div>
+								<div class="ui settings popup">
+									<form class="ui form">
+										<div class="field">
+											<label>X Axis</label>
+											<div class="col-dropdown">
+												<select class="ui fluid dropdown">
+													<option value="">Select Column</option>
+												</select>
+											</div>
+										</div>
+										<div class="field">
+											<label>Y Axis</label>
+											<div class="col-dropdown">
+												<select class="ui fluid dropdown">
+													<option value="">Select Column</option>
+												</select>
+											</div>
+										</div>
+										<div class="field">
+											<label>Plot Type</label>
+											<div class="plot-dropdown">
+												<select class="ui fluid dropdown">
+													<option value="heatmap">Heatmap</option>
+													<option value="scatter-plot">Scatter Plot</option>
+													<option value="line-chart">Line Chart</option>
+													<option value="stacked-histogram">Stacked Histogram</option>
+													<option value="donum-chart">Donut Chart</option>
+													<option value="stacked-column-chart">Stacked Column Chart</option>
+												</select>
+											</div>
+										</div>
+									</form>
+									<div class="plot options"></div>
+									<div class="ui divider"></div>
+									<div class="control options"></div>
+								</div>
+							</div>
+							<div class="content missing-notice"></div>
+							<div class="content">
+								<div class="hidden plot templates">
+									<div class="heatmap">
+										<div class="chart image"></div>
+										<div class="plot options">
+											<div class="ui divider"></div>
+											<span>X-Axis Ticks</span>
+											<input class="ui range"></input>
+											<div class="ui divider"></div>
+											<span>Y-Axis Ticks</span>
+											<input class="ui range"></input>
+										</div>
+									</div>
+									<div class="scatter-plot">
+										<div class="chart image"></div>
+										<div class="plot options">
+											<div class="ui divider"></div>
+											<div class="toggle-container">
+												<div>Regression</div>
+												<div class="ui fitted toggle checkbox">
+													<input type="checkbox">
+													<label></label>
+												</div>
+											</div>
+											<select class="ui fluid dropdown">
+												<option value="linear">Linear</option>
+												<option value="polynomial">Quadratic</option>
+												<option value="exponential">Exponential</option>
+												<option value="logarithmic">Logarithmic</option>
+												<option value="power">Power</option>
+											</select>
+										</div>
+									</div>
+									<div class="line-chart">
+										<div class="chart image"></div>
+									</div>
+									<div class="stacked-histogram">
+										<div class="chart image"></div>
+										<div class="plot options">
+											<div class="ui divider"></div>
+											<span>Number of Bins</span>
+											<input class="ui range"></input>
+										</div>
+									</div>
+									<div class="donut-chart">
+										<div class="chart image"></div>
+									</div>
+									<div class="stacked-column-chart">
 										<div class="chart image"></div>
 									</div>
 								</div>
@@ -279,11 +393,14 @@
 <script type="text/javascript" src="../assets/js/internal/drag-and-drop.js"></script>
 
 <!-- Graph Types-->
+<script src="graphs/basic.js" type="text/javascript"></script>
 <script src="graphs/univariate.js" type="text/javascript"></script>
 <script src="graphs/univariate/boxplot.js" type="text/javascript"></script>
 <script src="graphs/univariate/histogram.js" type="text/javascript"></script>
 <script src="graphs/univariate/piechart.js" type="text/javascript"></script>
 <script src="graphs/univariate/columnchart.js" type="text/javascript"></script>
+<script src="graphs/bivariate.js" type="text/javascript"></script>
+<script src="graphs/bivariate/scatterplot.js" type="text/javascript"></script>
 
 <!-- Initialization -->
 <script type="text/javascript" src="script.js"></script>

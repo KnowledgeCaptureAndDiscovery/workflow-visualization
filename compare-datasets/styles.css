@@ -36,9 +36,14 @@
 .graph-content > .column {
 	background-color: white;
 	padding: 0 !important;
+	margin: 1em 0;
 }
 .graph-content > .column > .content {
 	padding: 2em;
+}
+.graph-content > .column > .content:first-child {
+	background-color: #fafafa;
+	padding: 1.5em 2em;
 }
 .graph-content > .column > .content.missing.notice {
 	padding: 0 2em;

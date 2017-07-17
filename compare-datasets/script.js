@@ -234,10 +234,9 @@ function disableFileUploadIfNecessary() {
 function initControlButtons() {
 	$.fn.addControlButtons = function() {
 		var customizationButtons = ""
-		+	"<div class='ui fluid basic button export-graph-button'>"
+		+	"<div class='ui fluid basic button export-graph-button' style='margin-bottom: 10px'>"
 		+		"<i class='left floated save icon'></i>&nbsp;Export Graph"
 		+	"</div>"
-		+	"<div style='display: block; width: 100%; height: 10px;'></div>"
 		+	"<div class='ui fluid basic button close-module-button'>"
 		+		"<i class='left floated close icon'></i>&nbsp;Delete Module"
 		+	"</div>"
@@ -300,8 +299,10 @@ var restoreDefault = function() {
 function initSettings() {
 	$(".global.settings.dropdown").dropdown('setting', 'onChange', function() {
 		var operaton = $('.global.settings.dropdown').dropdown('get value');
-		window[operaton]();
-		$('.global.settings.dropdown').dropdown("clear");
+		if(operaton != "") {
+			window[operaton]();
+			$('.global.settings.dropdown').dropdown("clear");
+		}
 	});
 }
 
