@@ -59,6 +59,26 @@ function loadDataFromUrl() {
 		$(".global.data.dropdown").addClass("hidden");
 		var urlSource = json.map((val) => (val.url));
 		downloadData(urlSource);
+		var names = json.map((val) => (val.name));
+		$(".names-content").addClass("ui " + numberToEnglish(names.length) + " column grid");
+		names.forEach(function(name) {
+			$(".names-content").append(
+				$("<div>").addClass("column").append(
+					$("<h4>").addClass("ui center aligned header").text(name)
+				)
+			);
+		});
+		$(".dataset-names").removeClass("hidden").sticky({
+			offset: 40,
+			setSize: true,
+			context: $(".graph-content").closest(".ui.vertical.segment"),
+			onStick: function() {
+				$(".graph-content").closest(".ui.vertical.segment").css("margin-top", $(".dataset-names").outerHeight());
+			},
+			onUnstick: function() {
+				$(".graph-content").closest(".ui.vertical.segment").css("margin-top", 0);
+			}
+		});
 	}
 }
 
@@ -108,6 +128,7 @@ function initAddModuleDropdown() {
 			Dashboard.drawModule($moduleToDraw, chartType);
 			$moduleToDraw.addControlButtons();
 			updateSampleNotice();
+			$("body").animate({ scrollTop: $(document).height() }, "fast");
 		}, 1);
 	});
 }

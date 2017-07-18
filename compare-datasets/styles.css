@@ -48,6 +48,13 @@
 .graph-content > .column > .content.missing.notice {
 	padding: 0 2em;
 }
+.ui.sticky {
+	z-index: 10 !important;
+	transition: box-shadow 0.2s;
+}
+.ui.sticky.fixed.top {
+	box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
 
 /* Settings popup layout */
 .ui.settings.popup:before {

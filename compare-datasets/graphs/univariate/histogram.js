@@ -122,11 +122,11 @@
 		module.initGraphs = function() {
 			$div.html("<div class='ui " + numberToEnglish(data.length) + " column grid'></div>");
 			data.forEach(function(singleData, ix) {
+				$div.find(".grid").append($("<div>").addClass("block-" + ix).addClass("column"));
+
 				if(singleData == null) {
 					return;
 				}
-
-				$div.find(".grid").append($("<div>").addClass("block-" + ix).addClass("column"));
 			
 				var graph = new Highcharts.Chart({
 					chart: {
@@ -177,7 +177,8 @@
 			if(excludeOutliers) {
 				dataToShow = dataWithoutOutliers;
 			}
-			data.forEach(function(singleData, ix) {
+			console.log(dataToShow);
+			dataToShow.forEach(function(singleData, ix) {
 				module.renderIndividual(numBins, singleData, ix);
 			});
 		};
