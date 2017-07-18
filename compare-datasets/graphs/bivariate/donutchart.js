@@ -21,7 +21,6 @@
 		};
 
 		module.render = function(renderTo, names, data, classes) {
-			console.log("donut", data, classes);
 			if(data[0][0] == null || data[1][0] == null) {
 				renderTo.showNoData();
 				return;

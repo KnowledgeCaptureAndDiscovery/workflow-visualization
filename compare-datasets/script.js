@@ -65,15 +65,13 @@ function initAddModuleDropdown() {
 		function toTitleCase(txt) {
 			return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
 		}
-		$(".settings .add.module.dropdown > .menu").append(
+		$(".settings .add.module.item > .menu").append(
 			"<div class='item' value='" + ix + "'>" + toTitleCase(type) + "</div>"
 		);
 	});
-	$(".settings .add.module.dropdown").dropdown();
-	$(".add.module.button:not(.dropdown)").click(function() {
-		$(this).addClass("loading");
+	$(".settings .add.module.item").dropdown("setting", "onChange", function() {
 		setTimeout(function() {
-			var chartType = $(".settings .add.module.dropdown").dropdown("get value");
+			var chartType = $(".settings .add.module.item").dropdown("get value");
 			if(chartType == "") return;
 			$(".graph-content").append(
 				"<div class='column " + chartType + "'>"
@@ -83,12 +81,7 @@ function initAddModuleDropdown() {
 			var $moduleToDraw = $(".graph-content").children().last(".column");
 			Dashboard.drawModule($moduleToDraw, chartType);
 			$moduleToDraw.addControlButtons();
-			$(".masonry.grid").masonry('appended', $moduleToDraw);
-			$('.masonry.grid .column').resize(function() {
-				$(".masonry.grid").masonry('layout');
-			});
 			updateSampleNotice();
-			$(".add.module.button:not(.dropdown)").removeClass("loading");
 		}, 1);
 	});
 }
@@ -300,7 +293,7 @@ function initSettings() {
 	$(".global.settings.dropdown").dropdown('setting', 'onChange', function() {
 		var operaton = $('.global.settings.dropdown').dropdown('get value');
 		if(operaton != "") {
-			window[operaton]();
+			if(window[operaton]) window[operaton]();
 			$('.global.settings.dropdown').dropdown("clear");
 		}
 	});
