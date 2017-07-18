@@ -7,13 +7,10 @@ var Dashboard = (function ($) {
     var chartTypes = [];
 
     module.init = function(inputData, types) {
-      // TIME_KEEPING
-      // console.log("--- Dashboard Script Starts Loading ---");
-      // window.ST = (new Date());
-      // console.log("Dashboard init: " + 0);
-
       chartTypes = types;
       module.reset();
+
+      var success;
 
       inputData.forEach(function(individualInputData) {
         var dataReader = new DataReader(individualInputData);
@@ -22,14 +19,11 @@ var Dashboard = (function ($) {
         }
         else {
           module.handleError(dataReader.error);
-          return false;
         }
+        success = success && dataReader.success;
       });
-      return true;
 
-      // TIME_KEEPING
-      // console.log("Dashboard init: " + ((new Date())-window.ST));
-      // console.log("--- Dashboard Script Ends Loading ---");
+      return success;
     };
 
     // @brief error handler for the parsing process
