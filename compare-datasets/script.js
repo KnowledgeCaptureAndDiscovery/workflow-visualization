@@ -4,6 +4,9 @@ $(document).ready(function() {
 	showBody();
 	addSidebarAnimation();
 
+	/* Load Data from Url */
+	loadDataFromUrl();
+
 	/* Load Chart Types */
 	window.chartTypeData = loadChartTypes();
 
@@ -34,6 +37,29 @@ function addSidebarAnimation() {
 	$(".launch.icon").click(function(){
 		$(".sidebar.toc").sidebar('toggle');
 	});
+}
+
+function loadDataFromUrl() {
+	/* Function that analyzes url parameters */
+	/* Code source: http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript */
+	function getParameterByName(name, url) {
+		if (!url) url = window.location.href;
+		name = name.replace(/[\[\]]/g, "\\$&");
+		var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+			results = regex.exec(url);
+		if (!results) return null;
+		if (!results[2]) return '';
+		return decodeURIComponent(results[2].replace(/\+/g, " "));
+	}
+
+	var encodedUrl = getParameterByName("data");
+	if(encodedUrl != null) {
+		var json = JSON.parse(encodedUrl);
+		console.log("json", json);
+		$(".global.data.dropdown").addClass("hidden");
+		var urlSource = json.map((val) => (val.url));
+		downloadData(urlSource);
+	}
 }
 
 function loadChartTypes() {
