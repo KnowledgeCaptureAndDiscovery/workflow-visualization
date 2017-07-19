@@ -46,7 +46,7 @@
 	padding: 1.5em 2em;
 }
 .graph-content > .column > .content.missing.notice {
-	padding: 0 2em;
+	padding: 2em 2em 0 2em;
 }
 .ui.sticky {
 	z-index: 10 !important;
@@ -110,6 +110,39 @@
 /* Customization Functionalities Layout */
 .column.hoarded {
 	display: none !important;
+}
+
+/* D3 SVG Graph Layout */
+.svg {
+	font-family: 'Lato', sans-serif;
+}
+
+.background path {
+	fill: none;
+	stroke: #e6e6e6;
+}
+
+.foreground path {
+	fill: none;
+	stroke: #3198F7;
+}
+
+.brush .extent {
+	fill-opacity: .3;
+	stroke: #fff;
+}
+
+.axis line,
+.axis path {
+	fill: none;
+	stroke: #666;
+}
+
+.axis text {
+	text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+	fill: #666;
+	font-size: 11px;
+	font-family: 'Lato', sans-serif;
 }
 
 /* Upload Modal Layout */

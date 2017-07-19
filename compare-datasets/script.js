@@ -78,13 +78,15 @@ function showDatasetNames(urls, names) {
 		offset: 40,
 		setSize: true,
 		context: $(".graph-content").closest(".ui.vertical.segment"),
-		observeChanges: true,
 		onStick: function() {
 			$(".graph-content").closest(".ui.vertical.segment").css("margin-top", $(".dataset-names").outerHeight());
 		},
 		onUnstick: function() {
 			$(".graph-content").closest(".ui.vertical.segment").css("margin-top", 0);
 		}
+	});
+	$(".graph-content").closest(".ui.vertical.segment").resize(function() {
+		$(".dataset-names").removeClass("hidden").sticky("refresh");
 	});
 }
 

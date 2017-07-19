@@ -28,7 +28,6 @@
 		};
 
 		module.render = function(renderTo, data, classes) {
-			console.log(data);
 			if(data[0][0] == null || data[1][0] == null || data[2][0] == null) {
 				renderTo.showNoData();
 				return;

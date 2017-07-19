@@ -148,7 +148,7 @@
 		// @param	types 				data types of the 2 columns
 		// @return	trimmed column data
 		module.trimBadData = function(columnDataArray, types) {
-			var $missingNotice = $div.find(".missing-notice");
+			var $missingNotice = $div.find(".missing.notice");
 
 			if(types[0] != "numeric" && types[0] != "discrete" && types[1] != "numeric" && types[1] != "discrete") {
 				$missingNotice.addClass("hidden");
