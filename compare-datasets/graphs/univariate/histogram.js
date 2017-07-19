@@ -177,7 +177,6 @@
 			if(excludeOutliers) {
 				dataToShow = dataWithoutOutliers;
 			}
-			console.log(dataToShow);
 			dataToShow.forEach(function(singleData, ix) {
 				module.renderIndividual(numBins, singleData, ix);
 			});

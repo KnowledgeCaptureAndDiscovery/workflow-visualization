@@ -133,10 +133,13 @@
 				if(firstAvailableIx == null) firstAvailableIx = name;
 
 				// populate column selection dropdown
-				$colDropdown.append(
-					$("<option>").val(name).text(name)
+				$colDropdown.find(".menu").append(
+					$("<div>").addClass("item").attr("data-value", name)
+						.append($("<span>").addClass("right floated").css("color", "gray").text(module.getType(name)))
+						.append($("<span>").addClass("text").text(name))
 				);
 			});
+			$colDropdown = $colDropdown.dropdown();
 			return firstAvailableIx;
 		};
 
@@ -199,9 +202,31 @@
 			return columnData;
 		};
 
+		module.getType = function(columnName) {
+			var indices = data.map(function(singleData) {
+				return singleData["attribute"].findIndex(function(item) {
+					return item["name"] == columnName;
+				});
+			});
+
+			var types = indices.map(function(colIndex, ix) {
+				var typeToCheck = (colIndex == -1) ? null : data[ix]["attribute"][colIndex]["type"];
+				return getType(typeToCheck);
+			});
+
+			// identify column type inconsistency error
+			var typesNotNull = Array.from(new Set(types.filter((val) => (val != null))));
+			if(typesNotNull.length != 1) {
+				return "mixed";
+			}
+			else {
+				return (types.filter((val) => (val != null)))[0];
+			}
+		};
+
 		// @brief	init modules and set module visibility
 		module.render = function() {
-			var columnName = ($colDropdown.dropdown("get value"))[0];
+			var columnName = $colDropdown.dropdown("get value");
 			var indices = data.map(function(singleData) {
 				return singleData["attribute"].findIndex(function(item) {
 					return item["name"] == columnName;
@@ -292,9 +317,11 @@
 			if(!$div) return;
 
 			$div.find(".col-dropdown").html(""
-				+ "<select class='ui fluid dropdown'>"
-				+   "<option value=''>Select Columns</option>"
-				+ "</select>"
+				+ "<div class='ui fluid selection dropdown'>"
+				+	"<div class='default text'>Select Column</div>"
+				+	"<i class='dropdown icon'></i>"
+				+	"<div class='menu'></div>"
+				+ "</div>"
 			);
 
 			plotTypes.forEach(function(name) {
@@ -309,7 +336,7 @@
 
 		module.description = function() {
 			return $plotDropdown.dropdown("get text") + " of " 
-				+ $colDropdown.dropdown("get text")[0];
+				+ $colDropdown.dropdown("get value");
 		};
 
 		module.init(renderTo, dataCopy);

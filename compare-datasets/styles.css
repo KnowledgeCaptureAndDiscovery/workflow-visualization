@@ -88,7 +88,7 @@
 
 /* Graph Option Section Layout */
 .graph-content .content > span,
-.graph-content .content *:not(.dropdown) > span {
+.graph-content .content *:not(.dropdown):(.item) > span {
 	display: block;
 	margin-bottom: 10px !important;
 }

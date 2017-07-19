@@ -10,7 +10,7 @@ var Dashboard = (function ($) {
       chartTypes = types;
       module.reset();
 
-      var success;
+      var success = true;
 
       inputData.forEach(function(individualInputData) {
         var dataReader = new DataReader(individualInputData);

@@ -55,31 +55,37 @@ function loadDataFromUrl() {
 	var encodedUrl = getParameterByName("data");
 	if(encodedUrl != null) {
 		var json = JSON.parse(encodedUrl);
-		console.log("json", json);
 		$(".global.data.dropdown").addClass("hidden");
 		var urlSource = json.map((val) => (val.url));
 		downloadData(urlSource);
 		var names = json.map((val) => (val.name));
-		$(".names-content").addClass("ui " + numberToEnglish(names.length) + " column grid");
-		names.forEach(function(name) {
-			$(".names-content").append(
-				$("<div>").addClass("column").append(
-					$("<h4>").addClass("ui center aligned header").text(name)
-				)
-			);
-		});
-		$(".dataset-names").removeClass("hidden").sticky({
-			offset: 40,
-			setSize: true,
-			context: $(".graph-content").closest(".ui.vertical.segment"),
-			onStick: function() {
-				$(".graph-content").closest(".ui.vertical.segment").css("margin-top", $(".dataset-names").outerHeight());
-			},
-			onUnstick: function() {
-				$(".graph-content").closest(".ui.vertical.segment").css("margin-top", 0);
-			}
-		});
+		showDatasetNames(urlSource, names);
 	}
+}
+
+function showDatasetNames(urls, names) {
+	$(".names-content").html("").removeClass().addClass("ui " + numberToEnglish(names.length) + " column grid names-content");
+	names.forEach(function(name, ix) {
+		$(".names-content").append(
+			$("<div>").addClass("column").append(
+				$("<h4>").addClass("ui center aligned header").append(
+					$("<a>").addClass("ui header").text(name).attr("href", urls[ix]).attr("target", "_blank")
+				)
+			)
+		);
+	});
+	$(".dataset-names").removeClass("hidden").sticky({
+		offset: 40,
+		setSize: true,
+		context: $(".graph-content").closest(".ui.vertical.segment"),
+		observeChanges: true,
+		onStick: function() {
+			$(".graph-content").closest(".ui.vertical.segment").css("margin-top", $(".dataset-names").outerHeight());
+		},
+		onUnstick: function() {
+			$(".graph-content").closest(".ui.vertical.segment").css("margin-top", 0);
+		}
+	});
 }
 
 function loadChartTypes() {
@@ -240,8 +246,9 @@ function saveFile(filename, data, type) {
 }
 
 function initDataSelectionDropdown() {
-	$('.global.data.dropdown').dropdown('setting', 'onChange', function(){
+	$('.global.data.dropdown').dropdown('setting', 'onChange', function() {
 		var newValue = $('.global.data.dropdown').dropdown('get value');
+		$(".dataset-names").addClass("hidden");
 		$(".sample-notice").addClass("hidden");
 		if(newValue == "upload") {
 			DragAndDrop.init(drawCharts, true);
@@ -255,7 +262,9 @@ function initDataSelectionDropdown() {
 			}).modal("show");
 		}
 		else if(newValue != "") {
-			downloadData(newValue.split(","));
+			var urls = newValue.split(",");
+			downloadData(urls);
+			showDatasetNames(urls, urls.map((url) => (url.substring(url.lastIndexOf('/')+1))));
 		}
 	});
 }
