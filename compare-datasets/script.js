@@ -346,7 +346,15 @@ function initControlButtons() {
 				.attr("height", chartHeight + titleHeight + subtitleHeight)
 				.attr("style", $charts[0].attr("style"))
 				.attr("xmlns", $charts[0].attr("xmlns"))
-				.css("background", "white")
+				// background
+				.append($("<rect>")
+						.attr("x", 0)
+						.attr("y", 0)
+						.attr("width", chartWidth * $charts.length)
+						.attr("height", chartHeight + titleHeight + subtitleHeight)
+						.attr("fill", "#fff")
+						.prop("outerHTML")
+				)
 				// charts
 				.append($charts.map(function($chart, ix) {
 					return $("<g>")
