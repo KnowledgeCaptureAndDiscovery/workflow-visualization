@@ -433,4 +433,31 @@ window.numberToEnglish = function(num) {
 	var eng = ["zero", "one", "two", "three", "four", "five", "six"];
 	if(num >= 0 && num <= 6) return eng[num];
 	else return null;
-}
+};
+
+
+// @brief	get the type of a column with an array of datasets
+// @param	datasets 	array of datasets
+// @param	columnName 	the column name that is requested
+// @return	the type of the requested column
+window.getTypeOfColumn = function(datasets, columnName) {
+  var indices = datasets.map(function(singleDataset) {
+    return singleDataset["attribute"].findIndex(function(item) {
+      return item["name"] == columnName;
+    });
+  });
+
+  var types = indices.map(function(colIndex, ix) {
+    var typeToCheck = (colIndex == -1) ? null : datasets[ix]["attribute"][colIndex]["type"]["type"];
+    return typeToCheck;
+  });
+
+  // identify column type inconsistency error
+  var typesNotNull = Array.from(new Set(types.filter((val) => (val != null))));
+  if(typesNotNull.length != 1) {
+    return "mixed";
+  }
+  else {
+    return (types.filter((val) => (val != null)))[0];
+  }
+};

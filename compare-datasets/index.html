@@ -472,6 +472,75 @@
 							</div>
 						</div>
 
+						<div class="column compare">
+							<div class="content">
+								<div class="ui right floated meta flex-ignore">
+									<i class="setting icon link"></i>
+								</div>
+								<div class="header">Comparison Analysis <i class="angle right icon"></i><span class="header-description"></span></div>
+								<div class="ui settings popup">
+									<form class="ui form">
+										<div class="field">
+											<label>Grouping</label>
+											<div class="col-dropdown"></div>
+										</div>
+										<div class="field">
+											<label>Targets</label>
+											<div class="col-dropdown"></div>
+										</div>
+										<div class="field">
+											<label>Plot Type</label>
+											<div class="plot-dropdown">
+												<select class="ui fluid dropdown">
+													<option value="area-plot">Area Plot</option>
+													<option value="correlation-plot">Correlation Plot</option>
+													<option value="multiple-line-chart">Multiple Line Chart</option>
+												</select>
+											</div>
+										</div>
+									</form>
+									<div class="plot options"></div>
+									<div class="ui divider"></div>
+									<div class="control options"></div>
+								</div>
+							</div>
+							<div class="missing notice content"></div>
+							<div class="content">
+								<div class="hidden plot templates">
+									<div class="area-plot">
+										<div class="chart image"></div>
+										<div class="plot options">
+											<div class="ui divider"></div>
+											<span>Number of Bins</span>
+											<input class="ui range"></input>
+										</div>
+									</div>
+									<div class="correlation-plot">
+										<div class="chart image"></div>
+									</div>
+									<div class="multiple-line-chart">
+										<div class="chart image"></div>
+											<div class="plot options">
+											<div class="reduce options">
+												<div class="ui reduce divider"></div>
+												<div class="toggle-container">
+													<div>Reduce Duplicates</div>
+												</div>
+												<select class="ui fluid dropdown">
+													<option value="mean">Average</option>
+													<option value="median">Median</option>
+													<option value="sum">Sum</option>
+													<option value="variance">Variance</option>
+													<option value="deviation">Standard Deviation</option>
+												</select>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="plot wrapper"></div>
+							</div>
+						</div>
+
 					</div>
 				</div>
 
@@ -587,6 +656,9 @@
 <script src="graphs/multivariate/parallelcoordinate.js" type="text/javascript"></script>
 <script src="graphs/multivariate/parallelcoordinategraph.js" type="text/javascript"></script>
 <script src="graphs/multivariate/heatmap.js" type="text/javascript"></script>
+<script src="graphs/compare.js" type="text/javascript"></script>
+<script src="graphs/compare/correlationplot.js" type="text/javascript"></script>
+<script src="graphs/compare/multiplelinechart.js" type="text/javascript"></script>
 
 <!-- Initialization -->
 <script type="text/javascript" src="script.js"></script>

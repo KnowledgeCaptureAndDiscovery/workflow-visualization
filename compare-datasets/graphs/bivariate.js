@@ -172,13 +172,13 @@
 
 					if(types[0] == "numeric" || types[0] == "discrete") {
 						columnData = columnData.filter(function(val) {
-							return (typeof val[0] === 'number');
+							return (typeof val[0] === 'number' && !isNaN(val[0]));
 						});
 					}
 
 					if(types[1] == "numeric" || types[1] == "discrete") {
 						columnData = columnData.filter(function(val) {
-							return (typeof val[1] === 'number');
+							return (typeof val[1] === 'number' && !isNaN(val[1]));
 						});
 					}
 

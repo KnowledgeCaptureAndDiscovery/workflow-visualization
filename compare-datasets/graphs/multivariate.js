@@ -179,7 +179,7 @@
 					types.forEach(function(type, typeIx) {
 						if(type == "numeric" || type == "discrete") {
 							columnData = columnData.filter(function(val) {
-								return (typeof val[typeIx] === 'number');
+								return (typeof val[typeIx] === 'number' && !isNaN(val[typeIx]));
 							});
 						}
 					});

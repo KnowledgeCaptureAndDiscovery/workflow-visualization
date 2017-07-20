@@ -135,7 +135,7 @@
 				// populate column selection dropdown
 				$colDropdown.find(".menu").append(
 					$("<div>").addClass("item").attr("data-value", name)
-						.append($("<span>").addClass("right floated").css("color", "gray").text(module.getType(name)))
+						.append($("<span>").addClass("right floated").css("color", "gray").text(window.getTypeOfColumn(data, name)))
 						.append($("<span>").addClass("text").text(name))
 				);
 			});
@@ -169,7 +169,7 @@
 
 					var originalLength = columnData[ix].length;
 					columnData[ix] = columnData[ix].filter(function(val) {
-						return (typeof val === 'number');
+						return (typeof val === 'number' && !isNaN(val));
 					});
 
 					var trimmedLength = columnData[ix].length;
@@ -200,28 +200,6 @@
 			}
 
 			return columnData;
-		};
-
-		module.getType = function(columnName) {
-			var indices = data.map(function(singleData) {
-				return singleData["attribute"].findIndex(function(item) {
-					return item["name"] == columnName;
-				});
-			});
-
-			var types = indices.map(function(colIndex, ix) {
-				var typeToCheck = (colIndex == -1) ? null : data[ix]["attribute"][colIndex]["type"];
-				return getType(typeToCheck);
-			});
-
-			// identify column type inconsistency error
-			var typesNotNull = Array.from(new Set(types.filter((val) => (val != null))));
-			if(typesNotNull.length != 1) {
-				return "mixed";
-			}
-			else {
-				return (types.filter((val) => (val != null)))[0];
-			}
 		};
 
 		// @brief	init modules and set module visibility

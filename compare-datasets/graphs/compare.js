@@ -1,16 +1,16 @@
 (function($) {
 
-	function Trivariate(renderTo, dataCopy) {
+	var Compare = function(renderTo, dataCopy) {
 
 		/* Private Variables */
 		var module = this,
 			$div,
 			$dropdown1,
-			$dropdown2,
+			$dropdownX,
 			$plotDropdown,
-			ix = [],
 			data = {},
-			plotTypes = [];
+			plotTypes = [],
+			maxSelection = 10;
 
 		/* Helper Functions */
 
@@ -37,17 +37,13 @@
 			if(type === undefined || type == null) {
 				return null;
 			}
-			else if(type["type"] == "numeric" || type["type"] == "nominal") {
+			else if(type["type"] == "numeric" || type["type"] == "nominal" || type["type"] == "discrete") {
 				return type["type"];
-			}
-			else if(type["type"] == "discrete") {
-				return "nominal";
 			}
 			else {
 				return "others";
 			}
 		};
-
 
 		/* Member Functions */
 
@@ -58,18 +54,18 @@
 		//						(data is shallow copied)
 		module.init = function(renderTo, dataCopy) {
 			$div = renderTo;
-			$div.data("module-data", module);
+			$div.data("module-data", this);
 			data = dataCopy;
 
 			module.reset();
 			$dropdown1 = $div.find(".col-dropdown").first().find(".fluid.dropdown");
-			$dropdown2 = $div.find(".col-dropdown").last().find(".fluid.dropdown");
+			$dropdownX = $div.find(".col-dropdown").last().find(".fluid.dropdown");
 			$plotDropdown = $div.find(".ui.settings.popup").find(".plot-dropdown").find(".fluid.dropdown");
 			module.initPlotTypes();
 
 			var availableIx = module.initGraphOptionDropdown();
 
-			if(availableIx.length >= 3) {
+			if(availableIx.length >= 2) {
 				// init popup
 				$div.find(".right.floated.meta").find(".link.icon").popup({
 					popup: $div.find(".ui.settings.popup"),
@@ -84,16 +80,22 @@
 					module.updateDescription();
 				});
 
-				$dropdown1.dropdown("set selected", availableIx[0]);
-				$dropdown1.dropdown("set selected", availableIx[1]);
-				$dropdown2.dropdown("set selected", availableIx[2]);
+				var count = 0;
+				availableIx.forEach(function(item) {
+					if(count < 10) {
+						$dropdownX.dropdown("set selected", item);
+						count++;
+					}
+				});
+
+				$dropdown1.dropdown("set value", "none");
 
 				module.render();
 
 				$div.removeClass("hidden");
 			}
 			else {
-				console.log("No trivariate graph to show");
+				console.log("No comparison graph to show");
 				$div.addClass("hidden");
 			}
 		};
@@ -136,26 +138,33 @@
 			var uniqueColumns = Array.from(new Set(columns));
 			uniqueColumns.forEach(function(name) {
 				availableIx.push(name);
-
-				// populate column selection dropdown
-				$dropdown1.append(
-					$("<option>").val(name).text(name)
-				);
+				var columnType = getType({type: window.getTypeOfColumn(data, name)});
+				if(columnType == "numeric" || getType == "discrete") {
+					// populate column selection dropdown
+					$dropdownX.append(
+						$("<option>").val(name).text(name)
+					);
+				}
+				if(columnType != "others") {
+					$dropdown1.append(
+						$("<option>").val(name).text(name)
+					);
+				}
 			});
-			$dropdown2.html($dropdown1.html());
+
 			return availableIx;
 		};
 
 		// @brief	delete bad data in a numeric data column
 		//			add bad data notice in the module
-		// @param	columnDataArray		the column data to be trimmed
-		// @param	types 				data types of the 2 columns
+		// @param	columnData	the column data to be trimmed
+		// @param	types 		data types of the 2 columns
 		// @return	trimmed column data
 		module.trimBadData = function(columnDataArray, types) {
 			var $missingNotice = $div.find(".missing.notice");
 
-			if(types[0].indexOf("numeric") == -1) {
-				$missingNotice.addClass("hidden");
+			if(types.indexOf("numeric") == -1 && types.indexOf("discrete") == -1) {
+				$missingNotice.addClass("hidden");	
 			}
 
 			else {
@@ -223,61 +232,22 @@
 
 		// @brief	init modules and set module visibility
 		module.render = function() {
-			ix = $dropdown1.dropdown("get value").slice(0, -1);
-			if(ix.length != 2) {
-				$div.find(".header-description").text("Error");
-				$div.find(".plot.wrapper").showModuleError("No graph to show.");
-				return;
-			}
-			ix.push(($dropdown2.dropdown("get value"))[0]);
+			var viewpoint = $dropdown1.dropdown("get value")[0];
+			var targets = $dropdownX.dropdown("get value").slice(0,-1);
+
+			var columnNames = targets;
+			if(viewpoint != "none") columnNames.unshift(viewpoint);
+
 			var indices = data.map(function(singleData) {
-				return ix.map(function(ixn) {
+				return columnNames.map(function(ixn) {
 					return singleData["attribute"].findIndex(function(item) {
 						return item["name"] == ixn;
 					});
 				});
 			});
+			var columnTypes = targets.map(function(val) { return window.getTypeOfColumn(data, val); });
 
-			var types = ix.map(function(_, axisIndex) {
-				return indices.map(function(plotColumnIndexInDataset, datasetIx) {
-					var typeToCheck = (plotColumnIndexInDataset[axisIndex] == -1) ? null : data[datasetIx]["attribute"][plotColumnIndexInDataset[axisIndex]]["type"];
-					return getType(typeToCheck);
-				});
-			});
-
-			var plotTypeInconsistent = false;
-			types.forEach(function(type) {
-				var typesNotNull = Array.from(new Set(type.filter((val) => (val != null))));
-				if(typesNotNull.length != 1) {
-					$div.find(".header-description").text("Error");
-					$div.find(".plot.wrapper").showModuleError("Error: column data type inconsistent.");
-					plotTypeInconsistent = true;
-				}
-			});
-			if(plotTypeInconsistent) return;
-
-			// reduce elements of types, which used to be set of types, to single type values
-			types = types.map((type) => (type.filter((val) => (val != null)))[0]);
-
-			// rearrange plot type order to fit in plot types
-			if(types[0] == "numeric" && types[1] == "nominal") {
-				indices = indices.map(function(ix) {
-					types[0] = "nominal"; types[1] = "numeric";
-					var temp = ix[0]; ix[0] = ix[1]; ix[1] = temp;
-					return ix;
-				});
-			}
-			if(types[0] == "nominal" && types[1] == "numeric" && types[2] == "numeric") {
-				indices = indices.map(function(ix) {
-					types[0] = "numeric"; types[2] = "nominal";
-					var temp = ix[0]; ix[0] = ix[2]; ix[2] = temp;
-					return ix;
-				});
-			}
-
-			// get corresponding column data and remove bad data
-			var columnData = [];
-			columnData = indices.map(function(indice, ix) {
+			var columnData = indices.map(function(indice, ix) {
 				return indice.map(function(colIndex) {
 					var dataObjToExtract = (colIndex == -1) ? null : data[ix]["data"];
 					if(dataObjToExtract == null) return data[ix]["data"].map((_) => (null));
@@ -286,61 +256,29 @@
 					});
 				});
 			});
-			columnData = module.trimBadData(columnData, types);
+			columnData = module.trimBadData(columnData, columnTypes);
 			columnData = columnData.map((singleData) => ((singleData[0] == null) ? null : singleData));
 
 			// obtain modules that needs rendering
 			var names = [];
-			if(types.join("-") == "numeric-numeric-numeric") {
-				names = ["bubble-chart"];
-			}
-			else if(types.join("-") == "nominal-nominal-nominal") {
-				names = ["stacked-column-chart"];
-			}
-			// else if(types.join("-") == "numeric-numeric-nominal") {
-			// 	names = ["scatter-plot"];
-			// }
-			else if(types.join("-") == "nominal-nominal-numeric") {
-				names = ["heatmap"];
-			}
-			else if(types.join("-") == "nominal-numeric-nominal") {
-				names = ["grouped-column-chart"];
+			if(viewpoint == "none") {
+				names = ["correlation-plot"]; // "area-plot", 
 			}
 			else {
-				$div.find(".header-description").text("Error");
-				$div.find(".plot.wrapper").showModuleError("This data type cannot be plotted.");
-				return;
+				names = ["multiple-line-chart"];
 			}
 
 			// initialize necessary modules
 			var plotWrapper = $div.find(".plot.wrapper");
 			plotWrapper.html("");
 			names.forEach(function(name) {
-				var moduleName = name.replace(/-/g,"");				
+				var moduleName = name.replace(/-/g,"");
 				plotWrapper.append($("<div>").addClass(name).html($div.find(".plot.templates").find("." + name).html()));
 				var $divToRender = plotWrapper.find("." + name);
-				var columnNames = ix;
-				var columnCategories = indices.map((indice, ix) => (
-					indice.map(function(colIndex) {
-						if(colIndex == -1) {
-							return null;
-						}
-						else {
-							var oneof = data[ix]["attribute"][colIndex]["type"]["oneof"];
-							if(oneof != undefined) {
-								return oneof.map((val) => ("" + val));
-							}
-							else {
-								return null;
-							}
-						}
-					})
-				));
-
-				$divToRender["dashboard_trivariate_" + moduleName](
+				$divToRender["dashboard_compare_" + moduleName](
 					columnNames,
 					columnData,
-					columnCategories
+					columnTypes
 				);
 			});
 
@@ -368,19 +306,17 @@
 			// if init has not been run, do nothing
 			if(!$div) return;
 
-			$div.find(".col-dropdown").html(""
+			$div.find(".col-dropdown").first().html(""
 				+ "<select class='ui fluid dropdown'>"
-				+   "<option value=''>Select Columns</option>"
+				+   "<option value='none'>None</option>"
 				+ "</select>"
 			);
-			$div.find(".col-dropdown").first().find(".ui.dropdown").attr("multiple", "");
 
-			plotTypes.forEach(function(name) {
-				name = name.replace(/-/g,"");
-				if(module[name]) {
-					module[name].reset();
-				}
-			});
+			$div.find(".col-dropdown").last().html(""
+				+ "<select multiple='' class='ui fluid dropdown'>"
+				+   "<option value=''>Select Targets</option>"
+				+ "</select>"
+			);
 		};
 
 		module.updateDescription = function() {
@@ -389,32 +325,43 @@
 
 		module.description = function() {
 			var activeType = $plotDropdown.dropdown("get text");
-			if(ix == null || ix.length != 3) {
-				return "No Graph";
+			var activeNames = $dropdownX.dropdown("get value").slice(0,-1);
+			var activeNamesLength = activeNames.length;
+			var firstActiveName = activeNames[0];
+
+			var groupingSuffix = "";
+			if(activeType == "Multiple Line Chart") {
+				groupingSuffix = " grouped by " + $dropdown1.dropdown("get value")[0];
 			}
 			else {
-				return activeType + " of "
-					 + $dropdown1.dropdown("get text")[0] 
-					 + " and " 
-					 + $dropdown1.dropdown("get text")[1] 
-					 + " grouped by " 
-					 + $dropdown2.dropdown("get text")[0];
+				groupingSuffix = "";
+			}
+
+			if(activeNamesLength >= 3) {
+				return activeType + " of " + firstActiveName + " and " + (activeNamesLength-1) + " Other Columns" + groupingSuffix;
+			}
+			else {
+				return activeType + " of " 
+					+ activeNames.join(" and ")
+					+ groupingSuffix
 			}
 		};
 
 		module.init(renderTo, dataCopy);
+
 	};
 
-	$.fn.dashboard_trivariate = function () {
+
+	$.fn.dashboard_compare = function () {
 		var args = Array.prototype.slice.call(arguments);
         return this.each(function () {
         	if(typeof args[0] == "string") {
-				if($.data($(this), "module-data") !== undefined) {
+        		if($.data($(this), "module-data") !== undefined) {
         			$.data($(this), "module-data")[args[0]].apply(null, args.slice(1));
-        		}        	
+        		}
         	}
         	else {
-        		(new (Function.prototype.bind.apply(Trivariate, [null, $(this)].concat(args))));
+        		(new (Function.prototype.bind.apply(Compare, [null, $(this)].concat(args))));
         	}
         });
     };
