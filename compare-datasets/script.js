@@ -21,6 +21,9 @@ $(document).ready(function() {
 	initSettings();
 	initAddModuleDropdown();
 
+	/* Modals */
+	initExportModal();
+
 	/* Finishing */
 	removeDimmer();
 });
@@ -306,18 +309,88 @@ function initControlButtons() {
 			}
 			updateSampleNotice();
 		});
-		// $(this).find(".link.export-graph-button").on("click", function() {
-		// 	var $chart = $(this).closest(".column").find(".content.has-menu > div:not(.menu):not(.hidden) .chart.image").find("svg").parent();
-		// 	var $canvas = $(".export.modal canvas");
-		// 	$.data($canvas.get(0), "svgdata", $chart.html());
-		// 	$canvas.attr("width", $canvas.width());
-		// 	$canvas.attr("height", $canvas.height());
-		// 	$canvas.css("display", "block");
-		// 	$canvas.css("margin", "auto");
-		// 	canvg($canvas.get(0), $chart.html());
-		// 	$(".export.modal .ui.dropdown").dropdown();
-		// 	$(".export.modal").modal("show");
-		// });
+		$(this).find(".export-graph-button").on("click", function() {
+			var $charts = [];
+			$(this).closest(".column").find(".plot.wrapper > div:not(.hidden) .column.grid div[class^='block']").each(function() {
+				if($(this).find("svg").length) {
+					$charts.push($(this).find("svg"));
+				}
+				else {
+					console.log($(this).text());
+					$charts.push($("<svg>")
+						.attr("width", $(this).width())
+						.attr("height", $(this).height())
+						.css("background", "white")
+						.append(
+							$("<text>")
+								.attr("x", $(this).width() / 2)
+								.attr("y", $(this).height() / 2)
+								.attr("text-anchor", "middle")
+								.attr("alignment-baseline", "central")
+								.attr("fill", "gray")
+								.css("font-size", "18px")
+								.css("font-family", "Lato")
+								.html($(this).text())
+								.prop("outerHTML")
+						)
+					)
+				}
+			});
+			if($charts.length == 0) return;
+			var chartWidth = parseFloat($charts[0].attr("width"));
+			var chartHeight = parseFloat($charts[0].attr("height"));
+			var titleHeight = 80;
+			var subtitleHeight = 40;
+			var chartHtml = $("<svg>")
+				.attr("width", chartWidth * $charts.length)
+				.attr("height", chartHeight + titleHeight + subtitleHeight)
+				.attr("style", $charts[0].attr("style"))
+				.attr("xmlns", $charts[0].attr("xmlns"))
+				.css("background", "white")
+				// charts
+				.append($charts.map(function($chart, ix) {
+					return $("<g>")
+						.attr("transform", "translate(" + (chartWidth * ix) + ", " + (titleHeight + subtitleHeight) + ")")
+						.append($chart.prop("outerHTML"))
+						.prop("outerHTML");
+				}).join(""))
+				// title
+				.append(
+					$("<text>")
+						.attr("x", chartWidth * $charts.length / 2)
+						.attr("y", titleHeight / 2)
+						.attr("text-anchor", "middle")
+						.attr("alignment-baseline", "central")
+						.css("font-size", "20px")
+						.css("font-family", "Lato")
+						.html($(this).closest(".column").find(".header-description").text())
+						.prop("outerHTML")
+				)
+				// subtitle
+				.append(
+					$charts.map(function($chart, ix) {
+						return $("<text>")
+							.attr("x", chartWidth * (ix + 0.5))
+							.attr("y", titleHeight + subtitleHeight / 2)
+							.attr("text-anchor", "middle")
+							.attr("alignment-baseline", "central")
+							.css("font-size", "16px")
+							.css("font-family", "Lato")
+							.html($(".names-content .column:nth-of-type(" + (ix + 1) + ") a.ui.header").html())
+							.prop("outerHTML");
+					}).join("")
+				);
+			var $canvas = $(".export.modal canvas");
+			$.data($canvas.get(0), "svgdata", chartHtml.prop('outerHTML'));
+			$canvas.attr("width", $canvas.width());
+			$canvas.attr("height", $canvas.height());
+			$canvas.css("display", "block");
+			$canvas.css("margin", "auto");
+			canvg($canvas.get(0), chartHtml.prop('outerHTML'));
+			$(".export.modal .ui.dropdown").dropdown();
+			$(".ui.popup").popup("hide all");
+			$(".export.modal").modal("show");
+		});
 	};
 	$(".graph-content > .column").each(function() {
 		$(this).addClass("default-module");
@@ -357,46 +430,46 @@ function initSettings() {
 	});
 }
 
-// function initExportModal() {
-// 	$(".export.modal .ui.form").form({
-// 		fields: {
-// 			"file-name": "empty",
-// 			"file-format": "empty"
-// 		},
-// 		onSuccess: function() {
-// 			var format = $(".export.modal .ui.dropdown").dropdown("get value");
-// 			var fileName = $(".export.modal input[name='file-name']").val();
-// 			if(format == "svg") {
-// 				var svgData = $.data($(".export.modal canvas").get(0), "svgdata");
-// 				saveFile(fileName + ".svg", svgData, "image/svg+xml");
-// 			}
-// 			if(format == "png") {	
-// 				var pngData = atob($(".export.modal canvas").get(0).toDataURL("image/png").split(',')[1]);
-// 				var asArray = new Uint8Array(pngData.length);
-// 				for( var i = 0, len = pngData.length; i < len; i++) {
-// 					asArray[i] = pngData.charCodeAt(i);
-// 				}
-// 				saveFile(fileName + ".png", asArray.buffer, "image/png");
-// 			}
-// 			if(format == "jpg") {
-// 				var jpgData = atob($(".export.modal canvas").get(0).toDataURL("image/jpeg", 1.0).split(',')[1]);
-// 				var asArray = new Uint8Array(jpgData.length);
-// 				for( var i = 0, len = jpgData.length; i < len; i++) {
-// 					asArray[i] = jpgData.charCodeAt(i);
-// 				}
-// 				saveFile(fileName + ".jpg", asArray.buffer, "image/jpeg");
-// 			}
-// 			$(".export.modal").modal("hide");
-// 		}
-// 	});
-// 	$(".export.modal .primary.button").click(function() {
-// 		$(".export.modal .ui.form").submit();
-// 	});
-// 	$(".export.modal .deny.button").click(function() {
-// 		$(".export.modal").modal("hide");
-// 		$(".export.modal .form").form("reset");
-// 	});
-// }
+function initExportModal() {
+	$(".export.modal .ui.form").form({
+		fields: {
+			"file-name": "empty",
+			"file-format": "empty"
+		},
+		onSuccess: function() {
+			var format = $(".export.modal .ui.dropdown").dropdown("get value");
+			var fileName = $(".export.modal input[name='file-name']").val();
+			if(format == "svg") {
+				var svgData = $.data($(".export.modal canvas").get(0), "svgdata");
+				saveFile(fileName + ".svg", svgData, "image/svg+xml");
+			}
+			if(format == "png") {	
+				var pngData = atob($(".export.modal canvas").get(0).toDataURL("image/png").split(',')[1]);
+				var asArray = new Uint8Array(pngData.length);
+				for( var i = 0, len = pngData.length; i < len; i++) {
+					asArray[i] = pngData.charCodeAt(i);
+				}
+				saveFile(fileName + ".png", asArray.buffer, "image/png");
+			}
+			if(format == "jpg") {
+				var jpgData = atob($(".export.modal canvas").get(0).toDataURL("image/jpeg", 1.0).split(',')[1]);
+				var asArray = new Uint8Array(jpgData.length);
+				for( var i = 0, len = jpgData.length; i < len; i++) {
+					asArray[i] = jpgData.charCodeAt(i);
+				}
+				saveFile(fileName + ".jpg", asArray.buffer, "image/jpeg");
+			}
+			$(".export.modal").modal("hide");
+		}
+	});
+	$(".export.modal .primary.button").click(function() {
+		$(".export.modal .ui.form").submit();
+	});
+	$(".export.modal .deny.button").click(function() {
+		$(".export.modal").modal("hide");
+		$(".export.modal .form").form("reset");
+	});
+}
 
 function showDimmer() {
 	$("body.dimmable > .ui.dimmer").addClass("active");

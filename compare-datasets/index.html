@@ -581,6 +581,38 @@
 	  </div>
 	</div>
 
+	<!-- Export Modal -->
+	<div class="ui fullscreen modal export">
+		<div class="header">Export Graph</div>
+		<div class="content">
+			<div class="ui form" id="export-form">
+				<div class="ui two fields">
+					<div class="file name field">
+						<label>File Name</label>
+						<input name="file-name" type="text">
+					</div>
+					<div class="file format field">
+						<label>File Format</label>
+						<select name="file-format" class="ui selection dropdown">
+							<option value="">Select File Format</option>
+							<option value="svg">SVG</option>
+							<option value="jpg">JPG</option>
+							<option value="png">PNG</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<button type="submit" class="hidden" form="export-form"></button>
+			<div class="center ui">
+				<canvas class="chart image"></canvas>
+			</div>
+		</div>
+		<div class="actions">
+			<div class="ui black deny button">Cancel</div>
+			<div class="ui primary right button">OK</div>
+		</div>
+	</div>
+
 	<!-- Error Message Modal -->
 	<div class="ui small modal errmsg">
 		<div class="header">Error</div>
@@ -625,6 +657,9 @@
 
 <!-- Regression Library -->
 <script type="text/javascript" src="../assets/js/external/regression.js"></script>
+
+<!-- SVG to Canvas -->
+<script type="text/javascript" src="../assets/js/external/canvg.min.js"></script>
 
 <!-- Progressive Rendering -->
 <script type="text/javascript" src="../assets/js/external/render-queue.js"></script>
