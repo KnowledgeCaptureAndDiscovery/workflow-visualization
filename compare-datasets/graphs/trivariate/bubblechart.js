@@ -48,10 +48,11 @@
 		};
 
 		module.renderIndividual = function(renderTo, dataToShow, names) {
-			if(dataToShow == null) {
+			if(dataToShow == null || dataToShow[0][0] == null || dataToShow[1][0] == null || dataToShow[2][0] == null) {
 				renderTo.showNoData();
 				return;
 			}
+			console.log(dataToShow);
 
 			graphData = dataToShow[0].map(function(val, ix) {
 				return {

@@ -131,6 +131,9 @@
 			});
 			var uniqueColumns = Array.from(new Set(columns));
 			uniqueColumns.forEach(function(name) {
+				var columnType = getType({type: window.getTypeOfColumn(data, name)});
+				if(columnType == "others") return;
+
 				availableIx.push(name);
 
 				// populate column selection dropdown

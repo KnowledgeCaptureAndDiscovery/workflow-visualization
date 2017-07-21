@@ -48,8 +48,6 @@
 			module.initExcludeCheckbox();
 			module.initPercCheckbox();
 			module.initGraphs();
-
-			module.render(0);
 		};
 
 		// @brief 	calculate column meta information used by all visualizations
@@ -170,6 +168,26 @@
 					}
 				});
 			});
+
+			var initialNumberOfBins = 8;
+
+			$rangeSelector.ionRangeSlider({
+				min: 2,
+				max: 20,
+				from: initialNumberOfBins,
+				step: 1,
+				postfix: ' bins',
+				max_postfix: "+",
+				grid: false
+			});
+
+			$rangeSelector.data("ionRangeSlider").update({
+				onFinish: function(sliderData) {
+					module.render(sliderData.from);
+				}
+			});
+
+			module.render(initialNumberOfBins);
 		};
 
 		module.render = function(numBins) {
@@ -186,33 +204,6 @@
 			if(dataToShow == null) {
 				$div.find(".block-" + index).showNoData();
 				return;
-			}
-
-			// need to suggest number of bins
-			if(numBins == 0) {
-				numBins = d3.thresholdFreedmanDiaconis(
-					dataToShow, 
-					d3.min(dataToShow), 
-					d3.max(dataToShow)
-				);
-				if(numBins < 2) numBins = 2;
-				else if(numBins > 20) numBins = 20;
-			
-				$rangeSelector.ionRangeSlider({
-					min: 2,
-					max: 20,
-					from: numBins,
-					step: 1,
-					postfix: ' bins',
-					max_postfix: "+",
-					grid: false
-				});
-
-				$rangeSelector.data("ionRangeSlider").update({
-					onFinish: function(sliderData) {
-						module.render(sliderData.from);
-					}
-				});
 			}
 
 			var min = d3.min(dataToShow);

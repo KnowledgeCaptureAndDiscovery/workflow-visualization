@@ -38,7 +38,7 @@
 			else if(type["type"] == "numeric" || type["type"] == "nominal") {
 				return type["type"];
 			}
-			else if(type["type"] == "discrete" || type["type"] == "unique") {
+			else if(type["type"] == "discrete") {
 				return "nominal";
 			}
 			else {
@@ -130,6 +130,9 @@
 			});
 			var uniqueColumns = Array.from(new Set(columns));
 			uniqueColumns.forEach(function(name) {
+				var columnType = getType({type: window.getTypeOfColumn(data, name)});
+				if(columnType == "others") return;
+
 				if(firstAvailableIx == null) firstAvailableIx = name;
 
 				// populate column selection dropdown
