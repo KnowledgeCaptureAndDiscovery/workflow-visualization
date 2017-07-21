@@ -45,13 +45,13 @@ function initEmbedMode() {
 
 	var encodedUrl = getParameterByName("url");
 	if(encodedUrl != null) {
-		$("body").css("background-color", "white");
-		$(".full.height").css("background-color", "white");
-		$(".main-content").css("margin", "0").css("background", "none");
-		$(".toc").hide();
-		$(".toc-copy").hide();
-		$(".inverted.main.menu").hide();
-		$(".header-content").hide();
+		// $("body").css("background-color", "white");
+		// $(".full.height").css("background-color", "white");
+		// $(".main-content").css("margin", "0").css("background", "none");
+		// $(".toc").hide();
+		// $(".toc-copy").hide();
+		// $(".inverted.main.menu").hide();
+		// $(".header-content").hide();
 		var urlSource = decodeURIComponent(encodedUrl);
 		downloadData(urlSource);
 	}
